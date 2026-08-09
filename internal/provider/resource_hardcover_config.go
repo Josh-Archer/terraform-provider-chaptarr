@@ -189,7 +189,7 @@ func (r *hardcoverConfigResource) read(ctx context.Context) (hardcoverConfigResp
 	}
 	var current hardcoverConfigResponse
 	if err := json.Unmarshal(response.Body, &current); err != nil {
-		return hardcoverConfigResponse{}, errors.New("Chaptarr returned an invalid Hardcover configuration document")
+		return hardcoverConfigResponse{}, errors.New("chaptarr returned an invalid Hardcover configuration document")
 	}
 	return current, nil
 }

@@ -294,7 +294,7 @@ func (r *singletonConfigResource) readCurrent(ctx context.Context, identifier st
 	decoder.UseNumber()
 	var decoded any
 	if err := decoder.Decode(&decoded); err != nil {
-		return nil, errors.New("Chaptarr returned an invalid configuration document")
+		return nil, errors.New("chaptarr returned an invalid configuration document")
 	}
 
 	switch value := decoded.(type) {
@@ -302,15 +302,15 @@ func (r *singletonConfigResource) readCurrent(ctx context.Context, identifier st
 		return value, nil
 	case []any:
 		if len(value) != 1 {
-			return nil, fmt.Errorf("Chaptarr returned %d singleton configuration objects", len(value))
+			return nil, fmt.Errorf("chaptarr returned %d singleton configuration objects", len(value))
 		}
 		object, ok := value[0].(map[string]any)
 		if !ok {
-			return nil, errors.New("Chaptarr returned an invalid singleton configuration object")
+			return nil, errors.New("chaptarr returned an invalid singleton configuration object")
 		}
 		return object, nil
 	default:
-		return nil, errors.New("Chaptarr returned an invalid singleton configuration document")
+		return nil, errors.New("chaptarr returned an invalid singleton configuration document")
 	}
 }
 
