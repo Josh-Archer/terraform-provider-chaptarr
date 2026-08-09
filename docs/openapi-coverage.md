@@ -13,11 +13,11 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | Classification | Status | Operations |
 |---|---|---:|
 | action-only | excluded | 58 |
-| data-source | implemented | 35 |
-| data-source | planned | 43 |
+| data-source | implemented | 39 |
+| data-source | planned | 41 |
 | out-of-scope | excluded | 16 |
-| resource | implemented | 58 |
-| resource | planned | 107 |
+| resource | implemented | 78 |
+| resource | planned | 85 |
 
 ## Operation inventory
 
@@ -33,8 +33,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/bookfile/{id}` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `b43c16988af3` |
 | `DELETE /api/v1/command/{id}` | Command | action-only | excluded | Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh. | #11 | `d8ca0120df49` |
 | `DELETE /api/v1/config/hardcover` | HardcoverConfig | resource | implemented | chaptarr_hardcover_config | #2 | `00dd4e0cbe5e` |
-| `DELETE /api/v1/customfilter/{id}` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `e8bfeed5d96b` |
-| `DELETE /api/v1/customformat/{id}` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `7e44142adc91` |
+| `DELETE /api/v1/customfilter/{id}` | CustomFilter | resource | implemented | chaptarr_custom_filter | #7 | `e8bfeed5d96b` |
+| `DELETE /api/v1/customformat/{id}` | CustomFormat | resource | implemented | chaptarr_custom_format | #7 | `7e44142adc91` |
 | `DELETE /api/v1/delayprofile/{id}` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `edda2080a0fc` |
 | `DELETE /api/v1/downloadclient/bulk` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `3147f68ac1e8` |
 | `DELETE /api/v1/downloadclient/{id}` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `46ab689a6eb7` |
@@ -46,7 +46,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/importlistexclusion/{id}` | ImportListExclusion | resource | planned | chaptarr_import_list_exclusion | #6 | `0696490068e7` |
 | `DELETE /api/v1/indexer/bulk` | Indexer | resource | planned | chaptarr_indexer | #5 | `12a7d3d9b805` |
 | `DELETE /api/v1/indexer/{id}` | Indexer | resource | planned | chaptarr_indexer | #5 | `4fd4572456f2` |
-| `DELETE /api/v1/metadata/{id}` | Metadata | resource | planned | chaptarr_metadata | #7 | `35ebb5bc49a7` |
+| `DELETE /api/v1/metadata/{id}` | Metadata | resource | implemented | chaptarr_metadata | #7 | `35ebb5bc49a7` |
 | `DELETE /api/v1/metadataprofile/{id}` | MetadataProfile | resource | implemented | chaptarr_metadata_profile | #4 | `835d9a15fe53` |
 | `DELETE /api/v1/notification/bulk` | Notification | resource | planned | chaptarr_notification | #5 | `66ace462567e` |
 | `DELETE /api/v1/notification/{id}` | Notification | resource | planned | chaptarr_notification | #5 | `32ae0bf60de4` |
@@ -58,9 +58,9 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `547d9a343763` |
 | `DELETE /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `6e32c0e56b72` |
 | `DELETE /api/v1/series/{seriesId}/variants/{variantId}` | Series | resource | planned | chaptarr_series | #8 | `78087eff25b4` |
-| `DELETE /api/v1/settings/proxy/{id}` | Proxy | resource | planned | chaptarr_proxy | #7 | `f951e710fe0d` |
+| `DELETE /api/v1/settings/proxy/{id}` | Proxy | resource | implemented | chaptarr_proxy | #7 | `f951e710fe0d` |
 | `DELETE /api/v1/system/backup/{id}` | Backup | action-only | excluded | Backup deletion or restoration is imperative maintenance and must never run during plan or refresh. | #11 | `79d71f8e275d` |
-| `DELETE /api/v1/tag/{id}` | Tag | resource | planned | chaptarr_tag | #7 | `0389dacc955d` |
+| `DELETE /api/v1/tag/{id}` | Tag | resource | implemented | chaptarr_tag | #7 | `0389dacc955d` |
 | `GET /` | StaticResource | out-of-scope | excluded | Web UI static content is unrelated to infrastructure state. |  | `c3d13a469f71` |
 | `GET /api` | ApiInfo | data-source | implemented | chaptarr_api_info | #10 | `c409f455bc84` |
 | `GET /api/v1/author` | Author | resource | planned | chaptarr_author | #8 | `324cd3f0ab3f` |
@@ -105,10 +105,10 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/config/ui` | UiConfig | resource | implemented | chaptarr_ui_config | #2 | `b0b7e49e5bc7` |
 | `GET /api/v1/config/ui/{id}` | UiConfig | resource | implemented | chaptarr_ui_config | #2 | `f23fefb03830` |
 | `GET /api/v1/customfilter` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `1cfe530a185a` |
-| `GET /api/v1/customfilter/{id}` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `5e53161e4b68` |
+| `GET /api/v1/customfilter/{id}` | CustomFilter | resource | implemented | chaptarr_custom_filter | #7 | `5e53161e4b68` |
 | `GET /api/v1/customformat` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `324cb80f7d59` |
-| `GET /api/v1/customformat/schema` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `965f4fd22baa` |
-| `GET /api/v1/customformat/{id}` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `9c103e6c51f4` |
+| `GET /api/v1/customformat/schema` | CustomFormat | data-source | implemented | chaptarr_custom_format_schema | #7 | `965f4fd22baa` |
+| `GET /api/v1/customformat/{id}` | CustomFormat | resource | implemented | chaptarr_custom_format | #7 | `9c103e6c51f4` |
 | `GET /api/v1/delayprofile` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `548fefa62913` |
 | `GET /api/v1/delayprofile/{id}` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `11aaf675f8e7` |
 | `GET /api/v1/diskspace` | DiskSpace | data-source | implemented | chaptarr_disk_space | #10 | `cd448801b856` |
@@ -148,8 +148,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/mediacover/books/{bookId}/{filename}` | MediaCover | data-source | planned | chaptarr_media_cover | #10 | `0d74ded37d06` |
 | `GET /api/v1/mediacover/{authorId}/{filename}` | MediaCover | data-source | planned | chaptarr_media_cover | #10 | `23927348c310` |
 | `GET /api/v1/metadata` | Metadata | resource | planned | chaptarr_metadata | #7 | `cf380bfc3e4f` |
-| `GET /api/v1/metadata/schema` | Metadata | resource | planned | chaptarr_metadata | #7 | `cf380bfc3e4f` |
-| `GET /api/v1/metadata/{id}` | Metadata | resource | planned | chaptarr_metadata | #7 | `03f22a530414` |
+| `GET /api/v1/metadata/schema` | Metadata | data-source | implemented | chaptarr_metadata_schema | #7 | `cf380bfc3e4f` |
+| `GET /api/v1/metadata/{id}` | Metadata | resource | implemented | chaptarr_metadata | #7 | `03f22a530414` |
 | `GET /api/v1/metadataprofile` | MetadataProfile | resource | planned | chaptarr_metadata_profile | #4 | `f96cd7a03ddb` |
 | `GET /api/v1/metadataprofile/languages` | MetadataProfile | data-source | implemented | chaptarr_metadata_profile_schema | #4 | `fa074c5e1b22` |
 | `GET /api/v1/metadataprofile/schema` | MetadataProfileSchema | data-source | implemented | chaptarr_metadata_profile_schema | #4 | `0bd48c4aa737` |
@@ -188,7 +188,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/series/{seriesId}/narrators/inheritance` | Series | resource | planned | chaptarr_series | #8 | `404e01627393` |
 | `GET /api/v1/series/{seriesId}/variants` | Series | resource | planned | chaptarr_series | #8 | `f9c0c47d8368` |
 | `GET /api/v1/settings/proxy` | Proxy | resource | planned | chaptarr_proxy | #7 | `75ee3031de7e` |
-| `GET /api/v1/settings/proxy/{id}` | Proxy | resource | planned | chaptarr_proxy | #7 | `91251ce8ddcb` |
+| `GET /api/v1/settings/proxy/{id}` | Proxy | resource | implemented | chaptarr_proxy | #7 | `91251ce8ddcb` |
 | `GET /api/v1/system/backup` | Backup | data-source | planned | chaptarr_backups | #11 | `b60c7fc62722` |
 | `GET /api/v1/system/proxy/debug` | ProxyDebug | out-of-scope | excluded | Proxy debug output may expose network and credential-adjacent data; use controlled diagnostics. |  | `e926822b839d` |
 | `GET /api/v1/system/routes` | System | data-source | implemented | chaptarr_system_routes | #10 | `0aa98792b803` |
@@ -200,9 +200,9 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/system/task` | Task | data-source | implemented | chaptarr_tasks | #10 | `ee273f3fa4c2` |
 | `GET /api/v1/system/task/{id}` | Task | data-source | implemented | chaptarr_tasks | #10 | `f395e094ffb1` |
 | `GET /api/v1/tag` | Tag | resource | planned | chaptarr_tag | #7 | `d9a70d53645d` |
-| `GET /api/v1/tag/detail` | TagDetails | data-source | planned | chaptarr_tag_details | #7 | `b8372219ea39` |
-| `GET /api/v1/tag/detail/{id}` | TagDetails | data-source | planned | chaptarr_tag_details | #7 | `2df6abb4c360` |
-| `GET /api/v1/tag/{id}` | Tag | resource | planned | chaptarr_tag | #7 | `3dd144b8d94f` |
+| `GET /api/v1/tag/detail` | TagDetails | data-source | implemented | chaptarr_tag_details | #7 | `b8372219ea39` |
+| `GET /api/v1/tag/detail/{id}` | TagDetails | data-source | implemented | chaptarr_tag_details | #7 | `2df6abb4c360` |
+| `GET /api/v1/tag/{id}` | Tag | resource | implemented | chaptarr_tag | #7 | `3dd144b8d94f` |
 | `GET /api/v1/update` | Update | data-source | implemented | chaptarr_updates | #10 | `7112b7d88ec9` |
 | `GET /api/v1/wanted/cutoff` | Cutoff | data-source | planned | chaptarr_cutoff_wanted | #11 | `1e64d2e53e72` |
 | `GET /api/v1/wanted/cutoff/{id}` | Cutoff | data-source | planned | chaptarr_cutoff_wanted | #11 | `fcdc7bc85c66` |
@@ -242,8 +242,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/config/naming-pattern/decompile` | NamingPattern | data-source | implemented | chaptarr_naming_pattern | #2 | `70cac901aa62` |
 | `POST /api/v1/config/naming-pattern/preview` | NamingPattern | data-source | implemented | chaptarr_naming_pattern | #2 | `c19dca16bbc8` |
 | `POST /api/v1/config/naming-pattern/validate` | NamingPattern | data-source | implemented | chaptarr_naming_pattern | #2 | `4f9b2ee9f12c` |
-| `POST /api/v1/customfilter` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `b4fcbe41983b` |
-| `POST /api/v1/customformat` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `cad913ae2d2e` |
+| `POST /api/v1/customfilter` | CustomFilter | resource | implemented | chaptarr_custom_filter | #7 | `b4fcbe41983b` |
+| `POST /api/v1/customformat` | CustomFormat | resource | implemented | chaptarr_custom_format | #7 | `cad913ae2d2e` |
 | `POST /api/v1/delayprofile` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `446742170d7b` |
 | `POST /api/v1/downloadclient` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `82ae11afcfa1` |
 | `POST /api/v1/downloadclient/action/{name}` | DownloadClient | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `0b91e84b29e6` |
@@ -261,7 +261,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/indexer/testall` | Indexer | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `1f8aaa6561a2` |
 | `POST /api/v1/manualimport` | ManualImport | action-only | excluded | Manual import moves files and must never occur during plan or refresh. | #11 | `0ea02db9178d` |
 | `POST /api/v1/matchinglog/preview` | MatchingLog | out-of-scope | excluded | Log matching previews may expose operational or sensitive data and are not Terraform state. |  | `3fc2ad8d9885` |
-| `POST /api/v1/metadata` | Metadata | resource | planned | chaptarr_metadata | #7 | `da8c1bf7cdaa` |
+| `POST /api/v1/metadata` | Metadata | resource | implemented | chaptarr_metadata | #7 | `da8c1bf7cdaa` |
 | `POST /api/v1/metadata/action/{name}` | Metadata | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `8d5457ae1781` |
 | `POST /api/v1/metadata/test` | Metadata | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `fae0dde5c69f` |
 | `POST /api/v1/metadata/testall` | Metadata | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `cfbd8fd71f42` |
@@ -286,7 +286,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/series/add` | AddSeries | resource | planned | chaptarr_series | #8 | `436bae9dd0fa` |
 | `POST /api/v1/series/{seriesId}/narrators/discover` | Series | data-source | planned | chaptarr_series_narrator_discovery | #8 | `247122ba34c9` |
 | `POST /api/v1/series/{seriesId}/narrators/search` | Series | data-source | planned | chaptarr_series_narrator_discovery | #8 | `bf37e1089d44` |
-| `POST /api/v1/settings/proxy` | Proxy | resource | planned | chaptarr_proxy | #7 | `ecb2cc653144` |
+| `POST /api/v1/settings/proxy` | Proxy | resource | implemented | chaptarr_proxy | #7 | `ecb2cc653144` |
 | `POST /api/v1/settings/proxy/test` | Proxy | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `02ccc41b9a3c` |
 | `POST /api/v1/system/backup/restore/upload` | Backup | action-only | excluded | Backup deletion or restoration is imperative maintenance and must never run during plan or refresh. | #11 | `4553b4bea7c1` |
 | `POST /api/v1/system/backup/restore/{id}` | Backup | action-only | excluded | Backup deletion or restoration is imperative maintenance and must never run during plan or refresh. | #11 | `79d71f8e275d` |
@@ -295,7 +295,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/system/settingsbackup/create` | SettingsBackup | action-only | excluded | Creating or restoring settings backups is imperative maintenance, not desired state. | #11 | `a8a409ac965c` |
 | `POST /api/v1/system/settingsbackup/restore` | SettingsBackup | action-only | excluded | Creating or restoring settings backups is imperative maintenance, not desired state. | #11 | `28c71892f16a` |
 | `POST /api/v1/system/shutdown` | System | action-only | excluded | Reset, shutdown, and restart are destructive operational actions and never run during plan or refresh. | #11 | `02bcbe7bf1c1` |
-| `POST /api/v1/tag` | Tag | resource | planned | chaptarr_tag | #7 | `02811d82ac87` |
+| `POST /api/v1/tag` | Tag | resource | implemented | chaptarr_tag | #7 | `02811d82ac87` |
 | `POST /login` | Authentication | out-of-scope | excluded | Browser login/session APIs are not provider authentication; the provider uses X-Api-Key only. |  | `32aea9e7c78f` |
 | `PUT /api/v1/author/editor` | AuthorEditor | resource | planned | chaptarr_author | #8 | `2c5a38ed6534` |
 | `PUT /api/v1/author/{id}` | Author | resource | planned | chaptarr_author | #8 | `6dd9f9972ef1` |
@@ -317,8 +317,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/config/metadataprovider/{id}` | MetadataProviderConfig | resource | implemented | chaptarr_metadata_provider_config | #2 | `0c0061588f17` |
 | `PUT /api/v1/config/naming/{id}` | NamingConfig | resource | implemented | chaptarr_naming_config | #2 | `e69b0f08f6c8` |
 | `PUT /api/v1/config/ui/{id}` | UiConfig | resource | implemented | chaptarr_ui_config | #2 | `77d0411ff96f` |
-| `PUT /api/v1/customfilter/{id}` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `74102fb555af` |
-| `PUT /api/v1/customformat/{id}` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `f85c846dac80` |
+| `PUT /api/v1/customfilter/{id}` | CustomFilter | resource | implemented | chaptarr_custom_filter | #7 | `74102fb555af` |
+| `PUT /api/v1/customformat/{id}` | CustomFormat | resource | implemented | chaptarr_custom_format | #7 | `f85c846dac80` |
 | `PUT /api/v1/delayprofile/reorder/{id}` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `c091445cb7c9` |
 | `PUT /api/v1/delayprofile/{id}` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `1a41488d7070` |
 | `PUT /api/v1/downloadclient/bulk` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `af043a0d809f` |
@@ -328,7 +328,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/importlistexclusion/{id}` | ImportListExclusion | resource | planned | chaptarr_import_list_exclusion | #6 | `320543b7f313` |
 | `PUT /api/v1/indexer/bulk` | Indexer | resource | planned | chaptarr_indexer | #5 | `dd548c3fe8be` |
 | `PUT /api/v1/indexer/{id}` | Indexer | resource | planned | chaptarr_indexer | #5 | `91807de49581` |
-| `PUT /api/v1/metadata/{id}` | Metadata | resource | planned | chaptarr_metadata | #7 | `ed17dddbd4ad` |
+| `PUT /api/v1/metadata/{id}` | Metadata | resource | implemented | chaptarr_metadata | #7 | `ed17dddbd4ad` |
 | `PUT /api/v1/metadataprofile/{id}` | MetadataProfile | resource | implemented | chaptarr_metadata_profile | #4 | `e4e3209082e6` |
 | `PUT /api/v1/notification/{id}` | Notification | resource | planned | chaptarr_notification | #5 | `5f484222ca4e` |
 | `PUT /api/v1/qualitydefinition/update` | QualityDefinition | resource | planned | chaptarr_quality_definition | #4 | `106bc4a8e67d` |
@@ -338,5 +338,5 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `12746ba91a1f` |
 | `PUT /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `7b00820d50c4` |
 | `PUT /api/v1/series/{seriesId}/narrators/preferred` | Series | resource | planned | chaptarr_series | #8 | `1da362544b06` |
-| `PUT /api/v1/settings/proxy/{id}` | Proxy | resource | planned | chaptarr_proxy | #7 | `4d282f29fe51` |
-| `PUT /api/v1/tag/{id}` | Tag | resource | planned | chaptarr_tag | #7 | `8c393913c2f9` |
+| `PUT /api/v1/settings/proxy/{id}` | Proxy | resource | implemented | chaptarr_proxy | #7 | `4d282f29fe51` |
+| `PUT /api/v1/tag/{id}` | Tag | resource | implemented | chaptarr_tag | #7 | `8c393913c2f9` |

@@ -57,6 +57,10 @@ The [profile resource guide](resources/profiles.md) documents typed quality,
 metadata, release, and delay profiles; server schema data sources; ordered-list
 normalization; and built-in quality-definition adoption.
 
+The [library customization guide](resources/customization.md) documents tags,
+custom filters and formats, metadata providers, outbound proxies, stable JSON
+fingerprints, association preservation, and apply-only credentials.
+
 ## Coverage status
 
 The [generated coverage matrix](openapi-coverage.md) classifies every pinned
