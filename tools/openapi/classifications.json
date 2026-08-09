@@ -250,7 +250,7 @@
     },
     "GET /api": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_api_info",
       "tracking_issue": "#10"
     },
@@ -358,13 +358,13 @@
     },
     "GET /api/v1/calendar": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_calendar",
       "tracking_issue": "#10"
     },
     "GET /api/v1/calendar/{id}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_calendar",
       "tracking_issue": "#10"
     },
@@ -544,9 +544,9 @@
     },
     "GET /api/v1/diskspace": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_disk_space",
-      "tracking_issue": "#3"
+      "tracking_issue": "#10"
     },
     "GET /api/v1/downloadclient": {
       "classification": "resource",
@@ -574,25 +574,25 @@
     },
     "GET /api/v1/filesystem": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_file_system",
-      "tracking_issue": "#3"
+      "tracking_issue": "#10"
     },
     "GET /api/v1/filesystem/mediafiles": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_file_system",
-      "tracking_issue": "#3"
+      "tracking_issue": "#10"
     },
     "GET /api/v1/filesystem/type": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_file_system",
-      "tracking_issue": "#3"
+      "tracking_issue": "#10"
     },
     "GET /api/v1/health": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_health",
       "tracking_issue": "#10"
     },
@@ -676,25 +676,25 @@
     },
     "GET /api/v1/language": {
       "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_language",
+      "status": "implemented",
+      "target": "chaptarr_languages",
       "tracking_issue": "#10"
     },
     "GET /api/v1/language/{id}": {
       "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_language",
+      "status": "implemented",
+      "target": "chaptarr_languages",
       "tracking_issue": "#10"
     },
     "GET /api/v1/library/search": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_library_search",
       "tracking_issue": "#10"
     },
     "GET /api/v1/localization": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_localization",
       "tracking_issue": "#10"
     },
@@ -731,13 +731,13 @@
     },
     "GET /api/v1/mediacover/author/{authorId}/{filename}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_cover",
       "tracking_issue": "#10"
     },
     "GET /api/v1/mediacover/book/{bookId}/{filename}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_cover",
       "tracking_issue": "#10"
     },
@@ -815,7 +815,7 @@
     },
     "GET /api/v1/parse": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_parse",
       "tracking_issue": "#10"
     },
@@ -953,7 +953,7 @@
     },
     "GET /api/v1/search": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_search",
       "tracking_issue": "#10"
     },
@@ -1018,14 +1018,14 @@
     },
     "GET /api/v1/system/routes": {
       "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_system",
+      "status": "implemented",
+      "target": "chaptarr_system_routes",
       "tracking_issue": "#10"
     },
     "GET /api/v1/system/routes/duplicate": {
       "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_system",
+      "status": "implemented",
+      "target": "chaptarr_system_routes",
       "tracking_issue": "#10"
     },
     "GET /api/v1/system/settingsbackup/files": {
@@ -1042,25 +1042,25 @@
     },
     "GET /api/v1/system/statistics": {
       "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_system",
+      "status": "implemented",
+      "target": "chaptarr_system_statistics",
       "tracking_issue": "#10"
     },
     "GET /api/v1/system/status": {
       "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_system",
+      "status": "implemented",
+      "target": "chaptarr_system_status",
       "tracking_issue": "#10"
     },
     "GET /api/v1/system/task": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_tasks",
       "tracking_issue": "#10"
     },
     "GET /api/v1/system/task/{id}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_tasks",
       "tracking_issue": "#10"
     },
@@ -1090,7 +1090,7 @@
     },
     "GET /api/v1/update": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_updates",
       "tracking_issue": "#10"
     },
@@ -1140,13 +1140,13 @@
     },
     "GET /feed/v1/calendar/chaptarr.ics": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_calendar_feed",
       "tracking_issue": "#10"
     },
     "GET /feed/v1/calendar/readarr.ics": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_calendar_feed",
       "tracking_issue": "#10"
     },
@@ -1232,10 +1232,10 @@
       "tracking_issue": "#9"
     },
     "POST /api/v1/bookshelf": {
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_bookshelf",
-      "tracking_issue": "#10"
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Bookshelf updates author and book monitoring state; it is a mutating bulk action, not read-only discovery."
     },
     "POST /api/v1/command": {
       "classification": "action-only",

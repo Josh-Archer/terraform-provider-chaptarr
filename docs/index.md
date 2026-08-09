@@ -1,7 +1,8 @@
 # Chaptarr provider
 
 The provider configures access to Chaptarr and manages supported declarative
-application settings.
+application settings while offering read-only discovery and observability data
+sources.
 
 ## Example
 
@@ -37,6 +38,13 @@ resource or data source performs an operation.
 See [singleton configuration resources](resources/singleton-configuration.md)
 for supported settings, write-only credential handling, import, conservative
 destroy behavior, and naming-pattern data sources.
+
+## Data sources
+
+The [read-only data source guide](data-sources/read-only.md) documents API
+capabilities, catalog searches, calendar observations, health/system checks,
+filesystem lookups, and content fingerprints. Every data source refreshes when
+Terraform reads it and none sends a mutating HTTP method.
 
 ## Coverage status
 

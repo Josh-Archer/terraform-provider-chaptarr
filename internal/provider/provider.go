@@ -131,10 +131,14 @@ func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource
 }
 
 func (p *ChaptarrProvider) DataSources(context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{
+	dataSources := []func() datasource.DataSource{
 		newNamingPatternDataSource,
 		newNamingExamplesDataSource,
 	}
+	for _, definition := range readOnlyDefinitions() {
+		dataSources = append(dataSources, newReadOnlyDataSource(definition))
+	}
+	return dataSources
 }
 
 func resolveProviderConfig(data providerModel, getenv func(string) string) (providerConfig, diag.Diagnostics) {

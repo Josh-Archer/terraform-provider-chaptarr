@@ -4,9 +4,10 @@
 provider for declaratively managing [Chaptarr](https://github.com/Chaptarr/chaptarr).
 
 The provider includes hardened client behavior, operation-level OpenAPI
-coverage, singleton application configuration resources, and read-only naming
-pattern helpers. Resource credentials use OpenTofu write-only attributes so
-they are not retained in state.
+coverage, singleton application configuration resources, read-only naming
+helpers, and read-only discovery and observability data sources. Resource
+credentials use OpenTofu write-only attributes so they are not retained in
+state, and changing runtime observations are data sources rather than resources.
 
 ## Provider configuration
 
@@ -40,6 +41,17 @@ are documented in
 [configuration resources](docs/resources/singleton-configuration.md). A
 representative audiobook/ebook configuration is available under
 [`examples/configuration`](examples/configuration).
+
+## Read-only discovery
+
+The provider exposes API/version capability, language, search, calendar,
+health, system, task, update, disk, filesystem, and media-cover observations.
+Health and system summaries deliberately omit raw messages, logs, installation
+identifiers, and internal application paths. Binary cover and calendar-feed
+responses are represented by their content type, byte length, and SHA-256
+fingerprint instead of being stored in Terraform state.
+
+See the [read-only data source guide](docs/data-sources/read-only.md).
 
 ## Development
 
