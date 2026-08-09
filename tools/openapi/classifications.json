@@ -101,7 +101,7 @@
     },
     "DELETE /api/v1/downloadclient/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client",
       "tracking_issue": "#5"
     },
@@ -149,7 +149,7 @@
     },
     "DELETE /api/v1/indexer/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer",
       "tracking_issue": "#5"
     },
@@ -173,7 +173,7 @@
     },
     "DELETE /api/v1/notification/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_notification",
       "tracking_issue": "#5"
     },
@@ -555,14 +555,14 @@
       "tracking_issue": "#5"
     },
     "GET /api/v1/downloadclient/schema": {
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_download_client",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_download_client_schema",
       "tracking_issue": "#5"
     },
     "GET /api/v1/downloadclient/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client",
       "tracking_issue": "#5"
     },
@@ -657,20 +657,20 @@
       "tracking_issue": "#5"
     },
     "GET /api/v1/indexer/schema": {
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_indexer",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_indexer_schema",
       "tracking_issue": "#5"
     },
     "GET /api/v1/indexer/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer",
       "tracking_issue": "#5"
     },
     "GET /api/v1/indexerflag": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer_flags",
       "tracking_issue": "#5"
     },
@@ -802,14 +802,14 @@
       "tracking_issue": "#5"
     },
     "GET /api/v1/notification/schema": {
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_notification",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_notification_schema",
       "tracking_issue": "#5"
     },
     "GET /api/v1/notification/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_notification",
       "tracking_issue": "#5"
     },
@@ -1335,7 +1335,7 @@
     },
     "POST /api/v1/downloadclient": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client",
       "tracking_issue": "#5"
     },
@@ -1395,7 +1395,7 @@
     },
     "POST /api/v1/indexer": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer",
       "tracking_issue": "#5"
     },
@@ -1460,7 +1460,7 @@
     },
     "POST /api/v1/notification": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_notification",
       "tracking_issue": "#5"
     },
@@ -1796,7 +1796,7 @@
     },
     "PUT /api/v1/downloadclient/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client",
       "tracking_issue": "#5"
     },
@@ -1826,7 +1826,7 @@
     },
     "PUT /api/v1/indexer/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer",
       "tracking_issue": "#5"
     },
@@ -1844,7 +1844,7 @@
     },
     "PUT /api/v1/notification/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_notification",
       "tracking_issue": "#5"
     },
