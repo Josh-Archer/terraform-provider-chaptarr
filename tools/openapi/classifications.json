@@ -125,7 +125,7 @@
     },
     "DELETE /api/v1/importlist/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list",
       "tracking_issue": "#6"
     },
@@ -137,7 +137,7 @@
     },
     "DELETE /api/v1/importlistexclusion/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list_exclusion",
       "tracking_issue": "#6"
     },
@@ -627,14 +627,14 @@
       "tracking_issue": "#6"
     },
     "GET /api/v1/importlist/schema": {
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_import_list",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_import_list_schema",
       "tracking_issue": "#6"
     },
     "GET /api/v1/importlist/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list",
       "tracking_issue": "#6"
     },
@@ -646,7 +646,7 @@
     },
     "GET /api/v1/importlistexclusion/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list_exclusion",
       "tracking_issue": "#6"
     },
@@ -1365,7 +1365,7 @@
     },
     "POST /api/v1/importlist": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list",
       "tracking_issue": "#6"
     },
@@ -1389,7 +1389,7 @@
     },
     "POST /api/v1/importlistexclusion": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list_exclusion",
       "tracking_issue": "#6"
     },
@@ -1808,13 +1808,13 @@
     },
     "PUT /api/v1/importlist/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list",
       "tracking_issue": "#6"
     },
     "PUT /api/v1/importlistexclusion/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list_exclusion",
       "tracking_issue": "#6"
     },

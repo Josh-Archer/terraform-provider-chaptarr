@@ -258,7 +258,7 @@
       ],
       "contract_fingerprint": "55643a331e289d503c3a8e18d1dac5021d59ec9dd9cbd7d74f6f97a945aad67e",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list",
       "tracking_issue": "#6"
     },
@@ -284,7 +284,7 @@
       ],
       "contract_fingerprint": "0696490068e7b33197231f27572257f256633a25344b91e2fcaee9f3d50a95e1",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list_exclusion",
       "tracking_issue": "#6"
     },
@@ -1348,9 +1348,9 @@
         "ImportList"
       ],
       "contract_fingerprint": "036c31d67780c06b08d1c406750f0ff0875eea4dbaf2551ffa3eab7d74084fd0",
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_import_list",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_import_list_schema",
       "tracking_issue": "#6"
     },
     {
@@ -1362,7 +1362,7 @@
       ],
       "contract_fingerprint": "c5fa781b6539656d4ee662e3fc8c2d394cae18c3f5b1bd03584e3fc964bc289a",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list",
       "tracking_issue": "#6"
     },
@@ -1388,7 +1388,7 @@
       ],
       "contract_fingerprint": "774d1086a0da2e024672f58b8549f032db25405513eca8b057b4135c472d33fc",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list_exclusion",
       "tracking_issue": "#6"
     },
@@ -2961,7 +2961,7 @@
       ],
       "contract_fingerprint": "782ff6fb78f406dda29fb82484085ec88d16a5526f5efaf411ef123cc021f65a",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list",
       "tracking_issue": "#6"
     },
@@ -3013,7 +3013,7 @@
       ],
       "contract_fingerprint": "c69177671dba1402415437342e04675caec947010bb275382e506f429b3b3982",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list_exclusion",
       "tracking_issue": "#6"
     },
@@ -3922,7 +3922,7 @@
       ],
       "contract_fingerprint": "f5a9777b6207d3c7a9e5d5ad1168d1e9cf79503ec67dba7cf7d7eee3919a0aa1",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list",
       "tracking_issue": "#6"
     },
@@ -3935,7 +3935,7 @@
       ],
       "contract_fingerprint": "320543b7f3133e2bb70292b340b9b8297aee65bae0c5e22d066278903841ef33",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_import_list_exclusion",
       "tracking_issue": "#6"
     },

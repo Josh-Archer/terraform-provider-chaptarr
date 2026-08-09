@@ -43,6 +43,9 @@ func newDownloadClientSchemaDataSource() datasource.DataSource {
 func newNotificationSchemaDataSource() datasource.DataSource {
 	return &customizationSchemaDataSource{kind: "notification"}
 }
+func newImportListSchemaDataSource() datasource.DataSource {
+	return &customizationSchemaDataSource{kind: "import_list"}
+}
 func (d *customizationSchemaDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + d.kind + "_schema"
 }
@@ -61,7 +64,7 @@ func (d *customizationSchemaDataSource) Configure(_ context.Context, req datasou
 	d.client = apiClient
 }
 func (d *customizationSchemaDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
-	endpoints := map[string]string{"custom_format": "/api/v1/customformat/schema", "metadata": "/api/v1/metadata/schema", "indexer": "/api/v1/indexer/schema", "download_client": "/api/v1/downloadclient/schema", "notification": "/api/v1/notification/schema"}
+	endpoints := map[string]string{"custom_format": "/api/v1/customformat/schema", "metadata": "/api/v1/metadata/schema", "indexer": "/api/v1/indexer/schema", "download_client": "/api/v1/downloadclient/schema", "notification": "/api/v1/notification/schema", "import_list": "/api/v1/importlist/schema"}
 	endpoint, ok := endpoints[d.kind]
 	if !ok {
 		resp.Diagnostics.AddError("Invalid customization schema", "The provider requested an unknown customization schema kind.")

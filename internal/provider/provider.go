@@ -122,7 +122,7 @@ func (p *ChaptarrProvider) Configure(ctx context.Context, req provider.Configure
 }
 
 func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource {
-	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+16)
+	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+18)
 	for _, definition := range singletonConfigDefinitions {
 		resources = append(resources, newSingletonConfigResource(definition))
 	}
@@ -143,6 +143,8 @@ func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource
 		newIndexerResource,
 		newDownloadClientResource,
 		newNotificationResource,
+		newImportListResource,
+		newImportListExclusionResource,
 	)
 	return resources
 }
@@ -165,6 +167,7 @@ func (p *ChaptarrProvider) DataSources(context.Context) []func() datasource.Data
 		newDownloadClientSchemaDataSource,
 		newNotificationSchemaDataSource,
 		newIndexerFlagsDataSource,
+		newImportListSchemaDataSource,
 	)
 	return dataSources
 }
