@@ -44,3 +44,8 @@ If a future issue proposes an action resource, it must be create-only,
 disabled unless explicitly enabled, aware of upstream idempotency semantics,
 and protected against execution during refresh or destroy. No current Chaptarr
 maintenance endpoint meets that bar in this provider.
+
+The remote-path mapping connection test is not a maintenance mutation. Issue
+#3 permits that read-only network/filesystem probe only when
+`test_before_apply` is explicitly enabled, and only during create/update apply.
+It never runs during plan, refresh, or destroy.

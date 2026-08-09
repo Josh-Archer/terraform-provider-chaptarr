@@ -54,11 +54,13 @@ responses are represented by their content type, byte length, and SHA-256
 fingerprint instead of being stored in Terraform state.
 
 See the [read-only data source guide](docs/data-sources/read-only.md).
+Storage lifecycle and conservative delete behavior are documented in the
+[storage resource guide](docs/resources/storage.md).
 
 ## Development
 
 Prerequisites are Go 1.25.12 and OpenTofu 1.11.2 or newer. OpenTofu 1.11 is
-required for write-only configuration attributes. Run:
+required for write-only configuration and Calibre credential attributes. Run:
 
 ```shell
 go mod download

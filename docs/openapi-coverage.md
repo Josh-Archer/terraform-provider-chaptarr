@@ -12,12 +12,12 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 
 | Classification | Status | Operations |
 |---|---|---:|
-| action-only | excluded | 59 |
-| data-source | implemented | 30 |
-| data-source | planned | 44 |
+| action-only | excluded | 58 |
+| data-source | implemented | 32 |
+| data-source | planned | 45 |
 | out-of-scope | excluded | 16 |
-| resource | implemented | 30 |
-| resource | planned | 138 |
+| resource | implemented | 39 |
+| resource | planned | 127 |
 
 ## Operation inventory
 
@@ -55,8 +55,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/queue/bulk` | Queue | action-only | excluded | Queue cancellation/removal is destructive operational behavior and requires explicit tooling. | #11 | `976db35a6fcb` |
 | `DELETE /api/v1/queue/{id}` | Queue | action-only | excluded | Queue cancellation/removal is destructive operational behavior and requires explicit tooling. | #11 | `8798d6ad442d` |
 | `DELETE /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `dc08eccf2d7b` |
-| `DELETE /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `547d9a343763` |
-| `DELETE /api/v1/rootfolder/{id}` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `6e32c0e56b72` |
+| `DELETE /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `547d9a343763` |
+| `DELETE /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `6e32c0e56b72` |
 | `DELETE /api/v1/series/{seriesId}/variants/{variantId}` | Series | resource | planned | chaptarr_series | #8 | `78087eff25b4` |
 | `DELETE /api/v1/settings/proxy/{id}` | Proxy | resource | planned | chaptarr_proxy | #7 | `f951e710fe0d` |
 | `DELETE /api/v1/system/backup/{id}` | Backup | action-only | excluded | Backup deletion or restoration is imperative maintenance and must never run during plan or refresh. | #11 | `79d71f8e275d` |
@@ -173,13 +173,13 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/release` | Release | data-source | planned | chaptarr_release_search | #5 | `a45ef8624d3e` |
 | `GET /api/v1/releaseprofile` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `c8476e69a698` |
 | `GET /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `f5559fd58837` |
-| `GET /api/v1/remotepathmapping` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `ca1f912a5f93` |
-| `GET /api/v1/remotepathmapping/suggestions` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `ff0adb132bd5` |
-| `GET /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `f0cdb4a80f1e` |
+| `GET /api/v1/remotepathmapping` | RemotePathMapping | data-source | implemented | chaptarr_remote_path_mappings | #3 | `ca1f912a5f93` |
+| `GET /api/v1/remotepathmapping/suggestions` | RemotePathMapping | data-source | planned | chaptarr_remote_path_mapping_suggestions | #3 | `ff0adb132bd5` |
+| `GET /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `f0cdb4a80f1e` |
 | `GET /api/v1/rename` | RenameBook | data-source | planned | chaptarr_rename_book_preview | #9 | `03493bbd1990` |
 | `GET /api/v1/retag` | RetagBook | data-source | planned | chaptarr_retag_book_preview | #9 | `681a9f868238` |
-| `GET /api/v1/rootfolder` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `5bb05f44666c` |
-| `GET /api/v1/rootfolder/{id}` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `c50e18443ca7` |
+| `GET /api/v1/rootfolder` | RootFolder | data-source | implemented | chaptarr_root_folders | #3 | `5bb05f44666c` |
+| `GET /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `c50e18443ca7` |
 | `GET /api/v1/search` | Search | data-source | implemented | chaptarr_search | #10 | `505aa248d2a8` |
 | `GET /api/v1/series` | Series | resource | planned | chaptarr_series | #8 | `2cd3176e3d44` |
 | `GET /api/v1/series/lookup` | SeriesLookup | data-source | planned | chaptarr_series_lookup | #8 | `5659bf7bb9b1` |
@@ -279,9 +279,9 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/release` | Release | action-only | excluded | Grabbing a release triggers a download and must be explicit and disabled by default. | #11 | `bce6d09bf8c8` |
 | `POST /api/v1/release/push` | ReleasePush | action-only | excluded | Pushing a release can trigger acquisition/import and must be an explicit opt-in action. | #11 | `12d6f5b6f541` |
 | `POST /api/v1/releaseprofile` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `2d53117fcb9f` |
-| `POST /api/v1/remotepathmapping` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `e5add80122bc` |
-| `POST /api/v1/remotepathmapping/test` | RemotePathMapping | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `63836074a380` |
-| `POST /api/v1/rootfolder` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `907eafd4cbd8` |
+| `POST /api/v1/remotepathmapping` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `e5add80122bc` |
+| `POST /api/v1/remotepathmapping/test` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `63836074a380` |
+| `POST /api/v1/rootfolder` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `907eafd4cbd8` |
 | `POST /api/v1/rootfolder/{id}/link-author` | RootFolder | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `b7b34006fc31` |
 | `POST /api/v1/series/add` | AddSeries | resource | planned | chaptarr_series | #8 | `436bae9dd0fa` |
 | `POST /api/v1/series/{seriesId}/narrators/discover` | Series | data-source | planned | chaptarr_series_narrator_discovery | #8 | `247122ba34c9` |
@@ -335,8 +335,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/qualitydefinition/{id}` | QualityDefinition | resource | planned | chaptarr_quality_definition | #4 | `5c5082175058` |
 | `PUT /api/v1/qualityprofile/{id}` | QualityProfile | resource | planned | chaptarr_quality_profile | #4 | `38c14a8b70c7` |
 | `PUT /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `a3670037f70a` |
-| `PUT /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `12746ba91a1f` |
-| `PUT /api/v1/rootfolder/{id}` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `7b00820d50c4` |
+| `PUT /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `12746ba91a1f` |
+| `PUT /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `7b00820d50c4` |
 | `PUT /api/v1/series/{seriesId}/narrators/preferred` | Series | resource | planned | chaptarr_series | #8 | `1da362544b06` |
 | `PUT /api/v1/settings/proxy/{id}` | Proxy | resource | planned | chaptarr_proxy | #7 | `4d282f29fe51` |
 | `PUT /api/v1/tag/{id}` | Tag | resource | planned | chaptarr_tag | #7 | `8c393913c2f9` |

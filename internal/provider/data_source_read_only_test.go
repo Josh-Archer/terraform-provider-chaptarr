@@ -26,8 +26,8 @@ func TestReadOnlyDefinitionsAreUniqueAndNonMutating(t *testing.T) {
 
 	want := []string{
 		"api_info", "calendar", "calendar_feed", "disk_space", "file_system", "health", "languages",
-		"library_search", "localization", "media_cover", "parse", "search", "system_routes",
-		"system_statistics", "system_status", "tasks", "updates",
+		"library_search", "localization", "media_cover", "parse", "remote_path_mappings", "root_folders",
+		"search", "system_routes", "system_statistics", "system_status", "tasks", "updates",
 	}
 	definitions := readOnlyDefinitions()
 	got := make([]string, 0, len(definitions))

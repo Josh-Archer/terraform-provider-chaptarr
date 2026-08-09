@@ -260,7 +260,7 @@ func readOnlyDefinitions() []readOnlyDefinition {
 			}, request: statisticsRequest, decode: decodeStatistics,
 		},
 	}
-	return definitions
+	return append(definitions, storageReadOnlyDefinitions()...)
 }
 
 func jsonDefinition(name, description, requestPath string) readOnlyDefinition {

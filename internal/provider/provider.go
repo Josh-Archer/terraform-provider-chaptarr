@@ -122,11 +122,15 @@ func (p *ChaptarrProvider) Configure(ctx context.Context, req provider.Configure
 }
 
 func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource {
-	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+1)
+	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+3)
 	for _, definition := range singletonConfigDefinitions {
 		resources = append(resources, newSingletonConfigResource(definition))
 	}
-	resources = append(resources, newHardcoverConfigResource)
+	resources = append(resources,
+		newHardcoverConfigResource,
+		newRootFolderResource,
+		newRemotePathMappingResource,
+	)
 	return resources
 }
 

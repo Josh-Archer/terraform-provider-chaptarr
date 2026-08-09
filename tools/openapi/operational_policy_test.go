@@ -37,8 +37,8 @@ func TestOperationalIssueNeverImplementsMutatingEndpoints(t *testing.T) {
 			t.Errorf("mutating operational endpoint %s lacks rationale", operation)
 		}
 	}
-	if tracked != 77 {
-		t.Fatalf("%d operations track #11, want the pinned complete set of 77", tracked)
+	if tracked != 76 {
+		t.Fatalf("%d operations track #11, want the pinned complete set of 76 after the #3 opt-in mapping probe decision", tracked)
 	}
 }
 

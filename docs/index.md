@@ -17,6 +17,9 @@ Provide the credential through `CHAPTARR_API_KEY`. `CHAPTARR_URL` may supply
 the URL when `url` is omitted. Explicit configuration takes precedence over
 environment variables.
 
+OpenTofu 1.11.2 or newer is required because root-folder Calibre passwords use
+write-only provider schema and are never stored in Terraform state.
+
 ## Arguments
 
 - `url` (optional): HTTP or HTTPS Chaptarr base URL. User information, query
@@ -45,6 +48,10 @@ The [read-only data source guide](data-sources/read-only.md) documents API
 capabilities, catalog searches, calendar observations, health/system checks,
 filesystem lookups, and content fingerprints. Every data source refreshes when
 Terraform reads it and none sends a mutating HTTP method.
+
+The [storage resource guide](resources/storage.md) documents root folders,
+remote-path mappings, imports, opt-in connection probes, and conservative
+delete semantics.
 
 ## Coverage status
 

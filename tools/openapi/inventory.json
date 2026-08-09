@@ -440,7 +440,7 @@
       ],
       "contract_fingerprint": "547d9a3437632d69e3a4311f52b2b4482fe3499b0228afafe4018522d60102c6",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_remote_path_mapping",
       "tracking_issue": "#3"
     },
@@ -453,7 +453,7 @@
       ],
       "contract_fingerprint": "6e32c0e56b72e71ad25659d17c8e827aedebe93a865a4f4bb2cd08f291a1f5f4",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_root_folder",
       "tracking_issue": "#3"
     },
@@ -1967,9 +1967,9 @@
         "RemotePathMapping"
       ],
       "contract_fingerprint": "ca1f912a5f9338c93ca94acf5613c199fa3beb1eff5210843cb971d8cb803d42",
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_remote_path_mapping",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_remote_path_mappings",
       "tracking_issue": "#3"
     },
     {
@@ -1980,9 +1980,9 @@
         "RemotePathMapping"
       ],
       "contract_fingerprint": "ff0adb132bd5449eee18bd4fcba10496d1932c112049712d2d1a43d7b82cac73",
-      "classification": "resource",
+      "classification": "data-source",
       "status": "planned",
-      "target": "chaptarr_remote_path_mapping",
+      "target": "chaptarr_remote_path_mapping_suggestions",
       "tracking_issue": "#3"
     },
     {
@@ -1994,7 +1994,7 @@
       ],
       "contract_fingerprint": "f0cdb4a80f1e660c6ea4a7fc60eb2e19c77d86e72d2fd497f66739800ed92f5f",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_remote_path_mapping",
       "tracking_issue": "#3"
     },
@@ -2032,9 +2032,9 @@
         "RootFolder"
       ],
       "contract_fingerprint": "5bb05f44666c142e138d8b6a06bfe1390cc215f5a30a18bf39b2a572b412415f",
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_root_folder",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_root_folders",
       "tracking_issue": "#3"
     },
     {
@@ -2046,7 +2046,7 @@
       ],
       "contract_fingerprint": "c50e18443ca73aac2076060385220e35f49757035d4312ce5293cbbf661417dd",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_root_folder",
       "tracking_issue": "#3"
     },
@@ -3337,7 +3337,7 @@
       ],
       "contract_fingerprint": "e5add80122bc3b3eb6b1388790cfeb2f98fd303aeb3bd370d2f211a038545a65",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_remote_path_mapping",
       "tracking_issue": "#3"
     },
@@ -3349,10 +3349,11 @@
         "RemotePathMapping"
       ],
       "contract_fingerprint": "63836074a3805a73d0c3437cbe93545a5f64c427193b95c4c1cd5ec90d29ee2b",
-      "classification": "action-only",
-      "status": "excluded",
-      "tracking_issue": "#11",
-      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+      "classification": "resource",
+      "status": "implemented",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3",
+      "rationale": "Runs only when test_before_apply is explicitly enabled and only during create/update apply; never during plan, read, or destroy."
     },
     {
       "key": "POST /api/v1/rootfolder",
@@ -3363,7 +3364,7 @@
       ],
       "contract_fingerprint": "907eafd4cbd8124a0daf22c0a2d29d984b9fa3881859b21ed4c0f6c99887573f",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_root_folder",
       "tracking_issue": "#3"
     },
@@ -4064,7 +4065,7 @@
       ],
       "contract_fingerprint": "12746ba91a1f73512901f3dc717853c6c1bc9ef0e62626caa00f8cf7e7b5c56f",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_remote_path_mapping",
       "tracking_issue": "#3"
     },
@@ -4077,7 +4078,7 @@
       ],
       "contract_fingerprint": "7b00820d50c4024b4e60903dcf9885a7eff1d6fe53bfb38c6181ecd555b14d78",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_root_folder",
       "tracking_issue": "#3"
     },
