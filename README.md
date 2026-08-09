@@ -56,6 +56,8 @@ fingerprint instead of being stored in Terraform state.
 See the [read-only data source guide](docs/data-sources/read-only.md).
 Storage lifecycle and conservative delete behavior are documented in the
 [storage resource guide](docs/resources/storage.md).
+Typed quality, metadata, release, delay, and quality-definition management is
+documented in the [profile resource guide](docs/resources/profiles.md).
 
 ## Development
 

@@ -122,7 +122,7 @@ func (p *ChaptarrProvider) Configure(ctx context.Context, req provider.Configure
 }
 
 func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource {
-	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+3)
+	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+8)
 	for _, definition := range singletonConfigDefinitions {
 		resources = append(resources, newSingletonConfigResource(definition))
 	}
@@ -130,6 +130,11 @@ func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource
 		newHardcoverConfigResource,
 		newRootFolderResource,
 		newRemotePathMappingResource,
+		newQualityProfileResource,
+		newMetadataProfileResource,
+		newReleaseProfileResource,
+		newDelayProfileResource,
+		newQualityDefinitionResource,
 	)
 	return resources
 }
@@ -142,6 +147,10 @@ func (p *ChaptarrProvider) DataSources(context.Context) []func() datasource.Data
 	for _, definition := range readOnlyDefinitions() {
 		dataSources = append(dataSources, newReadOnlyDataSource(definition))
 	}
+	dataSources = append(dataSources,
+		newQualityProfileSchemaDataSource,
+		newMetadataProfileSchemaDataSource,
+	)
 	return dataSources
 }
 
