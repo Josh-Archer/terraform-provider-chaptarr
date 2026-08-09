@@ -233,7 +233,7 @@ func TestTagCreateAndUpdateAlwaysRefreshServerState(t *testing.T) {
 	instance := &tagResource{client: apiClient}
 	createPlan := stateForResource(t, instance, tagModel{ID: types.StringNull(), Label: types.StringValue("configured-create")})
 	createResponse := &resource.CreateResponse{State: emptyStateForResource(t, instance)}
-	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan{Raw: createPlan.Raw, Schema: createPlan.Schema}}, createResponse)
+	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan(createPlan)}, createResponse)
 	if createResponse.Diagnostics.HasError() {
 		t.Fatalf("create failed: %v", createResponse.Diagnostics)
 	}
@@ -245,7 +245,7 @@ func TestTagCreateAndUpdateAlwaysRefreshServerState(t *testing.T) {
 
 	updatePlan := stateForResource(t, instance, tagModel{ID: types.StringValue("27"), Label: types.StringValue("configured-update")})
 	updateResponse := &resource.UpdateResponse{State: emptyStateForResource(t, instance)}
-	instance.Update(t.Context(), resource.UpdateRequest{Plan: tfsdk.Plan{Raw: updatePlan.Raw, Schema: updatePlan.Schema}}, updateResponse)
+	instance.Update(t.Context(), resource.UpdateRequest{Plan: tfsdk.Plan(updatePlan)}, updateResponse)
 	if updateResponse.Diagnostics.HasError() {
 		t.Fatalf("update failed: %v", updateResponse.Diagnostics)
 	}
