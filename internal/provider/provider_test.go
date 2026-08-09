@@ -29,12 +29,12 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 	if metadata.TypeName != "chaptarr" || metadata.Version != "test-version" {
 		t.Fatalf("unexpected metadata: %#v", metadata)
 	}
-	if resources := p.Resources(context.Background()); len(resources) != 28 {
-		t.Fatalf("registered %d resources, want 28", len(resources))
+	if resources := p.Resources(context.Background()); len(resources) != 30 {
+		t.Fatalf("registered %d resources, want 30", len(resources))
 	}
 	dataSources := p.DataSources(context.Background())
-	if len(dataSources) != 32 {
-		t.Fatalf("registered %d data sources, want 32", len(dataSources))
+	if len(dataSources) != 34 {
+		t.Fatalf("registered %d data sources, want 34", len(dataSources))
 	}
 	registeredDataSources := make(map[string]struct{}, len(dataSources))
 	for _, factory := range dataSources {
@@ -51,6 +51,8 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 		"chaptarr_notification_schema",
 		"chaptarr_indexer_flags",
 		"chaptarr_import_list_schema",
+		"chaptarr_author_lookup",
+		"chaptarr_series_lookup",
 	} {
 		if _, ok := registeredDataSources[typeName]; !ok {
 			t.Fatalf("missing registered data source %q", typeName)

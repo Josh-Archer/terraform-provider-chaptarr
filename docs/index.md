@@ -69,6 +69,10 @@ The [import and Hardcover guide](resources/imports.md) documents import lists,
 per-ID exclusions, explicit external validation, safe singleton observation,
 and future multi-user GitOps routing.
 
+The [library ownership guide](resources/library.md) documents authors, series
+monitoring intent, provider-prefixed lookup identities, imports, and the
+explicit controls that keep searches, file moves, and file deletion disabled.
+
 ## Coverage status
 
 The [generated coverage matrix](openapi-coverage.md) classifies every pinned

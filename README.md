@@ -64,6 +64,9 @@ Indexer, download-client, and notification management is documented in the
 [external integrations guide](docs/resources/integrations.md).
 Import lists, exclusions, and the guarded Hardcover singleton are documented in
 the [import and Hardcover guide](docs/resources/imports.md).
+Author and series collection intent, lookup-assisted identity selection, and
+safe media-operation controls are documented in the
+[library ownership guide](docs/resources/library.md).
 
 ## Development
 
