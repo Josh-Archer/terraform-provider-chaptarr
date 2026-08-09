@@ -1,0 +1,24 @@
+title = "terraform-provider-chaptarr gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Allow only the fixed non-secret plan-test sentinel"
+regexes = [
+  '''CHAPTARR_TEST_API_KEY_SENTINEL_DO_NOT_USE_79f6f1d2'''
+]
+paths = [
+  '''scripts/test-plan-leak\.(sh|ps1)'''
+]
+
+[[allowlists]]
+description = "Allow only fixed non-secret Go unit-test API-key sentinels"
+regexes = [
+  '''test-api-key-sentinel-82df5''',
+  '''provider-api-key-sentinel-41b7'''
+]
+paths = [
+  '''internal/client/client_test\.go''',
+  '''internal/provider/provider_test\.go'''
+]

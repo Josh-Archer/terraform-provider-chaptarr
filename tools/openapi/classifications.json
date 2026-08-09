@@ -1,0 +1,1905 @@
+{
+  "version": 1,
+  "source": {
+    "blob_sha": "7ceb8445033c96eff1a757b2891fcd5f93a8369a",
+    "commit": "29853a2e4024b61857bfd64be200832beabf6938",
+    "drift_url": "https://raw.githubusercontent.com/Chaptarr/chaptarr/develop/src/Chaptarr.Api.V1/openapi.json",
+    "openapi_version": "3.0.4",
+    "operation_count": 317,
+    "path_count": 236,
+    "repository": "Chaptarr/chaptarr",
+    "schema_count": 230,
+    "global_contract_fingerprint": "4ec3783f44943490834aef8b4346e23519fd095802d6862212101573efef21d0",
+    "sha256": "00bb24c49621bcfc682720c2f4dcddde58a142e878935f21e112c410f9f9c6d4",
+    "tag": "v0.9.925",
+    "tag_count": 87
+  },
+  "operations": {
+    "DELETE /api/v1/author/editor": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "DELETE /api/v1/author/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "DELETE /api/v1/blocklist/bulk": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Blocklist removal is an imperative queue/history action, not declarative infrastructure."
+    },
+    "DELETE /api/v1/blocklist/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Blocklist removal is an imperative queue/history action, not declarative infrastructure."
+    },
+    "DELETE /api/v1/book/editor": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "DELETE /api/v1/book/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "DELETE /api/v1/bookfile/bulk": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#9",
+      "rationale": "Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards."
+    },
+    "DELETE /api/v1/bookfile/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#9",
+      "rationale": "Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards."
+    },
+    "DELETE /api/v1/command/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    "DELETE /api/v1/config/hardcover": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_hardcover_config",
+      "tracking_issue": "#6"
+    },
+    "DELETE /api/v1/customfilter/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    "DELETE /api/v1/customformat/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    "DELETE /api/v1/delayprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    "DELETE /api/v1/downloadclient/bulk": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    "DELETE /api/v1/downloadclient/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    "DELETE /api/v1/ignored/bulk": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Removing ignored records is imperative maintenance and must never run during plan or refresh."
+    },
+    "DELETE /api/v1/ignored/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Removing ignored records is imperative maintenance and must never run during plan or refresh."
+    },
+    "DELETE /api/v1/importlist/bulk": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    "DELETE /api/v1/importlist/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    "DELETE /api/v1/importlistexclusion/bulk": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    "DELETE /api/v1/importlistexclusion/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    "DELETE /api/v1/indexer/bulk": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    "DELETE /api/v1/indexer/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    "DELETE /api/v1/metadata/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    "DELETE /api/v1/metadataprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    "DELETE /api/v1/notification/bulk": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    "DELETE /api/v1/notification/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    "DELETE /api/v1/pendingauthorimport/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue, retry, and delete operations change import state and require explicit operational tooling."
+    },
+    "DELETE /api/v1/qualityprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    "DELETE /api/v1/queue/bulk": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue cancellation/removal is destructive operational behavior and requires explicit tooling."
+    },
+    "DELETE /api/v1/queue/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue cancellation/removal is destructive operational behavior and requires explicit tooling."
+    },
+    "DELETE /api/v1/releaseprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    "DELETE /api/v1/remotepathmapping/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    "DELETE /api/v1/rootfolder/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    "DELETE /api/v1/series/{seriesId}/variants/{variantId}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    "DELETE /api/v1/settings/proxy/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    "DELETE /api/v1/system/backup/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Backup deletion or restoration is imperative maintenance and must never run during plan or refresh."
+    },
+    "DELETE /api/v1/tag/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    },
+    "GET /": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Web UI static content is unrelated to infrastructure state."
+    },
+    "GET /api": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_api_info",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/author": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/author/lookup": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_author_lookup",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/author/{authorId}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/author/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/author/{id}/size/{mediaType}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_author_statistics",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/blocklist": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_blocklist",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/book": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/book/buckets": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/book/ids": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/book/lookup": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_book_lookup",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/book/paged": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/book/{bookId}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/book/{bookId}/siblings": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/book/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/book/{id}/overview": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/bookfile": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_book_file",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/bookfile/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_book_file",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/calendar": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_calendar",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/calendar/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_calendar",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/command": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_commands",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/command/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_commands",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/config/conversion": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_conversion_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/conversion/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_conversion_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/development": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_development_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/development/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_development_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/downloadclient": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/downloadclient/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/hardcover": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_hardcover_config",
+      "tracking_issue": "#6"
+    },
+    "GET /api/v1/config/host": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_host_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/host/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_host_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/indexer": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/indexer/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/mediamanagement": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_media_management_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/mediamanagement/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_media_management_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/metadataprovider": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_provider_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/metadataprovider/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_provider_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/naming": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_naming_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/naming/examples": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_naming_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/naming/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_naming_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/ui": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_ui_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/config/ui/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_ui_config",
+      "tracking_issue": "#2"
+    },
+    "GET /api/v1/customfilter": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/customfilter/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/customformat": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/customformat/schema": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/customformat/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/delayprofile": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/delayprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/diskspace": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_disk_space",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/downloadclient": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/downloadclient/schema": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/downloadclient/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/edition": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_editions",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/filesystem": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_file_system",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/filesystem/mediafiles": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_file_system",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/filesystem/type": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_file_system",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/health": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_health",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/history": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_history",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/history/author": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_history",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/history/since": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_history",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/ignored": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_ignored",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/importlist": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    "GET /api/v1/importlist/schema": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    "GET /api/v1/importlist/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    "GET /api/v1/importlistexclusion": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    "GET /api/v1/importlistexclusion/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    "GET /api/v1/indexer": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/indexer/schema": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/indexer/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/indexerflag": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_indexer_flags",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/language": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_language",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/language/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_language",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/library/search": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_library_search",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/localization": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_localization",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/log": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw application logs are operational data and may contain sensitive values; use observability tooling."
+    },
+    "GET /api/v1/log/file": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw log files may contain sensitive values; use access-controlled observability tooling."
+    },
+    "GET /api/v1/log/file/update": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw update logs may contain sensitive values; use access-controlled observability tooling."
+    },
+    "GET /api/v1/log/file/update/{filename}": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw update logs may contain sensitive values; use access-controlled observability tooling."
+    },
+    "GET /api/v1/log/file/{filename}": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw log files may contain sensitive values; use access-controlled observability tooling."
+    },
+    "GET /api/v1/manualimport": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_manual_import_candidates",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/mediacover/author/{authorId}/{filename}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_media_cover",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/mediacover/book/{bookId}/{filename}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_media_cover",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/mediacover/books/{bookId}/{filename}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_media_cover",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/mediacover/{authorId}/{filename}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_media_cover",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/metadata": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/metadata/schema": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/metadata/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/metadataprofile": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/metadataprofile/languages": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/metadataprofile/schema": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile_schema",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/metadataprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/notification": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/notification/schema": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/notification/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/parse": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_parse",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/pendingauthorimport": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_pending_author_import",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/pendingauthorimport/author/exists/{providerId}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_pending_author_import",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/pendingauthorimport/profiles/options": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_pending_author_import",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/pendingauthorimport/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_pending_author_import",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/qualitydefinition": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_definition",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/qualitydefinition/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_definition",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/qualityprofile": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/qualityprofile/schema": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_quality_profile_schema",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/qualityprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/queue": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_queue",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/queue/details": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_queue_details",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/queue/status": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_queue_status",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/release": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_release_search",
+      "tracking_issue": "#5"
+    },
+    "GET /api/v1/releaseprofile": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/releaseprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    "GET /api/v1/remotepathmapping": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/remotepathmapping/suggestions": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/remotepathmapping/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/rename": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_rename_book_preview",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/retag": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_retag_book_preview",
+      "tracking_issue": "#9"
+    },
+    "GET /api/v1/rootfolder": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/rootfolder/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    "GET /api/v1/search": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_search",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/series": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/series/lookup": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_series_lookup",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/series/{seriesId}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/series/{seriesId}/narrators": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/series/{seriesId}/narrators/inheritance": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/series/{seriesId}/variants": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    "GET /api/v1/settings/proxy": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/settings/proxy/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/system/backup": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_backups",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/system/proxy/debug": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Proxy debug output may expose network and credential-adjacent data; use controlled diagnostics."
+    },
+    "GET /api/v1/system/routes": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_system",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/system/routes/duplicate": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_system",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/system/settingsbackup/files": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_settings_backups",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/system/settingsbackup/locations": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_settings_backups",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/system/statistics": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_system",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/system/status": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_system",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/system/task": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_tasks",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/system/task/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_tasks",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/tag": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/tag/detail": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_tag_details",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/tag/detail/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_tag_details",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/tag/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    },
+    "GET /api/v1/update": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_updates",
+      "tracking_issue": "#10"
+    },
+    "GET /api/v1/wanted/cutoff": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_cutoff_wanted",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/wanted/cutoff/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_cutoff_wanted",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/wanted/missing": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_missing",
+      "tracking_issue": "#11"
+    },
+    "GET /api/v1/wanted/missing/{id}": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_missing",
+      "tracking_issue": "#11"
+    },
+    "GET /auth/oidc": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Interactive OIDC login belongs to the Chaptarr UI, not Terraform."
+    },
+    "GET /auth/plex": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Interactive Plex login and callbacks belong to the Chaptarr UI, not Terraform."
+    },
+    "GET /auth/plex/callback": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Interactive Plex login and callbacks belong to the Chaptarr UI, not Terraform."
+    },
+    "GET /content/{path}": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Web UI static content is unrelated to infrastructure state."
+    },
+    "GET /feed/v1/calendar/chaptarr.ics": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_calendar_feed",
+      "tracking_issue": "#10"
+    },
+    "GET /feed/v1/calendar/readarr.ics": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_calendar_feed",
+      "tracking_issue": "#10"
+    },
+    "GET /login": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Web UI static content is unrelated to infrastructure state."
+    },
+    "GET /logout": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Browser login/session APIs are not provider authentication; the provider uses X-Api-Key only."
+    },
+    "GET /ping": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_ping",
+      "tracking_issue": "#10"
+    },
+    "GET /{path}": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Web UI static content is unrelated to infrastructure state."
+    },
+    "HEAD /ping": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_ping",
+      "tracking_issue": "#10"
+    },
+    "POST /api/v1/author": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "POST /api/v1/author/import": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "POST /api/v1/author/statistics/aggregate": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_author_statistics",
+      "tracking_issue": "#8"
+    },
+    "POST /api/v1/author/{id}/downloadmedia": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/author/{id}/loadimage": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/book": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "POST /api/v1/book/import": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "POST /api/v1/book/{id}/downloadmedia": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/book/{id}/editions/wanted": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "POST /api/v1/bookshelf": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_bookshelf",
+      "tracking_issue": "#10"
+    },
+    "POST /api/v1/command": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    "POST /api/v1/command/cancel/all": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    "POST /api/v1/command/pause/all": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    "POST /api/v1/command/resume/all": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    "POST /api/v1/command/{id}/pause": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    "POST /api/v1/command/{id}/resume": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    "POST /api/v1/config/development/test": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/config/hardcover": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_hardcover_config",
+      "tracking_issue": "#6"
+    },
+    "POST /api/v1/config/host/test/proxy": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/config/naming-pattern/compile": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_naming_pattern",
+      "tracking_issue": "#2"
+    },
+    "POST /api/v1/config/naming-pattern/decompile": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_naming_pattern",
+      "tracking_issue": "#2"
+    },
+    "POST /api/v1/config/naming-pattern/preview": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_naming_pattern",
+      "tracking_issue": "#2"
+    },
+    "POST /api/v1/config/naming-pattern/validate": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_naming_pattern",
+      "tracking_issue": "#2"
+    },
+    "POST /api/v1/customfilter": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    "POST /api/v1/customformat": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    "POST /api/v1/delayprofile": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    "POST /api/v1/downloadclient": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    "POST /api/v1/downloadclient/action/{name}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/downloadclient/test": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/downloadclient/testall": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/history/failed/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Marking a history item failed changes operational state and must be explicit."
+    },
+    "POST /api/v1/importlist": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    "POST /api/v1/importlist/action/{name}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/importlist/test": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/importlist/testall": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/importlistexclusion": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    "POST /api/v1/indexer": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    "POST /api/v1/indexer/action/{name}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/indexer/test": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/indexer/testall": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/manualimport": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Manual import moves files and must never occur during plan or refresh."
+    },
+    "POST /api/v1/matchinglog/preview": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Log matching previews may expose operational or sensitive data and are not Terraform state."
+    },
+    "POST /api/v1/metadata": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    "POST /api/v1/metadata/action/{name}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/metadata/test": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/metadata/testall": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/metadataprofile": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    "POST /api/v1/notification": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    "POST /api/v1/notification/action/{name}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/notification/test": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/notification/testall": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/pendingauthorimport/author/queue": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue, retry, and delete operations change import state and require explicit operational tooling."
+    },
+    "POST /api/v1/pendingauthorimport/{id}/retry": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue, retry, and delete operations change import state and require explicit operational tooling."
+    },
+    "POST /api/v1/qualityprofile": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    "POST /api/v1/queue/cancelconversion/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue cancellation/removal is destructive operational behavior and requires explicit tooling."
+    },
+    "POST /api/v1/queue/grab/bulk": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Grabbing queued releases triggers downloads and must never run during plan or refresh."
+    },
+    "POST /api/v1/queue/grab/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Grabbing queued releases triggers downloads and must never run during plan or refresh."
+    },
+    "POST /api/v1/release": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Grabbing a release triggers a download and must be explicit and disabled by default."
+    },
+    "POST /api/v1/release/push": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Pushing a release can trigger acquisition/import and must be an explicit opt-in action."
+    },
+    "POST /api/v1/releaseprofile": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    "POST /api/v1/remotepathmapping": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    "POST /api/v1/remotepathmapping/test": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/rootfolder": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    "POST /api/v1/rootfolder/{id}/link-author": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/series/add": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    "POST /api/v1/series/{seriesId}/narrators/discover": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_series_narrator_discovery",
+      "tracking_issue": "#8"
+    },
+    "POST /api/v1/series/{seriesId}/narrators/search": {
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_series_narrator_discovery",
+      "tracking_issue": "#8"
+    },
+    "POST /api/v1/settings/proxy": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    "POST /api/v1/settings/proxy/test": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    "POST /api/v1/system/backup/restore/upload": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Backup deletion or restoration is imperative maintenance and must never run during plan or refresh."
+    },
+    "POST /api/v1/system/backup/restore/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Backup deletion or restoration is imperative maintenance and must never run during plan or refresh."
+    },
+    "POST /api/v1/system/reset": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Reset, shutdown, and restart are destructive operational actions and never run during plan or refresh."
+    },
+    "POST /api/v1/system/restart": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Reset, shutdown, and restart are destructive operational actions and never run during plan or refresh."
+    },
+    "POST /api/v1/system/settingsbackup/create": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Creating or restoring settings backups is imperative maintenance, not desired state."
+    },
+    "POST /api/v1/system/settingsbackup/restore": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Creating or restoring settings backups is imperative maintenance, not desired state."
+    },
+    "POST /api/v1/system/shutdown": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Reset, shutdown, and restart are destructive operational actions and never run during plan or refresh."
+    },
+    "POST /api/v1/tag": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    },
+    "POST /login": {
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Browser login/session APIs are not provider authentication; the provider uses X-Api-Key only."
+    },
+    "PUT /api/v1/author/editor": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "PUT /api/v1/author/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "PUT /api/v1/author/{id}/monitor/{mediaType}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "PUT /api/v1/author/{id}/primaryphoto": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "PUT /api/v1/author/{id}/selectedmediatype/{mediaType}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    "PUT /api/v1/book": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "PUT /api/v1/book/editor": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "PUT /api/v1/book/monitor": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "PUT /api/v1/book/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    "PUT /api/v1/bookfile/editor": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#9",
+      "rationale": "Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards."
+    },
+    "PUT /api/v1/bookfile/{id}": {
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#9",
+      "rationale": "Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards."
+    },
+    "PUT /api/v1/config/conversion/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_conversion_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/config/development/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_development_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/config/downloadclient/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/config/host/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_host_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/config/indexer/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/config/mediamanagement/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_media_management_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/config/metadataprovider/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_provider_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/config/naming/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_naming_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/config/ui/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_ui_config",
+      "tracking_issue": "#2"
+    },
+    "PUT /api/v1/customfilter/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    "PUT /api/v1/customformat/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    "PUT /api/v1/delayprofile/reorder/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    "PUT /api/v1/delayprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    "PUT /api/v1/downloadclient/bulk": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    "PUT /api/v1/downloadclient/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    "PUT /api/v1/importlist/bulk": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    "PUT /api/v1/importlist/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    "PUT /api/v1/importlistexclusion/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    "PUT /api/v1/indexer/bulk": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    "PUT /api/v1/indexer/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    "PUT /api/v1/metadata/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    "PUT /api/v1/metadataprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    "PUT /api/v1/notification/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    "PUT /api/v1/qualitydefinition/update": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_definition",
+      "tracking_issue": "#4"
+    },
+    "PUT /api/v1/qualitydefinition/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_definition",
+      "tracking_issue": "#4"
+    },
+    "PUT /api/v1/qualityprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    "PUT /api/v1/releaseprofile/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    "PUT /api/v1/remotepathmapping/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    "PUT /api/v1/rootfolder/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    "PUT /api/v1/series/{seriesId}/narrators/preferred": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    "PUT /api/v1/settings/proxy/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    "PUT /api/v1/tag/{id}": {
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    }
+  }
+}
