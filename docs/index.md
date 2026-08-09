@@ -65,6 +65,10 @@ The [external integrations guide](resources/integrations.md) documents
 indexers, download clients, notifications, schema-driven settings, Prowlarr
 compatibility, suppressed connection tests, and release-action boundaries.
 
+The [import and Hardcover guide](resources/imports.md) documents import lists,
+per-ID exclusions, explicit external validation, safe singleton observation,
+and future multi-user GitOps routing.
+
 ## Coverage status
 
 The [generated coverage matrix](openapi-coverage.md) classifies every pinned

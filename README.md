@@ -62,6 +62,8 @@ Tags, custom filters and formats, metadata providers, and outbound proxies are
 documented in the [library customization guide](docs/resources/customization.md).
 Indexer, download-client, and notification management is documented in the
 [external integrations guide](docs/resources/integrations.md).
+Import lists, exclusions, and the guarded Hardcover singleton are documented in
+the [import and Hardcover guide](docs/resources/imports.md).
 
 ## Development
 

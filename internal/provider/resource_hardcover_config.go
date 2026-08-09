@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Josh-Archer/terraform-provider-chaptarr/internal/client"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -21,17 +21,17 @@ var (
 	_ resource.ResourceWithImportState = &hardcoverConfigResource{}
 )
 
-type hardcoverConfigResource struct {
-	client *client.Client
-}
+type hardcoverConfigResource struct{ client *client.Client }
 
 type hardcoverConfigModel struct {
-	ID        types.String `tfsdk:"id"`
-	Enabled   types.Bool   `tfsdk:"enabled"`
-	Token     types.String `tfsdk:"token"`
-	HasToken  types.Bool   `tfsdk:"has_token"`
-	Username  types.String `tfsdk:"username"`
-	AvatarURL types.String `tfsdk:"avatar_url"`
+	ID                      types.String `tfsdk:"id"`
+	Enabled                 types.Bool   `tfsdk:"enabled"`
+	Token                   types.String `tfsdk:"token"`
+	HasToken                types.Bool   `tfsdk:"has_token"`
+	Username                types.String `tfsdk:"username"`
+	AvatarURL               types.String `tfsdk:"avatar_url"`
+	AllowExternalValidation types.Bool   `tfsdk:"allow_external_validation"`
+	ObserveServer           types.Bool   `tfsdk:"observe_server"`
 }
 
 type hardcoverConfigResponse struct {
@@ -41,9 +41,7 @@ type hardcoverConfigResponse struct {
 	AvatarURL *string `json:"avatarUrl"`
 }
 
-func newHardcoverConfigResource() resource.Resource {
-	return &hardcoverConfigResource{}
-}
+func newHardcoverConfigResource() resource.Resource { return &hardcoverConfigResource{} }
 
 func (r *hardcoverConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_hardcover_config"
@@ -51,171 +49,180 @@ func (r *hardcoverConfigResource) Metadata(_ context.Context, req resource.Metad
 
 func (r *hardcoverConfigResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Manage the singleton Hardcover connection. The token is write-only and never stored in state. Setting `enabled = false` is the only operation that disconnects Hardcover; destroy only relinquishes Terraform ownership.",
+		MarkdownDescription: "Manage the singleton Hardcover connection. Tokens are write-only. Chaptarr validates submitted tokens externally, and its GET may backfill profile data, so both network behaviors require explicit opt-in. Destroy only relinquishes Terraform ownership; set enabled=false to disconnect.",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Stable singleton identifier.",
-			},
-			"enabled": schema.BoolAttribute{
-				Optional:            true,
-				Computed:            true,
-				MarkdownDescription: "Whether the Hardcover connection is enabled.",
-			},
-			"token": schema.StringAttribute{
-				Optional:            true,
-				Sensitive:           true,
-				WriteOnly:           true,
-				MarkdownDescription: "Hardcover token used only when explicitly configured. It is never read back or stored in state.",
-			},
-			"has_token": schema.BoolAttribute{
-				Computed:            true,
-				Sensitive:           true,
-				MarkdownDescription: "Whether Chaptarr reports that a Hardcover token is configured.",
-			},
-			"username": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Connected Hardcover username.",
-			},
-			"avatar_url": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Connected Hardcover avatar URL.",
-			},
+			"id":                        schema.StringAttribute{Computed: true},
+			"enabled":                   schema.BoolAttribute{Optional: true, Computed: true},
+			"token":                     schema.StringAttribute{Optional: true, Sensitive: true, WriteOnly: true},
+			"has_token":                 schema.BoolAttribute{Computed: true, Sensitive: true},
+			"username":                  schema.StringAttribute{Computed: true},
+			"avatar_url":                schema.StringAttribute{Computed: true},
+			"allow_external_validation": schema.BoolAttribute{Optional: true, Computed: true, MarkdownDescription: "Authorize Chaptarr to submit a configured token to Hardcover during create or rotation."},
+			"observe_server":            schema.BoolAttribute{Optional: true, Computed: true, MarkdownDescription: "Authorize GET observation, which may cause Chaptarr to contact Hardcover to backfill profile fields."},
 		},
 	}
 }
 
 func (r *hardcoverConfigResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if req.ProviderData == nil {
-		return
+	r.client = configuredResourceClient(req.ProviderData, &resp.Diagnostics)
+}
+
+func loadHardcoverToken(ctx context.Context, config tfsdk.Config, model *hardcoverConfigModel, diagnostics *diag.Diagnostics) {
+	diagnostics.Append(config.GetAttribute(ctx, path.Root("token"), &model.Token)...)
+}
+
+func validateHardcoverWrite(model hardcoverConfigModel, diagnostics *diag.Diagnostics) bool {
+	if model.Token.IsNull() || model.Token.IsUnknown() || strings.TrimSpace(model.Token.ValueString()) == "" {
+		diagnostics.AddAttributeError(path.Root("token"), "Hardcover token required", "Configure a non-empty ephemeral token for create or rotation.")
+		return false
 	}
-	apiClient, ok := req.ProviderData.(*client.Client)
-	if !ok {
-		resp.Diagnostics.AddError("Unexpected provider data", fmt.Sprintf("Expected *client.Client, got %T.", req.ProviderData))
-		return
+	if !valueBool(model.AllowExternalValidation) {
+		diagnostics.AddAttributeError(path.Root("allow_external_validation"), "External validation authorization required", "Chaptarr submits this token to Hardcover before saving it. Set allow_external_validation=true to authorize that apply-time external call.")
+		return false
 	}
-	r.client = apiClient
+	return true
 }
 
 func (r *hardcoverConfigResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan hardcoverConfigModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	loadHardcoverToken(ctx, req.Config, &plan, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	if !r.apply(ctx, plan, &resp.Diagnostics) {
+	if !plan.Token.IsNull() && !plan.Token.IsUnknown() {
+		if !validateHardcoverWrite(plan, &resp.Diagnostics) || !r.postToken(ctx, plan.Token.ValueString(), &resp.Diagnostics) {
+			return
+		}
+		plan.Enabled = types.BoolValue(true)
+		plan.HasToken = types.BoolValue(true)
+	} else if valueBool(plan.Enabled) && !valueBool(plan.ObserveServer) {
+		resp.Diagnostics.AddAttributeError(path.Root("token"), "Hardcover token required", "Configure token with allow_external_validation=true, or set observe_server=true to adopt an existing connection.")
 		return
 	}
-	r.refresh(ctx, &resp.State, &resp.Diagnostics)
+	normalizeHardcoverControls(&plan)
+	r.refresh(ctx, &plan, &resp.State, &resp.Diagnostics)
 }
 
-func (r *hardcoverConfigResource) Read(ctx context.Context, _ resource.ReadRequest, resp *resource.ReadResponse) {
-	r.refresh(ctx, &resp.State, &resp.Diagnostics)
+func (r *hardcoverConfigResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var state hardcoverConfigModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if !resp.Diagnostics.HasError() {
+		r.refresh(ctx, &state, &resp.State, &resp.Diagnostics)
+	}
 }
 
 func (r *hardcoverConfigResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan hardcoverConfigModel
+	var configuredEnabled types.Bool
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	loadHardcoverToken(ctx, req.Config, &plan, &resp.Diagnostics)
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("enabled"), &configuredEnabled)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	if !r.apply(ctx, plan, &resp.Diagnostics) {
-		return
+	if !plan.Token.IsNull() && !plan.Token.IsUnknown() {
+		if !validateHardcoverWrite(plan, &resp.Diagnostics) || !r.postToken(ctx, plan.Token.ValueString(), &resp.Diagnostics) {
+			return
+		}
+		plan.Enabled = types.BoolValue(true)
+		plan.HasToken = types.BoolValue(true)
+	} else if !configuredEnabled.IsNull() && !configuredEnabled.IsUnknown() && !configuredEnabled.ValueBool() {
+		if _, err := r.client.Do(ctx, http.MethodDelete, "/api/v1/config/hardcover", nil); err != nil && !hardcoverNotFound(err) {
+			resp.Diagnostics.AddError("Unable to disable Hardcover", err.Error())
+			return
+		}
+		plan.HasToken = types.BoolValue(false)
+		plan.Username = types.StringNull()
+		plan.AvatarURL = types.StringNull()
 	}
-	r.refresh(ctx, &resp.State, &resp.Diagnostics)
+	normalizeHardcoverControls(&plan)
+	r.refresh(ctx, &plan, &resp.State, &resp.Diagnostics)
 }
 
 func (r *hardcoverConfigResource) Delete(context.Context, resource.DeleteRequest, *resource.DeleteResponse) {
-	// Disconnecting an external service is an explicit enabled=false operation.
+	// Disconnecting an external account is an explicit enabled=false operation.
 }
 
 func (r *hardcoverConfigResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	if req.ID == "" {
-		resp.Diagnostics.AddError("Invalid import identifier", "Use `hardcover` as the import identifier.")
+	if strings.TrimSpace(req.ID) != "hardcover" {
+		resp.Diagnostics.AddError("Invalid Hardcover import identifier", "Use the literal identifier hardcover.")
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), "hardcover")...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("allow_external_validation"), false)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("observe_server"), false)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("enabled"), false)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("has_token"), false)...)
 }
 
-func (r *hardcoverConfigResource) apply(ctx context.Context, plan hardcoverConfigModel, diagnostics *diag.Diagnostics) bool {
-	current, err := r.read(ctx)
+func (r *hardcoverConfigResource) postToken(ctx context.Context, token string, diagnostics *diag.Diagnostics) bool {
+	body, err := json.Marshal(map[string]string{"token": strings.TrimSpace(token)})
 	if err != nil {
-		diagnostics.AddError("Unable to read Hardcover configuration", err.Error())
+		diagnostics.AddError("Unable to encode Hardcover configuration", "The token payload could not be encoded.")
 		return false
 	}
-
-	tokenConfigured := !plan.Token.IsNull() && !plan.Token.IsUnknown()
-	enabledConfigured := !plan.Enabled.IsNull() && !plan.Enabled.IsUnknown()
-	if enabledConfigured && !plan.Enabled.ValueBool() && tokenConfigured {
-		diagnostics.AddError("Conflicting Hardcover configuration", "`token` cannot be supplied when `enabled` is false.")
+	if _, err := r.client.Do(ctx, http.MethodPost, "/api/v1/config/hardcover", body); err != nil {
+		diagnostics.AddError("Unable to configure Hardcover", err.Error())
 		return false
 	}
-
-	wantEnabled := current.Enabled
-	if enabledConfigured {
-		wantEnabled = plan.Enabled.ValueBool()
-	} else if tokenConfigured {
-		wantEnabled = true
-	}
-
-	switch {
-	case !wantEnabled && current.Enabled:
-		if _, err := r.client.Do(ctx, http.MethodDelete, "/api/v1/config/hardcover", nil); err != nil {
-			diagnostics.AddError("Unable to disable Hardcover", err.Error())
-			return false
-		}
-	case wantEnabled && tokenConfigured:
-		body, err := json.Marshal(map[string]string{"token": plan.Token.ValueString()})
-		if err != nil {
-			diagnostics.AddError("Unable to encode Hardcover configuration", "The token payload could not be encoded.")
-			return false
-		}
-		if _, err := r.client.Do(ctx, http.MethodPost, "/api/v1/config/hardcover", body); err != nil {
-			diagnostics.AddError("Unable to configure Hardcover", err.Error())
-			return false
-		}
-	case wantEnabled && !current.HasToken:
-		diagnostics.AddError("Hardcover token required", "Chaptarr has no Hardcover token. Configure the write-only `token` attribute to enable the connection.")
-		return false
-	}
-
-	return !diagnostics.HasError()
+	return true
 }
 
-func (r *hardcoverConfigResource) read(ctx context.Context) (hardcoverConfigResponse, error) {
-	response, err := r.client.Do(ctx, http.MethodGet, "/api/v1/config/hardcover", nil)
-	if err != nil {
-		return hardcoverConfigResponse{}, err
-	}
-	var current hardcoverConfigResponse
-	if err := json.Unmarshal(response.Body, &current); err != nil {
-		return hardcoverConfigResponse{}, errors.New("chaptarr returned an invalid Hardcover configuration document")
-	}
-	return current, nil
+func hardcoverNotFound(err error) bool {
+	var apiErr *client.APIError
+	return errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound
 }
 
-func (r *hardcoverConfigResource) refresh(ctx context.Context, state *tfsdk.State, diagnostics *diag.Diagnostics) {
-	current, err := r.read(ctx)
-	if err != nil {
-		diagnostics.AddError("Unable to read Hardcover configuration", err.Error())
+func normalizeHardcoverControls(model *hardcoverConfigModel) {
+	if model.AllowExternalValidation.IsNull() || model.AllowExternalValidation.IsUnknown() {
+		model.AllowExternalValidation = types.BoolValue(false)
+	}
+	if model.ObserveServer.IsNull() || model.ObserveServer.IsUnknown() {
+		model.ObserveServer = types.BoolValue(false)
+	}
+	model.Token = types.StringNull()
+	if model.ID.IsNull() || model.ID.IsUnknown() {
+		model.ID = types.StringValue("hardcover")
+	}
+	if model.Enabled.IsNull() || model.Enabled.IsUnknown() {
+		model.Enabled = types.BoolValue(false)
+	}
+	if model.HasToken.IsNull() || model.HasToken.IsUnknown() {
+		model.HasToken = types.BoolValue(false)
+	}
+	if model.Username.IsUnknown() {
+		model.Username = types.StringNull()
+	}
+	if model.AvatarURL.IsUnknown() {
+		model.AvatarURL = types.StringNull()
+	}
+}
+
+func (r *hardcoverConfigResource) refresh(ctx context.Context, state *hardcoverConfigModel, target *tfsdk.State, diagnostics *diag.Diagnostics) {
+	normalizeHardcoverControls(state)
+	if !valueBool(state.ObserveServer) {
+		diagnostics.Append(target.Set(ctx, state)...)
 		return
 	}
-
-	model := hardcoverConfigModel{
-		ID:       types.StringValue("hardcover"),
-		Enabled:  types.BoolValue(current.Enabled),
-		Token:    types.StringNull(),
-		HasToken: types.BoolValue(current.HasToken),
+	response, err := r.client.Do(ctx, http.MethodGet, "/api/v1/config/hardcover", nil)
+	if err != nil {
+		if hardcoverNotFound(err) {
+			target.RemoveResource(ctx)
+			return
+		}
+		diagnostics.AddError("Unable to observe Hardcover configuration", err.Error())
+		return
 	}
-	if current.Username == nil {
-		model.Username = types.StringNull()
-	} else {
-		model.Username = types.StringValue(*current.Username)
+	var current hardcoverConfigResponse
+	if json.Unmarshal(response.Body, &current) != nil {
+		diagnostics.AddError("Invalid Chaptarr response", "Chaptarr returned invalid Hardcover configuration.")
+		return
 	}
-	if current.AvatarURL == nil {
-		model.AvatarURL = types.StringNull()
-	} else {
-		model.AvatarURL = types.StringValue(*current.AvatarURL)
-	}
-	diagnostics.Append(state.Set(ctx, &model)...)
+	state.Enabled = types.BoolValue(current.Enabled)
+	state.HasToken = types.BoolValue(current.HasToken)
+	state.Username = nullableString(current.Username)
+	state.AvatarURL = nullableString(current.AvatarURL)
+	state.Token = types.StringNull()
+	diagnostics.Append(target.Set(ctx, state)...)
 }
