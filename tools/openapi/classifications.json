@@ -23,7 +23,7 @@
     },
     "DELETE /api/v1/author/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_author",
       "tracking_issue": "#8"
     },
@@ -262,19 +262,19 @@
     },
     "GET /api/v1/author/lookup": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_author_lookup",
       "tracking_issue": "#8"
     },
     "GET /api/v1/author/{authorId}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_author",
       "tracking_issue": "#8"
     },
     "GET /api/v1/author/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_author",
       "tracking_issue": "#8"
     },
@@ -959,19 +959,19 @@
     },
     "GET /api/v1/series": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series",
       "tracking_issue": "#8"
     },
     "GET /api/v1/series/lookup": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series_lookup",
       "tracking_issue": "#8"
     },
     "GET /api/v1/series/{seriesId}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series",
       "tracking_issue": "#8"
     },
@@ -1179,7 +1179,7 @@
     },
     "POST /api/v1/author": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_author",
       "tracking_issue": "#8"
     },
@@ -1563,7 +1563,7 @@
     },
     "POST /api/v1/series/add": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series",
       "tracking_issue": "#8"
     },
@@ -1652,7 +1652,7 @@
     },
     "PUT /api/v1/author/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_author",
       "tracking_issue": "#8"
     },
