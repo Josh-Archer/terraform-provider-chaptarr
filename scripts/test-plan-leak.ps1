@@ -12,7 +12,7 @@ if (-not $resolvedTestRoot.StartsWith($systemTemp, [StringComparison]::OrdinalIg
     throw 'Refusing to use a test directory outside the system temporary directory.'
 }
 
-$environmentNames = @('CHAPTARR_API_KEY', 'TF_CLI_CONFIG_FILE', 'TF_LOG', 'TF_LOG_PATH', 'GOTOOLCHAIN')
+$environmentNames = @('CHAPTARR_API_KEY', 'TF_VAR_oidc_client_secret', 'TF_CLI_CONFIG_FILE', 'TF_LOG', 'TF_LOG_PATH', 'GOTOOLCHAIN')
 $previousEnvironment = @{}
 foreach ($name in $environmentNames) {
     $item = Get-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
@@ -50,6 +50,9 @@ provider_installation {
 
     @'
 terraform {
+
+  required_version = ">= 1.11.2"
+
   required_providers {
     chaptarr = {
       source = "josh-archer/chaptarr"
@@ -60,10 +63,23 @@ terraform {
 provider "chaptarr" {
   url = "https://chaptarr.example.test/reverse-proxy"
 }
+
+variable "oidc_client_secret" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
+resource "chaptarr_host_config" "leak_test" {
+  instance_name     = "plan-leak-test"
+  oidc_client_secret = var.oidc_client_secret
+}
 '@ | Set-Content -Encoding ascii (Join-Path $configurationDirectory 'main.tf')
 
     $sentinel = 'CHAPTARR_TEST_API_KEY_SENTINEL_DO_NOT_USE_79f6f1d2'
+	$hostSentinel = 'CHAPTARR_HOST_WRITE_ONLY_SENTINEL_DO_NOT_USE_913ad7c4'
     $env:CHAPTARR_API_KEY = $sentinel
+	$env:TF_VAR_oidc_client_secret = $hostSentinel
     $env:TF_CLI_CONFIG_FILE = Join-Path $resolvedTestRoot 'tofurc'
     Remove-Item Env:TF_LOG -ErrorAction SilentlyContinue
     Remove-Item Env:TF_LOG_PATH -ErrorAction SilentlyContinue
@@ -90,8 +106,9 @@ provider "chaptarr" {
     }
 
     foreach ($path in @($planOutput, $showOutput)) {
-        if ((Get-Content -Raw $path).Contains($sentinel)) {
-            throw "Synthetic API key leaked into $(Split-Path -Leaf $path)."
+		$content = Get-Content -Raw $path
+		if ($content.Contains($sentinel) -or $content.Contains($hostSentinel)) {
+            throw "Synthetic credential leaked into $(Split-Path -Leaf $path)."
         }
     }
 

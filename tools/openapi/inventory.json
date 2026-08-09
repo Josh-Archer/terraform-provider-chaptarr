@@ -141,9 +141,9 @@
       ],
       "contract_fingerprint": "00dd4e0cbe5e82e1b1b5776190c30b329a7c47301bea7e9ea44f0ebb1e41d3b7",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_hardcover_config",
-      "tracking_issue": "#6"
+      "tracking_issue": "#2"
     },
     {
       "key": "DELETE /api/v1/customfilter/{id}",
@@ -816,7 +816,7 @@
       ],
       "contract_fingerprint": "1e68ff850f6b00dd3616b494f6062c261327383eee344d8dcb9155888a0ac61d",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_conversion_config",
       "tracking_issue": "#2"
     },
@@ -829,7 +829,7 @@
       ],
       "contract_fingerprint": "833e31fac2047b4767ae80856fd626cbc9adc4c996587ca129b76f9b2df2e121",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_conversion_config",
       "tracking_issue": "#2"
     },
@@ -842,7 +842,7 @@
       ],
       "contract_fingerprint": "e7739e0bc9e424ea4b1d8c679b34f861bb253f4b66837cba85363f64ca93b569",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_development_config",
       "tracking_issue": "#2"
     },
@@ -855,7 +855,7 @@
       ],
       "contract_fingerprint": "14e6e89d0ad74488db5452227af0252ff0d5b472d23e10e72461732400ee9da7",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_development_config",
       "tracking_issue": "#2"
     },
@@ -868,7 +868,7 @@
       ],
       "contract_fingerprint": "c355201502ff635e785d83b6678219f57a3bb698ab7277a714d1828b53691ffd",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client_config",
       "tracking_issue": "#2"
     },
@@ -881,7 +881,7 @@
       ],
       "contract_fingerprint": "b1f11ab7925dbd25163f9efa6efba6fa846b2b1c7cf9cbfee01ed5274ccac03a",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client_config",
       "tracking_issue": "#2"
     },
@@ -894,9 +894,9 @@
       ],
       "contract_fingerprint": "0cdfab8f2d9c30c098dae5658f7e5b53be364acbba72757784440c1d68babc93",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_hardcover_config",
-      "tracking_issue": "#6"
+      "tracking_issue": "#2"
     },
     {
       "key": "GET /api/v1/config/host",
@@ -907,7 +907,7 @@
       ],
       "contract_fingerprint": "3bf7437e7ac607d8d2ab8a58955c011afac16f12859cd3eaf7ee3afb26d4960e",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_host_config",
       "tracking_issue": "#2"
     },
@@ -920,7 +920,7 @@
       ],
       "contract_fingerprint": "e02936b0b0ce0acf9b93d4f942473eba18f73cb6edcad3a78e4168d57b534628",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_host_config",
       "tracking_issue": "#2"
     },
@@ -933,7 +933,7 @@
       ],
       "contract_fingerprint": "7115942ce2fa10aa7ca0eceada9fc085835e4eb531dfccae940f050ad33b1605",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer_config",
       "tracking_issue": "#2"
     },
@@ -946,7 +946,7 @@
       ],
       "contract_fingerprint": "098f356ae8d91fb711a7102d1b85fe75ed0c14e4c1f31a433158d9b78451197b",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer_config",
       "tracking_issue": "#2"
     },
@@ -959,7 +959,7 @@
       ],
       "contract_fingerprint": "9df7108771b0a2c330c997954c6d9b181c896705abf4e7c49040f55a403dc8a6",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_management_config",
       "tracking_issue": "#2"
     },
@@ -972,7 +972,7 @@
       ],
       "contract_fingerprint": "5e09c77f3d7b86476d15681d4259761c17e8efef415ae3b274ca8fd66b27d76a",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_management_config",
       "tracking_issue": "#2"
     },
@@ -985,7 +985,7 @@
       ],
       "contract_fingerprint": "e7fd44a7a0556ba68827e497e933117bcd6ce21347a3b30f19831069a97c06e3",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_provider_config",
       "tracking_issue": "#2"
     },
@@ -998,7 +998,7 @@
       ],
       "contract_fingerprint": "f8f852051a26c35047e0084fa2866b1e5017571afd8885b767120c724669c935",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_provider_config",
       "tracking_issue": "#2"
     },
@@ -1011,7 +1011,7 @@
       ],
       "contract_fingerprint": "9c9dda0378ae6fce6d3473f9ea46e1668432b58b6544c86094131f40dec975dd",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_config",
       "tracking_issue": "#2"
     },
@@ -1023,9 +1023,9 @@
         "NamingConfig"
       ],
       "contract_fingerprint": "dfff798d89967199e024aea59640b1827243bfe223af0227984a3bd43cad00f7",
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_naming_config",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_naming_examples",
       "tracking_issue": "#2"
     },
     {
@@ -1037,7 +1037,7 @@
       ],
       "contract_fingerprint": "7f0654430342234f3a613573b80dc703ebf1eb2a587deaca0febeeb48a1b69ac",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_config",
       "tracking_issue": "#2"
     },
@@ -1050,7 +1050,7 @@
       ],
       "contract_fingerprint": "b0b7e49e5bc799e60475a62895dce8a6c4be8aae06012f88a4974e666359fdd5",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ui_config",
       "tracking_issue": "#2"
     },
@@ -1063,7 +1063,7 @@
       ],
       "contract_fingerprint": "f23fefb03830838eee7cd58a4bd4e0765fa9dc9e6d6ef8eb50e5707af592524a",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ui_config",
       "tracking_issue": "#2"
     },
@@ -2779,9 +2779,9 @@
       ],
       "contract_fingerprint": "26e1742e4d0dfa89d66c30d1c9f2b6d3710188a6ec3900be8d6cb84370cbc55e",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_hardcover_config",
-      "tracking_issue": "#6"
+      "tracking_issue": "#2"
     },
     {
       "key": "POST /api/v1/config/host/test/proxy",
@@ -2805,7 +2805,7 @@
       ],
       "contract_fingerprint": "c69c5869199b124fe703e8ff4cd19debb187ee2ee4335f1bf7e6c69c1f38e379",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_pattern",
       "tracking_issue": "#2"
     },
@@ -2818,7 +2818,7 @@
       ],
       "contract_fingerprint": "70cac901aa621c94c3baab187be0a33a2b483f3ca6a3d82b2b983e26a595461b",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_pattern",
       "tracking_issue": "#2"
     },
@@ -2831,7 +2831,7 @@
       ],
       "contract_fingerprint": "c19dca16bbc8a98ee33e4b36715c3d39663ead2272163c59e12b52e8efe9f676",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_pattern",
       "tracking_issue": "#2"
     },
@@ -2844,7 +2844,7 @@
       ],
       "contract_fingerprint": "4f9b2ee9f12c4573913f986570efe2787b2253082a812825367c910ce6930e2c",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_pattern",
       "tracking_issue": "#2"
     },
@@ -3713,7 +3713,7 @@
       ],
       "contract_fingerprint": "25d950918044def89300dcc32f50c010720838ff0479aee670636906fe5f2bd6",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_conversion_config",
       "tracking_issue": "#2"
     },
@@ -3726,7 +3726,7 @@
       ],
       "contract_fingerprint": "2c319ca64808fbdc9fe2e03369d4f42d33483685e72beb6d039d09177febf7e1",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_development_config",
       "tracking_issue": "#2"
     },
@@ -3739,7 +3739,7 @@
       ],
       "contract_fingerprint": "b6036815ccd25f3951d6370c40f19c4d21389685e628846fb073f8f6a4cf594b",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client_config",
       "tracking_issue": "#2"
     },
@@ -3752,7 +3752,7 @@
       ],
       "contract_fingerprint": "4413443f7360fc47a1527af2cef5425e96c118d532aa9b3e97a064c9ad6c4422",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_host_config",
       "tracking_issue": "#2"
     },
@@ -3765,7 +3765,7 @@
       ],
       "contract_fingerprint": "8e2abf58ae6d2a1d2158b0f3d6263cafc0666e93a67e666c1aeadfab25832b03",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer_config",
       "tracking_issue": "#2"
     },
@@ -3778,7 +3778,7 @@
       ],
       "contract_fingerprint": "8f4011be299bb1a1b1b5255c2215abd294e4137c20c230231a4c702e66f8e359",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_management_config",
       "tracking_issue": "#2"
     },
@@ -3791,7 +3791,7 @@
       ],
       "contract_fingerprint": "0c0061588f1730d8c00cd5c485498b9004d6b23bbfb681466411e63b26144e6a",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_provider_config",
       "tracking_issue": "#2"
     },
@@ -3804,7 +3804,7 @@
       ],
       "contract_fingerprint": "e69b0f08f6c8e5d395cded182e60bc1da929be6830ab6a87a24943eecc673540",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_config",
       "tracking_issue": "#2"
     },
@@ -3817,7 +3817,7 @@
       ],
       "contract_fingerprint": "77d0411ff96f259ae596923665b7f0e7ea83a5937d286f8999ca103822ef3f75",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ui_config",
       "tracking_issue": "#2"
     },

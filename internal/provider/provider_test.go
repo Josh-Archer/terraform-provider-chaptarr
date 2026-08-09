@@ -19,7 +19,7 @@ import (
 
 const providerSyntheticKey = "provider-api-key-sentinel-41b7"
 
-func TestProviderMetadataAndEmptyRegistrations(t *testing.T) {
+func TestProviderMetadataAndRegistrations(t *testing.T) {
 	t.Parallel()
 
 	p := &ChaptarrProvider{version: "test-version"}
@@ -28,11 +28,11 @@ func TestProviderMetadataAndEmptyRegistrations(t *testing.T) {
 	if metadata.TypeName != "chaptarr" || metadata.Version != "test-version" {
 		t.Fatalf("unexpected metadata: %#v", metadata)
 	}
-	if resources := p.Resources(context.Background()); len(resources) != 0 {
-		t.Fatalf("registered %d placeholder resources", len(resources))
+	if resources := p.Resources(context.Background()); len(resources) != 10 {
+		t.Fatalf("registered %d resources, want 10", len(resources))
 	}
-	if dataSources := p.DataSources(context.Background()); len(dataSources) != 0 {
-		t.Fatalf("registered %d placeholder data sources", len(dataSources))
+	if dataSources := p.DataSources(context.Background()); len(dataSources) != 2 {
+		t.Fatalf("registered %d data sources, want 2", len(dataSources))
 	}
 }
 

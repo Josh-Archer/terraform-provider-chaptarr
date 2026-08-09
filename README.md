@@ -3,10 +3,10 @@
 `terraform-provider-chaptarr` is an early-stage Terraform Plugin Framework
 provider for declaratively managing [Chaptarr](https://github.com/Chaptarr/chaptarr).
 
-The bootstrap release contains the provider configuration, a hardened API
-client, and an operation-level OpenAPI coverage guardrail. Resources and data
-sources are intentionally not registered until their roadmap issues are
-implemented and acceptance-tested.
+The provider includes hardened client behavior, operation-level OpenAPI
+coverage, singleton application configuration resources, and read-only naming
+pattern helpers. Resource credentials use OpenTofu write-only attributes so
+they are not retained in state.
 
 ## Provider configuration
 
@@ -35,9 +35,16 @@ configuration performs no network request.
 See [provider documentation](docs/index.md) and the generated
 [OpenAPI coverage matrix](docs/openapi-coverage.md).
 
+Singleton resource behavior, imports, credential handling, and naming helpers
+are documented in
+[configuration resources](docs/resources/singleton-configuration.md). A
+representative audiobook/ebook configuration is available under
+[`examples/configuration`](examples/configuration).
+
 ## Development
 
-Prerequisites are Go 1.25.12 and OpenTofu 1.8.0 or newer. Run:
+Prerequisites are Go 1.25.12 and OpenTofu 1.11.2 or newer. OpenTofu 1.11 is
+required for write-only configuration attributes. Run:
 
 ```shell
 go mod download

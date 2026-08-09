@@ -122,11 +122,19 @@ func (p *ChaptarrProvider) Configure(ctx context.Context, req provider.Configure
 }
 
 func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource {
-	return nil
+	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+1)
+	for _, definition := range singletonConfigDefinitions {
+		resources = append(resources, newSingletonConfigResource(definition))
+	}
+	resources = append(resources, newHardcoverConfigResource)
+	return resources
 }
 
 func (p *ChaptarrProvider) DataSources(context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		newNamingPatternDataSource,
+		newNamingExamplesDataSource,
+	}
 }
 
 func resolveProviderConfig(data providerModel, getenv func(string) string) (providerConfig, diag.Diagnostics) {

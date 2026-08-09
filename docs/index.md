@@ -1,7 +1,7 @@
 # Chaptarr provider
 
-The provider configures access to a Chaptarr API. This bootstrap does not yet
-register resources or data sources.
+The provider configures access to Chaptarr and manages supported declarative
+application settings.
 
 ## Example
 
@@ -29,8 +29,14 @@ environment variables.
 - `request_timeout_seconds` (optional): bounds the entire API operation,
   including safe-read retries. The schema documents and validates its range.
 
-Provider configuration is offline. A network request occurs only when a future
+Provider configuration is offline. A network request occurs only when a
 resource or data source performs an operation.
+
+## Configuration resources
+
+See [singleton configuration resources](resources/singleton-configuration.md)
+for supported settings, write-only credential handling, import, conservative
+destroy behavior, and naming-pattern data sources.
 
 ## Coverage status
 
