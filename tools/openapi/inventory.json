@@ -1,0 +1,4124 @@
+{
+  "version": 1,
+  "source": {
+    "repository": "Chaptarr/chaptarr",
+    "tag": "v0.9.925",
+    "commit": "29853a2e4024b61857bfd64be200832beabf6938",
+    "blob_sha": "7ceb8445033c96eff1a757b2891fcd5f93a8369a",
+    "sha256": "00bb24c49621bcfc682720c2f4dcddde58a142e878935f21e112c410f9f9c6d4",
+    "openapi_version": "3.0.4",
+    "path_count": 236,
+    "operation_count": 317,
+    "tag_count": 87,
+    "schema_count": 230,
+    "global_contract_fingerprint": "4ec3783f44943490834aef8b4346e23519fd095802d6862212101573efef21d0",
+    "drift_url": "https://raw.githubusercontent.com/Chaptarr/chaptarr/develop/src/Chaptarr.Api.V1/openapi.json"
+  },
+  "operations": [
+    {
+      "key": "DELETE /api/v1/author/editor",
+      "method": "DELETE",
+      "path": "/api/v1/author/editor",
+      "tags": [
+        "AuthorEditor"
+      ],
+      "contract_fingerprint": "2c5a38ed65344b4e59c453233bceb32969f9fe570587aa83d9fac1f65fe38b87",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "DELETE /api/v1/author/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/author/{id}",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "3a54040c9d65dc724a8f548116f2cc93a9bd39e515266d15f8b43cb6349f338f",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "DELETE /api/v1/blocklist/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/blocklist/bulk",
+      "tags": [
+        "Blocklist"
+      ],
+      "contract_fingerprint": "0cb87cd7f5292f8226d2b8f13cc5fce69bbe12ed699298ceaed9ba06cc474b8d",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Blocklist removal is an imperative queue/history action, not declarative infrastructure."
+    },
+    {
+      "key": "DELETE /api/v1/blocklist/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/blocklist/{id}",
+      "tags": [
+        "Blocklist"
+      ],
+      "contract_fingerprint": "05c9940da5f1409b85e0d517201797a2adb8a4523626bcea30f79f117d0aeeb7",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Blocklist removal is an imperative queue/history action, not declarative infrastructure."
+    },
+    {
+      "key": "DELETE /api/v1/book/editor",
+      "method": "DELETE",
+      "path": "/api/v1/book/editor",
+      "tags": [
+        "BookEditor"
+      ],
+      "contract_fingerprint": "e75a4429aac13474392d218e4cbbc2b2d22d93335597abd8dab47ea5398d41d4",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "DELETE /api/v1/book/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/book/{id}",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "a373fdd26a30278fd8bb314ecec214d14c4f21ad2f7e8001224013b70b9da868",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "DELETE /api/v1/bookfile/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/bookfile/bulk",
+      "tags": [
+        "BookFile"
+      ],
+      "contract_fingerprint": "46084991c5581a5292a3e47c564076cd291fcd29c72755a3491da7a03b6ff178",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#9",
+      "rationale": "Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards."
+    },
+    {
+      "key": "DELETE /api/v1/bookfile/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/bookfile/{id}",
+      "tags": [
+        "BookFile"
+      ],
+      "contract_fingerprint": "b43c16988af3e3362a237950c091b5ba1b94f0015e8cbfc2b3a80ed0c3f34c43",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#9",
+      "rationale": "Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards."
+    },
+    {
+      "key": "DELETE /api/v1/command/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/command/{id}",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "d8ca0120df497a176d12a55799fd6c76b37aeedc9764178e67d0dc4319c48ca9",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    {
+      "key": "DELETE /api/v1/config/hardcover",
+      "method": "DELETE",
+      "path": "/api/v1/config/hardcover",
+      "tags": [
+        "HardcoverConfig"
+      ],
+      "contract_fingerprint": "00dd4e0cbe5e82e1b1b5776190c30b329a7c47301bea7e9ea44f0ebb1e41d3b7",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_hardcover_config",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "DELETE /api/v1/customfilter/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/customfilter/{id}",
+      "tags": [
+        "CustomFilter"
+      ],
+      "contract_fingerprint": "e8bfeed5d96b85c6ef6fbc5439a106486bc2fe398a3f103634588cac4e07481a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "DELETE /api/v1/customformat/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/customformat/{id}",
+      "tags": [
+        "CustomFormat"
+      ],
+      "contract_fingerprint": "7e44142adc9177c205d6427f75b1abb953763525caa4fd39f25ce09d2fbc91a5",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "DELETE /api/v1/delayprofile/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/delayprofile/{id}",
+      "tags": [
+        "DelayProfile"
+      ],
+      "contract_fingerprint": "edda2080a0fce766f62b580ca83b10cd8108a40aa682f2e7ce50d2321738ee60",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "DELETE /api/v1/downloadclient/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/downloadclient/bulk",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "3147f68ac1e843766df6547eff025198567bc4bd5c15dcf187af39950f6b94ab",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "DELETE /api/v1/downloadclient/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/downloadclient/{id}",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "46ab689a6eb705ee85859221c2eb71f9b65784733deeb39d3d6e4df688212fc9",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "DELETE /api/v1/ignored/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/ignored/bulk",
+      "tags": [
+        "Ignored"
+      ],
+      "contract_fingerprint": "2baf51ea997973f007981d56c6f7f13ec146af527848e4c47295d53754c34e83",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Removing ignored records is imperative maintenance and must never run during plan or refresh."
+    },
+    {
+      "key": "DELETE /api/v1/ignored/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/ignored/{id}",
+      "tags": [
+        "Ignored"
+      ],
+      "contract_fingerprint": "5bc7e6e35f1b4add7d27463b4266d7a42bd48a564b9bfb5505b955bfd2303bfb",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Removing ignored records is imperative maintenance and must never run during plan or refresh."
+    },
+    {
+      "key": "DELETE /api/v1/importlist/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/importlist/bulk",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "a18cfd369a6d394f42cf6ca9bbc0f4c2f1b41414da975bdd8c8e17f17d5e503b",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "DELETE /api/v1/importlist/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/importlist/{id}",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "55643a331e289d503c3a8e18d1dac5021d59ec9dd9cbd7d74f6f97a945aad67e",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "DELETE /api/v1/importlistexclusion/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/importlistexclusion/bulk",
+      "tags": [
+        "ImportListExclusion"
+      ],
+      "contract_fingerprint": "26100c13808968eb184642eecc3ba6814310237606c7d039438f6da74c1bf2a2",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "DELETE /api/v1/importlistexclusion/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/importlistexclusion/{id}",
+      "tags": [
+        "ImportListExclusion"
+      ],
+      "contract_fingerprint": "0696490068e7b33197231f27572257f256633a25344b91e2fcaee9f3d50a95e1",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "DELETE /api/v1/indexer/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/indexer/bulk",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "12a7d3d9b8052bab642307a6daedd5f4e698bfdac3e4a3c2a20d9d5f0fed7644",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "DELETE /api/v1/indexer/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/indexer/{id}",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "4fd4572456f23c8aeb4f0622141d1b07be1547d5c9c49f8f4300ee28ea344f8d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "DELETE /api/v1/metadata/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/metadata/{id}",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "35ebb5bc49a7017a1e546f3b3a672ae9fa2362ada1e7a08100ede2cf5081e5b6",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "DELETE /api/v1/metadataprofile/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/metadataprofile/{id}",
+      "tags": [
+        "MetadataProfile"
+      ],
+      "contract_fingerprint": "835d9a15fe5322b4eb61b96acea7927bcc2d4e0c32d58c111206b20bce55913d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "DELETE /api/v1/notification/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/notification/bulk",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "66ace462567ee5feffb15d2e4aafa6bea29c327fe72f06954a7c1e02f5451e6d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "DELETE /api/v1/notification/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/notification/{id}",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "32ae0bf60de4a8b58be09e5c59e4012eea3551285493b0cf134826c6bf62d401",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "DELETE /api/v1/pendingauthorimport/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/pendingauthorimport/{id}",
+      "tags": [
+        "PendingAuthorImport"
+      ],
+      "contract_fingerprint": "cea2a78e83fafae683f3e0cb2aae05ba45fcc61d80013458dd9a43300b17965f",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue, retry, and delete operations change import state and require explicit operational tooling."
+    },
+    {
+      "key": "DELETE /api/v1/qualityprofile/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/qualityprofile/{id}",
+      "tags": [
+        "QualityProfile"
+      ],
+      "contract_fingerprint": "e935d614ae716b5d06470efab49ab963e3edd3c1a9f1dcfb8df926084995f26a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "DELETE /api/v1/queue/bulk",
+      "method": "DELETE",
+      "path": "/api/v1/queue/bulk",
+      "tags": [
+        "Queue"
+      ],
+      "contract_fingerprint": "976db35a6fcb70edcaa52bb5d47584f49471a858080d4e4d7c505337d356156c",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue cancellation/removal is destructive operational behavior and requires explicit tooling."
+    },
+    {
+      "key": "DELETE /api/v1/queue/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/queue/{id}",
+      "tags": [
+        "Queue"
+      ],
+      "contract_fingerprint": "8798d6ad442df21602d9c9f64c4f3badb331f417ca3b5bd0b102c5171fd87ceb",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue cancellation/removal is destructive operational behavior and requires explicit tooling."
+    },
+    {
+      "key": "DELETE /api/v1/releaseprofile/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/releaseprofile/{id}",
+      "tags": [
+        "ReleaseProfile"
+      ],
+      "contract_fingerprint": "dc08eccf2d7b583e49c0ce5806a294451694ae94cc147388dbca19fae26d22ab",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "DELETE /api/v1/remotepathmapping/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/remotepathmapping/{id}",
+      "tags": [
+        "RemotePathMapping"
+      ],
+      "contract_fingerprint": "547d9a3437632d69e3a4311f52b2b4482fe3499b0228afafe4018522d60102c6",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "DELETE /api/v1/rootfolder/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/rootfolder/{id}",
+      "tags": [
+        "RootFolder"
+      ],
+      "contract_fingerprint": "6e32c0e56b72e71ad25659d17c8e827aedebe93a865a4f4bb2cd08f291a1f5f4",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "DELETE /api/v1/series/{seriesId}/variants/{variantId}",
+      "method": "DELETE",
+      "path": "/api/v1/series/{seriesId}/variants/{variantId}",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "78087eff25b45daec98b4816537d51e819ebab69c34fada706da23bcc54302f0",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "DELETE /api/v1/settings/proxy/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/settings/proxy/{id}",
+      "tags": [
+        "Proxy"
+      ],
+      "contract_fingerprint": "f951e710fe0d25404c155f543c36788f33d9927c6036aed968f736f119db6862",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "DELETE /api/v1/system/backup/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/system/backup/{id}",
+      "tags": [
+        "Backup"
+      ],
+      "contract_fingerprint": "79d71f8e275d3a5c6cb6c165ec2d5be157766c26d4687f6716005bf501a14f1e",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Backup deletion or restoration is imperative maintenance and must never run during plan or refresh."
+    },
+    {
+      "key": "DELETE /api/v1/tag/{id}",
+      "method": "DELETE",
+      "path": "/api/v1/tag/{id}",
+      "tags": [
+        "Tag"
+      ],
+      "contract_fingerprint": "0389dacc955da0232d4c17ea736f7761798f02195d65a98f06523428f3dbbbaa",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /",
+      "method": "GET",
+      "path": "/",
+      "tags": [
+        "StaticResource"
+      ],
+      "contract_fingerprint": "c3d13a469f71b9ab728c6701559320c7e8f826608e1f3a11cebe76593582f2b3",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Web UI static content is unrelated to infrastructure state."
+    },
+    {
+      "key": "GET /api",
+      "method": "GET",
+      "path": "/api",
+      "tags": [
+        "ApiInfo"
+      ],
+      "contract_fingerprint": "c409f455bc8419e7ed6338511c1859c719815b26e415a8a477ae347e2fa210e3",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_api_info",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/author",
+      "method": "GET",
+      "path": "/api/v1/author",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "324cd3f0ab3f3fdb2b50dcc470953d91b6c08c8165e7a3d8e69ca946237d2083",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/author/lookup",
+      "method": "GET",
+      "path": "/api/v1/author/lookup",
+      "tags": [
+        "AuthorLookup"
+      ],
+      "contract_fingerprint": "4409a8f7af156a8cd46be4f4951cebd6f31880de865c25628b025ae4af63c707",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_author_lookup",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/author/{authorId}",
+      "method": "GET",
+      "path": "/api/v1/author/{authorId}",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "19d8bcc9929f60e03fe4ba1438a94a4f5f90333cef8f60e3ce1529b7c7d2c862",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/author/{id}",
+      "method": "GET",
+      "path": "/api/v1/author/{id}",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "88ee8a38ddf2660bae96543ce3598040d7ac33c8f75cc7f63c59520ddaeb89d2",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/author/{id}/size/{mediaType}",
+      "method": "GET",
+      "path": "/api/v1/author/{id}/size/{mediaType}",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "ec92be86e482634df4081746091ff2fea707da2e39bc9a6e2558819ab3fffda3",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_author_statistics",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/blocklist",
+      "method": "GET",
+      "path": "/api/v1/blocklist",
+      "tags": [
+        "Blocklist"
+      ],
+      "contract_fingerprint": "d67f92dee71c4e39adeef80a204d6c61695cca961d16a02701de1a62a8d74f21",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_blocklist",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/book",
+      "method": "GET",
+      "path": "/api/v1/book",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "df1ca665201fc62645e45c50408d7782760e048b79894142d37062409ca15979",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/book/buckets",
+      "method": "GET",
+      "path": "/api/v1/book/buckets",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "e61f46a83461380d9ea738f4e4fe2897ec4f09634e39afa22c8ee18d89e7184d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/book/ids",
+      "method": "GET",
+      "path": "/api/v1/book/ids",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "a10ae089f148ceefecb5cb2eb0385c1767dbcce621b57a5b484f18c4f553835d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/book/lookup",
+      "method": "GET",
+      "path": "/api/v1/book/lookup",
+      "tags": [
+        "BookLookup"
+      ],
+      "contract_fingerprint": "68b96c3a14404b326b238a0b7e5e0c59ff2011aa40e5329ef7535d7888476ef9",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_book_lookup",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/book/paged",
+      "method": "GET",
+      "path": "/api/v1/book/paged",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "b29855f4b873c0282207e5490f86c536c3e3232ac1f5f5255d8960a72e87f908",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/book/{bookId}",
+      "method": "GET",
+      "path": "/api/v1/book/{bookId}",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "a3a9f20656220792ac1dc176301f47866c02371a1fcf92030a91bd858508c41d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/book/{bookId}/siblings",
+      "method": "GET",
+      "path": "/api/v1/book/{bookId}/siblings",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "96998ef08e28b2ce7dfbbbd41d77f6f439a4dff11ab65f1e9965041a3ff03684",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/book/{id}",
+      "method": "GET",
+      "path": "/api/v1/book/{id}",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "6b0962069a20843c28c2c033b07cbfe65c6b701949a965a37a8c2c5ac95cadaa",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/book/{id}/overview",
+      "method": "GET",
+      "path": "/api/v1/book/{id}/overview",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "ea766f3d62474a67b3d52361a2c127fe65aecfb9d8d4fd43f0457320ae2e619f",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/bookfile",
+      "method": "GET",
+      "path": "/api/v1/bookfile",
+      "tags": [
+        "BookFile"
+      ],
+      "contract_fingerprint": "cfb675c56beaa3223e2957ac39a8ebbd19bf9ce1115b80b285e2784ba7adf92b",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_book_file",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/bookfile/{id}",
+      "method": "GET",
+      "path": "/api/v1/bookfile/{id}",
+      "tags": [
+        "BookFile"
+      ],
+      "contract_fingerprint": "12894d975b1b51488a58a681329e83902e8cbe2878381efd1dfd61d2ca7cba38",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_book_file",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/calendar",
+      "method": "GET",
+      "path": "/api/v1/calendar",
+      "tags": [
+        "Calendar"
+      ],
+      "contract_fingerprint": "eba179c41717437b8da34c3a792c56c63c464aad508169c6f71e655f3d2e384c",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_calendar",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/calendar/{id}",
+      "method": "GET",
+      "path": "/api/v1/calendar/{id}",
+      "tags": [
+        "Calendar"
+      ],
+      "contract_fingerprint": "7852aa78ae4843a0642538440c85e1be6e63eca9c1b464277d8ceac264278962",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_calendar",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/command",
+      "method": "GET",
+      "path": "/api/v1/command",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "efefa80f8fb97c19012618ae5f09a683c7284fbd3e6bd9fb76b02e3e70c0ffc3",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_commands",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/command/{id}",
+      "method": "GET",
+      "path": "/api/v1/command/{id}",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "396939337e09d26ad302a0c42d1257fa81d36e70c05249c00d81e9ed0a280263",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_commands",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/config/conversion",
+      "method": "GET",
+      "path": "/api/v1/config/conversion",
+      "tags": [
+        "ConversionConfig"
+      ],
+      "contract_fingerprint": "1e68ff850f6b00dd3616b494f6062c261327383eee344d8dcb9155888a0ac61d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_conversion_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/conversion/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/conversion/{id}",
+      "tags": [
+        "ConversionConfig"
+      ],
+      "contract_fingerprint": "833e31fac2047b4767ae80856fd626cbc9adc4c996587ca129b76f9b2df2e121",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_conversion_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/development",
+      "method": "GET",
+      "path": "/api/v1/config/development",
+      "tags": [
+        "DevelopmentConfig"
+      ],
+      "contract_fingerprint": "e7739e0bc9e424ea4b1d8c679b34f861bb253f4b66837cba85363f64ca93b569",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_development_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/development/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/development/{id}",
+      "tags": [
+        "DevelopmentConfig"
+      ],
+      "contract_fingerprint": "14e6e89d0ad74488db5452227af0252ff0d5b472d23e10e72461732400ee9da7",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_development_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/downloadclient",
+      "method": "GET",
+      "path": "/api/v1/config/downloadclient",
+      "tags": [
+        "DownloadClientConfig"
+      ],
+      "contract_fingerprint": "c355201502ff635e785d83b6678219f57a3bb698ab7277a714d1828b53691ffd",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/downloadclient/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/downloadclient/{id}",
+      "tags": [
+        "DownloadClientConfig"
+      ],
+      "contract_fingerprint": "b1f11ab7925dbd25163f9efa6efba6fa846b2b1c7cf9cbfee01ed5274ccac03a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/hardcover",
+      "method": "GET",
+      "path": "/api/v1/config/hardcover",
+      "tags": [
+        "HardcoverConfig"
+      ],
+      "contract_fingerprint": "0cdfab8f2d9c30c098dae5658f7e5b53be364acbba72757784440c1d68babc93",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_hardcover_config",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "GET /api/v1/config/host",
+      "method": "GET",
+      "path": "/api/v1/config/host",
+      "tags": [
+        "HostConfig"
+      ],
+      "contract_fingerprint": "3bf7437e7ac607d8d2ab8a58955c011afac16f12859cd3eaf7ee3afb26d4960e",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_host_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/host/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/host/{id}",
+      "tags": [
+        "HostConfig"
+      ],
+      "contract_fingerprint": "e02936b0b0ce0acf9b93d4f942473eba18f73cb6edcad3a78e4168d57b534628",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_host_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/indexer",
+      "method": "GET",
+      "path": "/api/v1/config/indexer",
+      "tags": [
+        "IndexerConfig"
+      ],
+      "contract_fingerprint": "7115942ce2fa10aa7ca0eceada9fc085835e4eb531dfccae940f050ad33b1605",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/indexer/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/indexer/{id}",
+      "tags": [
+        "IndexerConfig"
+      ],
+      "contract_fingerprint": "098f356ae8d91fb711a7102d1b85fe75ed0c14e4c1f31a433158d9b78451197b",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/mediamanagement",
+      "method": "GET",
+      "path": "/api/v1/config/mediamanagement",
+      "tags": [
+        "MediaManagementConfig"
+      ],
+      "contract_fingerprint": "9df7108771b0a2c330c997954c6d9b181c896705abf4e7c49040f55a403dc8a6",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_media_management_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/mediamanagement/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/mediamanagement/{id}",
+      "tags": [
+        "MediaManagementConfig"
+      ],
+      "contract_fingerprint": "5e09c77f3d7b86476d15681d4259761c17e8efef415ae3b274ca8fd66b27d76a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_media_management_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/metadataprovider",
+      "method": "GET",
+      "path": "/api/v1/config/metadataprovider",
+      "tags": [
+        "MetadataProviderConfig"
+      ],
+      "contract_fingerprint": "e7fd44a7a0556ba68827e497e933117bcd6ce21347a3b30f19831069a97c06e3",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_provider_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/metadataprovider/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/metadataprovider/{id}",
+      "tags": [
+        "MetadataProviderConfig"
+      ],
+      "contract_fingerprint": "f8f852051a26c35047e0084fa2866b1e5017571afd8885b767120c724669c935",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_provider_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/naming",
+      "method": "GET",
+      "path": "/api/v1/config/naming",
+      "tags": [
+        "NamingConfig"
+      ],
+      "contract_fingerprint": "9c9dda0378ae6fce6d3473f9ea46e1668432b58b6544c86094131f40dec975dd",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_naming_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/naming/examples",
+      "method": "GET",
+      "path": "/api/v1/config/naming/examples",
+      "tags": [
+        "NamingConfig"
+      ],
+      "contract_fingerprint": "dfff798d89967199e024aea59640b1827243bfe223af0227984a3bd43cad00f7",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_naming_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/naming/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/naming/{id}",
+      "tags": [
+        "NamingConfig"
+      ],
+      "contract_fingerprint": "7f0654430342234f3a613573b80dc703ebf1eb2a587deaca0febeeb48a1b69ac",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_naming_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/ui",
+      "method": "GET",
+      "path": "/api/v1/config/ui",
+      "tags": [
+        "UiConfig"
+      ],
+      "contract_fingerprint": "b0b7e49e5bc799e60475a62895dce8a6c4be8aae06012f88a4974e666359fdd5",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_ui_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/config/ui/{id}",
+      "method": "GET",
+      "path": "/api/v1/config/ui/{id}",
+      "tags": [
+        "UiConfig"
+      ],
+      "contract_fingerprint": "f23fefb03830838eee7cd58a4bd4e0765fa9dc9e6d6ef8eb50e5707af592524a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_ui_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "GET /api/v1/customfilter",
+      "method": "GET",
+      "path": "/api/v1/customfilter",
+      "tags": [
+        "CustomFilter"
+      ],
+      "contract_fingerprint": "1cfe530a185a14d4045e89922b686635a709f916ee54780b66be0d1b9b179864",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/customfilter/{id}",
+      "method": "GET",
+      "path": "/api/v1/customfilter/{id}",
+      "tags": [
+        "CustomFilter"
+      ],
+      "contract_fingerprint": "5e53161e4b682f4dcf52c5c3cb1ce5ea0016bc240e2e9f6dee5e028e830a34e2",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/customformat",
+      "method": "GET",
+      "path": "/api/v1/customformat",
+      "tags": [
+        "CustomFormat"
+      ],
+      "contract_fingerprint": "324cb80f7d594072025d53af8dc42d13c789a61cb23e9eaa423a5958fabd89eb",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/customformat/schema",
+      "method": "GET",
+      "path": "/api/v1/customformat/schema",
+      "tags": [
+        "CustomFormat"
+      ],
+      "contract_fingerprint": "965f4fd22baa6e9ce0d89bebc25714597e8d8d3b6fc47af8715d0c47e67d644e",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/customformat/{id}",
+      "method": "GET",
+      "path": "/api/v1/customformat/{id}",
+      "tags": [
+        "CustomFormat"
+      ],
+      "contract_fingerprint": "9c103e6c51f46788df4c3dbc5c43fe70d410a33516c4b11d47354c7bfa5555c5",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/delayprofile",
+      "method": "GET",
+      "path": "/api/v1/delayprofile",
+      "tags": [
+        "DelayProfile"
+      ],
+      "contract_fingerprint": "548fefa629138f4e4452e94eede126862c15b3c80040e2107a45dcaf585b759b",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/delayprofile/{id}",
+      "method": "GET",
+      "path": "/api/v1/delayprofile/{id}",
+      "tags": [
+        "DelayProfile"
+      ],
+      "contract_fingerprint": "11aaf675f8e7e19ec81817ae1cc2bb6d01a141f9ebe2cc832eccab1e5675434b",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/diskspace",
+      "method": "GET",
+      "path": "/api/v1/diskspace",
+      "tags": [
+        "DiskSpace"
+      ],
+      "contract_fingerprint": "cd448801b8565d592d88cf9f044a2c577d913bf38ade921e17f6e10eb77d9510",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_disk_space",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/downloadclient",
+      "method": "GET",
+      "path": "/api/v1/downloadclient",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "a4fc4fcb0dfdac9aea1619d4803e9c4a8ed5ad22119563b18cbfc5db24268cb8",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/downloadclient/schema",
+      "method": "GET",
+      "path": "/api/v1/downloadclient/schema",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "a4fc4fcb0dfdac9aea1619d4803e9c4a8ed5ad22119563b18cbfc5db24268cb8",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/downloadclient/{id}",
+      "method": "GET",
+      "path": "/api/v1/downloadclient/{id}",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "e63aec50afb4b76946136cec0642563ec489108278eded0f24bb07a519e44c3b",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/edition",
+      "method": "GET",
+      "path": "/api/v1/edition",
+      "tags": [
+        "Edition"
+      ],
+      "contract_fingerprint": "1ef568b59172378403577357ae72ce235ba02f7771f51a2d3696d310247fc255",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_editions",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/filesystem",
+      "method": "GET",
+      "path": "/api/v1/filesystem",
+      "tags": [
+        "FileSystem"
+      ],
+      "contract_fingerprint": "d66c20be634c5a64086b4fa8d897ea4488ebf30985ec715a381b5e28261693fa",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_file_system",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/filesystem/mediafiles",
+      "method": "GET",
+      "path": "/api/v1/filesystem/mediafiles",
+      "tags": [
+        "FileSystem"
+      ],
+      "contract_fingerprint": "3fb9113d4790ba2c828914d54a6ee7de46c6e762cc46421d94cd5f55d18da61f",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_file_system",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/filesystem/type",
+      "method": "GET",
+      "path": "/api/v1/filesystem/type",
+      "tags": [
+        "FileSystem"
+      ],
+      "contract_fingerprint": "3fb9113d4790ba2c828914d54a6ee7de46c6e762cc46421d94cd5f55d18da61f",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_file_system",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/health",
+      "method": "GET",
+      "path": "/api/v1/health",
+      "tags": [
+        "Health"
+      ],
+      "contract_fingerprint": "4a359b3a4bf25bb92b2f468d34cd9ca5aceb202512c69ad6d08407d418f23f19",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_health",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/history",
+      "method": "GET",
+      "path": "/api/v1/history",
+      "tags": [
+        "History"
+      ],
+      "contract_fingerprint": "03a7fc4c03cdf17b1c33523bd8ea783843d1bf997b15def75dc119da5d4f1633",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_history",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/history/author",
+      "method": "GET",
+      "path": "/api/v1/history/author",
+      "tags": [
+        "History"
+      ],
+      "contract_fingerprint": "731950500f6e904c323f0a91249aabe03ceb8884fc032c4cbaec816d0326dd29",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_history",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/history/since",
+      "method": "GET",
+      "path": "/api/v1/history/since",
+      "tags": [
+        "History"
+      ],
+      "contract_fingerprint": "d1d23b56e54750a13cb67bdc9cd39127eda9835ebc4b25d21c0c326feeb1afd4",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_history",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/ignored",
+      "method": "GET",
+      "path": "/api/v1/ignored",
+      "tags": [
+        "Ignored"
+      ],
+      "contract_fingerprint": "9a40fa1f3e908a77c5e648095b4305169f39971668635321a70838ede092746e",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_ignored",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/importlist",
+      "method": "GET",
+      "path": "/api/v1/importlist",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "036c31d67780c06b08d1c406750f0ff0875eea4dbaf2551ffa3eab7d74084fd0",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "GET /api/v1/importlist/schema",
+      "method": "GET",
+      "path": "/api/v1/importlist/schema",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "036c31d67780c06b08d1c406750f0ff0875eea4dbaf2551ffa3eab7d74084fd0",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "GET /api/v1/importlist/{id}",
+      "method": "GET",
+      "path": "/api/v1/importlist/{id}",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "c5fa781b6539656d4ee662e3fc8c2d394cae18c3f5b1bd03584e3fc964bc289a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "GET /api/v1/importlistexclusion",
+      "method": "GET",
+      "path": "/api/v1/importlistexclusion",
+      "tags": [
+        "ImportListExclusion"
+      ],
+      "contract_fingerprint": "3c7d7b55e1e3601c3657a8223dfcf39e6cfebb3b5c44954cdc9431b08860d45c",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "GET /api/v1/importlistexclusion/{id}",
+      "method": "GET",
+      "path": "/api/v1/importlistexclusion/{id}",
+      "tags": [
+        "ImportListExclusion"
+      ],
+      "contract_fingerprint": "774d1086a0da2e024672f58b8549f032db25405513eca8b057b4135c472d33fc",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "GET /api/v1/indexer",
+      "method": "GET",
+      "path": "/api/v1/indexer",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "c766b99cf5f473312435de12c2ab79c82ee334145320b78d9d2dad7985719bef",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/indexer/schema",
+      "method": "GET",
+      "path": "/api/v1/indexer/schema",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "c766b99cf5f473312435de12c2ab79c82ee334145320b78d9d2dad7985719bef",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/indexer/{id}",
+      "method": "GET",
+      "path": "/api/v1/indexer/{id}",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "1b3e1d9d188149206058f6cce0aed82d29456db12afeaa7a96cf501a3efd14a5",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/indexerflag",
+      "method": "GET",
+      "path": "/api/v1/indexerflag",
+      "tags": [
+        "IndexerFlag"
+      ],
+      "contract_fingerprint": "d31bc47ce3587e308cee929af7898629f914f02b1e40c87d9596dee06d91582a",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_indexer_flags",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/language",
+      "method": "GET",
+      "path": "/api/v1/language",
+      "tags": [
+        "Language"
+      ],
+      "contract_fingerprint": "d24dbec28342171e8e00549c6e174f9ce8e92725934d125f4242c63b3af89cc1",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_language",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/language/{id}",
+      "method": "GET",
+      "path": "/api/v1/language/{id}",
+      "tags": [
+        "Language"
+      ],
+      "contract_fingerprint": "0e9683ebfcbb4ce88fe0b5546aa679df1eb36f7417f92b731bc9a8baf9d01077",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_language",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/library/search",
+      "method": "GET",
+      "path": "/api/v1/library/search",
+      "tags": [
+        "LibrarySearch"
+      ],
+      "contract_fingerprint": "6bdd38ab23295ef264548147a64b4c920fa07b258eaa10f73d2ce87e5352618f",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_library_search",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/localization",
+      "method": "GET",
+      "path": "/api/v1/localization",
+      "tags": [
+        "Localization"
+      ],
+      "contract_fingerprint": "e7c740682d98ae98b7b5dcdedd920e07c275a9e09f5ed4236f00df333525e78a",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_localization",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/log",
+      "method": "GET",
+      "path": "/api/v1/log",
+      "tags": [
+        "Log"
+      ],
+      "contract_fingerprint": "d2858b445744f8bbf57cfaf8040c3ff4fbe86fa5c1aefdb5f5a8030a604b2af2",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw application logs are operational data and may contain sensitive values; use observability tooling."
+    },
+    {
+      "key": "GET /api/v1/log/file",
+      "method": "GET",
+      "path": "/api/v1/log/file",
+      "tags": [
+        "LogFile"
+      ],
+      "contract_fingerprint": "d5b106ed0008273da874484de6dec91cac247b57d3999084c9643964d5adfd8e",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw log files may contain sensitive values; use access-controlled observability tooling."
+    },
+    {
+      "key": "GET /api/v1/log/file/update",
+      "method": "GET",
+      "path": "/api/v1/log/file/update",
+      "tags": [
+        "UpdateLogFile"
+      ],
+      "contract_fingerprint": "08cb91336671abd241746e39f037885f93da29d335a357a9896b1656134b95b9",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw update logs may contain sensitive values; use access-controlled observability tooling."
+    },
+    {
+      "key": "GET /api/v1/log/file/update/{filename}",
+      "method": "GET",
+      "path": "/api/v1/log/file/update/{filename}",
+      "tags": [
+        "UpdateLogFile"
+      ],
+      "contract_fingerprint": "173fe4b6d7b98f1cc613228140b25404bc6325387061e8d5d65bfc8b2f68e14b",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw update logs may contain sensitive values; use access-controlled observability tooling."
+    },
+    {
+      "key": "GET /api/v1/log/file/{filename}",
+      "method": "GET",
+      "path": "/api/v1/log/file/{filename}",
+      "tags": [
+        "LogFile"
+      ],
+      "contract_fingerprint": "3f5a672bb94c93904c94faf363f10c54333b311e57e884889b716b018499c490",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Raw log files may contain sensitive values; use access-controlled observability tooling."
+    },
+    {
+      "key": "GET /api/v1/manualimport",
+      "method": "GET",
+      "path": "/api/v1/manualimport",
+      "tags": [
+        "ManualImport"
+      ],
+      "contract_fingerprint": "d964caab68d3ad64eaac5ac52c09296e1b1d6a231a725f9e5e81aae5943449b7",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_manual_import_candidates",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/mediacover/author/{authorId}/{filename}",
+      "method": "GET",
+      "path": "/api/v1/mediacover/author/{authorId}/{filename}",
+      "tags": [
+        "MediaCover"
+      ],
+      "contract_fingerprint": "23927348c3100f47ec82bbc483033dd1f067e63a9770baf7ebd4d7b311ce5bb6",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_media_cover",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/mediacover/book/{bookId}/{filename}",
+      "method": "GET",
+      "path": "/api/v1/mediacover/book/{bookId}/{filename}",
+      "tags": [
+        "MediaCover"
+      ],
+      "contract_fingerprint": "0d74ded37d06763836fce27e64509c14eeb2cfade47cddb3ad10b1c2932cb710",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_media_cover",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/mediacover/books/{bookId}/{filename}",
+      "method": "GET",
+      "path": "/api/v1/mediacover/books/{bookId}/{filename}",
+      "tags": [
+        "MediaCover"
+      ],
+      "contract_fingerprint": "0d74ded37d06763836fce27e64509c14eeb2cfade47cddb3ad10b1c2932cb710",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_media_cover",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/mediacover/{authorId}/{filename}",
+      "method": "GET",
+      "path": "/api/v1/mediacover/{authorId}/{filename}",
+      "tags": [
+        "MediaCover"
+      ],
+      "contract_fingerprint": "23927348c3100f47ec82bbc483033dd1f067e63a9770baf7ebd4d7b311ce5bb6",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_media_cover",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/metadata",
+      "method": "GET",
+      "path": "/api/v1/metadata",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "cf380bfc3e4f21897da44d07abb0ff8ae5e8d306e80f86f9181e81c5f6443aa8",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/metadata/schema",
+      "method": "GET",
+      "path": "/api/v1/metadata/schema",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "cf380bfc3e4f21897da44d07abb0ff8ae5e8d306e80f86f9181e81c5f6443aa8",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/metadata/{id}",
+      "method": "GET",
+      "path": "/api/v1/metadata/{id}",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "03f22a530414d9638b73340ce446b30aaa3291627918ee5c7cfaac13a66aec89",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/metadataprofile",
+      "method": "GET",
+      "path": "/api/v1/metadataprofile",
+      "tags": [
+        "MetadataProfile"
+      ],
+      "contract_fingerprint": "f96cd7a03ddb70450fbdcc6db5ff81cce2277d61ddad76d9539dfae01b9d8a2e",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/metadataprofile/languages",
+      "method": "GET",
+      "path": "/api/v1/metadataprofile/languages",
+      "tags": [
+        "MetadataProfile"
+      ],
+      "contract_fingerprint": "fa074c5e1b222f1f4a347cfea2d12d3c182d8baa6431205cede95b285785c21b",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/metadataprofile/schema",
+      "method": "GET",
+      "path": "/api/v1/metadataprofile/schema",
+      "tags": [
+        "MetadataProfileSchema"
+      ],
+      "contract_fingerprint": "0bd48c4aa73788379c8eeea206ece84edda9385176e7426f1944d415a6880127",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile_schema",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/metadataprofile/{id}",
+      "method": "GET",
+      "path": "/api/v1/metadataprofile/{id}",
+      "tags": [
+        "MetadataProfile"
+      ],
+      "contract_fingerprint": "424c58d156d46bbbc972e605c1714651c8cf3d9ac559f55f4489da7f9f716197",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/notification",
+      "method": "GET",
+      "path": "/api/v1/notification",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "19e3708de3e12ceb0e582b4ff41dd7bbd3788d80fc9cae920c385121b8ac6dc2",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/notification/schema",
+      "method": "GET",
+      "path": "/api/v1/notification/schema",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "19e3708de3e12ceb0e582b4ff41dd7bbd3788d80fc9cae920c385121b8ac6dc2",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/notification/{id}",
+      "method": "GET",
+      "path": "/api/v1/notification/{id}",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "36145461e500c2db0b46feb583c1755f518d2546dd290c7a5797738f7a6c19ff",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/parse",
+      "method": "GET",
+      "path": "/api/v1/parse",
+      "tags": [
+        "Parse"
+      ],
+      "contract_fingerprint": "983debd8319cc2454a0d4a04946e11821c3708a585910bc01cc8e45639827f7c",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_parse",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/pendingauthorimport",
+      "method": "GET",
+      "path": "/api/v1/pendingauthorimport",
+      "tags": [
+        "PendingAuthorImport"
+      ],
+      "contract_fingerprint": "008d9e72e294f4f3ef2a1ba6b655fd0471d5d3069b15d687397119a625345f62",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_pending_author_import",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/pendingauthorimport/author/exists/{providerId}",
+      "method": "GET",
+      "path": "/api/v1/pendingauthorimport/author/exists/{providerId}",
+      "tags": [
+        "PendingAuthorImport"
+      ],
+      "contract_fingerprint": "cf618c309ca110c3fce585095506f7431070ce5ba24c950d1ff96b4db0fc4928",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_pending_author_import",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/pendingauthorimport/profiles/options",
+      "method": "GET",
+      "path": "/api/v1/pendingauthorimport/profiles/options",
+      "tags": [
+        "PendingAuthorImport"
+      ],
+      "contract_fingerprint": "eddeee82e7925a37424572bf6889166ab78f1e99e57c659947d49490a63cb2ee",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_pending_author_import",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/pendingauthorimport/{id}",
+      "method": "GET",
+      "path": "/api/v1/pendingauthorimport/{id}",
+      "tags": [
+        "PendingAuthorImport"
+      ],
+      "contract_fingerprint": "902c9b2558a4816a118172de6ae47a6e83c58d9c45b7a672838c4d5680fdf422",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_pending_author_import",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/qualitydefinition",
+      "method": "GET",
+      "path": "/api/v1/qualitydefinition",
+      "tags": [
+        "QualityDefinition"
+      ],
+      "contract_fingerprint": "187c275e2a448872f0e8d6e4590d50dec5a10c2c7908a435774c4326774e2eb9",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_definition",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/qualitydefinition/{id}",
+      "method": "GET",
+      "path": "/api/v1/qualitydefinition/{id}",
+      "tags": [
+        "QualityDefinition"
+      ],
+      "contract_fingerprint": "19af7037fb8533f321c6f4ade86bcc9db0ee7cb563f9149f2b59631e032a2644",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_definition",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/qualityprofile",
+      "method": "GET",
+      "path": "/api/v1/qualityprofile",
+      "tags": [
+        "QualityProfile"
+      ],
+      "contract_fingerprint": "a71a0ea426a5af785a10997aeade8b7d984572098e9dbb641be3ceba54d69c1d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/qualityprofile/schema",
+      "method": "GET",
+      "path": "/api/v1/qualityprofile/schema",
+      "tags": [
+        "QualityProfileSchema"
+      ],
+      "contract_fingerprint": "06d14457231a564312a200dec1b1bdecb9f25059939561ad3a89e8b9d34ffde2",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_quality_profile_schema",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/qualityprofile/{id}",
+      "method": "GET",
+      "path": "/api/v1/qualityprofile/{id}",
+      "tags": [
+        "QualityProfile"
+      ],
+      "contract_fingerprint": "eb50c19bfe2b5dc0ad24d1cb2cf1ffc4f48e2a1a1b1488090ee06f8c478b2ffc",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/queue",
+      "method": "GET",
+      "path": "/api/v1/queue",
+      "tags": [
+        "Queue"
+      ],
+      "contract_fingerprint": "3f6e25d27786388a948e467b9a1cd8e81abf5512fc5bdf1d04fadee138eeaf26",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_queue",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/queue/details",
+      "method": "GET",
+      "path": "/api/v1/queue/details",
+      "tags": [
+        "QueueDetails"
+      ],
+      "contract_fingerprint": "a60dced36271fd363161827fbbf4a257b4783ab1092e52e23cd0b9e8d973ba14",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_queue_details",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/queue/status",
+      "method": "GET",
+      "path": "/api/v1/queue/status",
+      "tags": [
+        "QueueStatus"
+      ],
+      "contract_fingerprint": "c4fc28051a6290ab7115f285d34d90b01280035c129cc3b1a83be521976e5f5f",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_queue_status",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/release",
+      "method": "GET",
+      "path": "/api/v1/release",
+      "tags": [
+        "Release"
+      ],
+      "contract_fingerprint": "a45ef8624d3e1b50b90ad71b82dc169533cd6e6e009095ccf7362ef406503b8b",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_release_search",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "GET /api/v1/releaseprofile",
+      "method": "GET",
+      "path": "/api/v1/releaseprofile",
+      "tags": [
+        "ReleaseProfile"
+      ],
+      "contract_fingerprint": "c8476e69a698c7c5c37bc8b23d5fa979edc3492d4d21d98257dc40918933d79f",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/releaseprofile/{id}",
+      "method": "GET",
+      "path": "/api/v1/releaseprofile/{id}",
+      "tags": [
+        "ReleaseProfile"
+      ],
+      "contract_fingerprint": "f5559fd588378d02e5726622845549d20e5dbdad85df62d53cb728ee846876ed",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "GET /api/v1/remotepathmapping",
+      "method": "GET",
+      "path": "/api/v1/remotepathmapping",
+      "tags": [
+        "RemotePathMapping"
+      ],
+      "contract_fingerprint": "ca1f912a5f9338c93ca94acf5613c199fa3beb1eff5210843cb971d8cb803d42",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/remotepathmapping/suggestions",
+      "method": "GET",
+      "path": "/api/v1/remotepathmapping/suggestions",
+      "tags": [
+        "RemotePathMapping"
+      ],
+      "contract_fingerprint": "ff0adb132bd5449eee18bd4fcba10496d1932c112049712d2d1a43d7b82cac73",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/remotepathmapping/{id}",
+      "method": "GET",
+      "path": "/api/v1/remotepathmapping/{id}",
+      "tags": [
+        "RemotePathMapping"
+      ],
+      "contract_fingerprint": "f0cdb4a80f1e660c6ea4a7fc60eb2e19c77d86e72d2fd497f66739800ed92f5f",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/rename",
+      "method": "GET",
+      "path": "/api/v1/rename",
+      "tags": [
+        "RenameBook"
+      ],
+      "contract_fingerprint": "03493bbd199000c1d4222051394c897168a1fa0cb984820ff47737d694599c95",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_rename_book_preview",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/retag",
+      "method": "GET",
+      "path": "/api/v1/retag",
+      "tags": [
+        "RetagBook"
+      ],
+      "contract_fingerprint": "681a9f868238504975f8bc31d496e7b6de63e6593cd2e163c256dda42c46ebf2",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_retag_book_preview",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "GET /api/v1/rootfolder",
+      "method": "GET",
+      "path": "/api/v1/rootfolder",
+      "tags": [
+        "RootFolder"
+      ],
+      "contract_fingerprint": "5bb05f44666c142e138d8b6a06bfe1390cc215f5a30a18bf39b2a572b412415f",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/rootfolder/{id}",
+      "method": "GET",
+      "path": "/api/v1/rootfolder/{id}",
+      "tags": [
+        "RootFolder"
+      ],
+      "contract_fingerprint": "c50e18443ca73aac2076060385220e35f49757035d4312ce5293cbbf661417dd",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "GET /api/v1/search",
+      "method": "GET",
+      "path": "/api/v1/search",
+      "tags": [
+        "Search"
+      ],
+      "contract_fingerprint": "505aa248d2a8330e53f7f76b13a717e06f5534db9e58c9c31db50ee307291144",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_search",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/series",
+      "method": "GET",
+      "path": "/api/v1/series",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "2cd3176e3d4411f5ddd449ebb1db127f6b4bffd2d4b289895caaf98151810586",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/series/lookup",
+      "method": "GET",
+      "path": "/api/v1/series/lookup",
+      "tags": [
+        "SeriesLookup"
+      ],
+      "contract_fingerprint": "5659bf7bb9b154399b79940944c9d221f540e5b4ae3143e3ec1558794cdc6539",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_series_lookup",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/series/{seriesId}",
+      "method": "GET",
+      "path": "/api/v1/series/{seriesId}",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "565b6861e16d9b5602b26d07303ac7474d9a9a7d160d3c307347bea42f2e7d05",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/series/{seriesId}/narrators",
+      "method": "GET",
+      "path": "/api/v1/series/{seriesId}/narrators",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "cc6a9f3cea1de5c82f0208dea641361f13cb563236bb65b1eb42f40d64898dcf",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/series/{seriesId}/narrators/inheritance",
+      "method": "GET",
+      "path": "/api/v1/series/{seriesId}/narrators/inheritance",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "404e0162739324cb2e1d4c99abebec89b69f9e23de789bd9d7b948aaa1cfc551",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/series/{seriesId}/variants",
+      "method": "GET",
+      "path": "/api/v1/series/{seriesId}/variants",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "f9c0c47d8368a714df93296b9cc2ab62cd6cfa89272a2c11acdfabe223685dd8",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "GET /api/v1/settings/proxy",
+      "method": "GET",
+      "path": "/api/v1/settings/proxy",
+      "tags": [
+        "Proxy"
+      ],
+      "contract_fingerprint": "75ee3031de7e9d387782ee4c880b7e3fc15611cbc2f42b1b899a3347baaec46e",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/settings/proxy/{id}",
+      "method": "GET",
+      "path": "/api/v1/settings/proxy/{id}",
+      "tags": [
+        "Proxy"
+      ],
+      "contract_fingerprint": "91251ce8ddcb245f53bfe7cb40a9b0b0aaa0507b1f4134fe9413f7fa39669be9",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/system/backup",
+      "method": "GET",
+      "path": "/api/v1/system/backup",
+      "tags": [
+        "Backup"
+      ],
+      "contract_fingerprint": "b60c7fc62722f674d94b76b21f6ee45b626e72738a58e5f181c261c5e7961c48",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_backups",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/system/proxy/debug",
+      "method": "GET",
+      "path": "/api/v1/system/proxy/debug",
+      "tags": [
+        "ProxyDebug"
+      ],
+      "contract_fingerprint": "e926822b839d6acf7607353839999ad1a4fb3b51368cfde2771a99ec2b7e8bd7",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Proxy debug output may expose network and credential-adjacent data; use controlled diagnostics."
+    },
+    {
+      "key": "GET /api/v1/system/routes",
+      "method": "GET",
+      "path": "/api/v1/system/routes",
+      "tags": [
+        "System"
+      ],
+      "contract_fingerprint": "0aa98792b803969e3ff05ac35ff97ed7e203c28ebbc35fc2f336730b9dc4dd1d",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_system",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/system/routes/duplicate",
+      "method": "GET",
+      "path": "/api/v1/system/routes/duplicate",
+      "tags": [
+        "System"
+      ],
+      "contract_fingerprint": "0aa98792b803969e3ff05ac35ff97ed7e203c28ebbc35fc2f336730b9dc4dd1d",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_system",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/system/settingsbackup/files",
+      "method": "GET",
+      "path": "/api/v1/system/settingsbackup/files",
+      "tags": [
+        "SettingsBackup"
+      ],
+      "contract_fingerprint": "e468ddaead915df4b4736a230954eda9fc30335b64aa5384f28e5e32ba99cd82",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_settings_backups",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/system/settingsbackup/locations",
+      "method": "GET",
+      "path": "/api/v1/system/settingsbackup/locations",
+      "tags": [
+        "SettingsBackup"
+      ],
+      "contract_fingerprint": "ef9950a11f12c90da47531a522a7a22b2665c9d4bec36aa28cf320307649f084",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_settings_backups",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/system/statistics",
+      "method": "GET",
+      "path": "/api/v1/system/statistics",
+      "tags": [
+        "System"
+      ],
+      "contract_fingerprint": "19d0ca5aaea3cb96bfeb05f0d72102d06345ff18b4e4093e42ee406394b3b3bf",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_system",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/system/status",
+      "method": "GET",
+      "path": "/api/v1/system/status",
+      "tags": [
+        "System"
+      ],
+      "contract_fingerprint": "a4ceab853ca1f01ac21948c67fc339c0cf199e92961109fc576118380505487d",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_system",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/system/task",
+      "method": "GET",
+      "path": "/api/v1/system/task",
+      "tags": [
+        "Task"
+      ],
+      "contract_fingerprint": "ee273f3fa4c20eeaede0cb2276460e416ca3b5672802680dc3c5578ee1fc5fc6",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_tasks",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/system/task/{id}",
+      "method": "GET",
+      "path": "/api/v1/system/task/{id}",
+      "tags": [
+        "Task"
+      ],
+      "contract_fingerprint": "f395e094ffb1dd28c5001e52bcb6060d001ee519b452b80aadc592a8b078f88f",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_tasks",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/tag",
+      "method": "GET",
+      "path": "/api/v1/tag",
+      "tags": [
+        "Tag"
+      ],
+      "contract_fingerprint": "d9a70d53645da12580a3d2f8575623dc0906ab96b305a7345cbd1470c6a6229e",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/tag/detail",
+      "method": "GET",
+      "path": "/api/v1/tag/detail",
+      "tags": [
+        "TagDetails"
+      ],
+      "contract_fingerprint": "b8372219ea397b05f2387983a4da69233a4d9b2d627ce70ad5e0d7a97ecd914d",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_tag_details",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/tag/detail/{id}",
+      "method": "GET",
+      "path": "/api/v1/tag/detail/{id}",
+      "tags": [
+        "TagDetails"
+      ],
+      "contract_fingerprint": "2df6abb4c36019180fe03a84c4f1796a0ab35b830788e56fabb6b61ac72cd32f",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_tag_details",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/tag/{id}",
+      "method": "GET",
+      "path": "/api/v1/tag/{id}",
+      "tags": [
+        "Tag"
+      ],
+      "contract_fingerprint": "3dd144b8d94f97bc2e48a4ff1b8e36c5a919f78d8d8979682ffcf12b1b81aae6",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "GET /api/v1/update",
+      "method": "GET",
+      "path": "/api/v1/update",
+      "tags": [
+        "Update"
+      ],
+      "contract_fingerprint": "7112b7d88ec9ad9c2393bfc8d07367a2f23e202bb6b5b0368a3df582405cef5c",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_updates",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /api/v1/wanted/cutoff",
+      "method": "GET",
+      "path": "/api/v1/wanted/cutoff",
+      "tags": [
+        "Cutoff"
+      ],
+      "contract_fingerprint": "1e64d2e53e722940362ab9e7d225f369f2091096c1b0a1f84e0970a334155418",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_cutoff_wanted",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/wanted/cutoff/{id}",
+      "method": "GET",
+      "path": "/api/v1/wanted/cutoff/{id}",
+      "tags": [
+        "Cutoff"
+      ],
+      "contract_fingerprint": "fcdc7bc85c66c3bbf770642f99590341fa1960726a90f6b85ddb8cf3dbc9ee8b",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_cutoff_wanted",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/wanted/missing",
+      "method": "GET",
+      "path": "/api/v1/wanted/missing",
+      "tags": [
+        "Missing"
+      ],
+      "contract_fingerprint": "336bce2da2505d916cc95b6199dc8f49ef23dc0b0877a65424d474c934330b61",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_missing",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /api/v1/wanted/missing/{id}",
+      "method": "GET",
+      "path": "/api/v1/wanted/missing/{id}",
+      "tags": [
+        "Missing"
+      ],
+      "contract_fingerprint": "45a87938dff32d9cbcc14a3adea1488e0c4fea827724edfbf7c931ecc92a413c",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_missing",
+      "tracking_issue": "#11"
+    },
+    {
+      "key": "GET /auth/oidc",
+      "method": "GET",
+      "path": "/auth/oidc",
+      "tags": [
+        "OidcAuthentication"
+      ],
+      "contract_fingerprint": "6141b49713c8636d562cc57af07b8e1689f7da184930dcbfe02c4322d1aae218",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Interactive OIDC login belongs to the Chaptarr UI, not Terraform."
+    },
+    {
+      "key": "GET /auth/plex",
+      "method": "GET",
+      "path": "/auth/plex",
+      "tags": [
+        "PlexAuthentication"
+      ],
+      "contract_fingerprint": "741ed0c80712c77aff953f8ee8503a9cd78b14e5e31788a76b72b718c87293e0",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Interactive Plex login and callbacks belong to the Chaptarr UI, not Terraform."
+    },
+    {
+      "key": "GET /auth/plex/callback",
+      "method": "GET",
+      "path": "/auth/plex/callback",
+      "tags": [
+        "PlexAuthentication"
+      ],
+      "contract_fingerprint": "095d55bd65446fb8f31e2d909f60f254b60e9bd5d45e24a8717a780c822247a2",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Interactive Plex login and callbacks belong to the Chaptarr UI, not Terraform."
+    },
+    {
+      "key": "GET /content/{path}",
+      "method": "GET",
+      "path": "/content/{path}",
+      "tags": [
+        "StaticResource"
+      ],
+      "contract_fingerprint": "cafde46b4f72ec9f33ef5377af0aac7c93def26239df00effa82161f32b54c3a",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Web UI static content is unrelated to infrastructure state."
+    },
+    {
+      "key": "GET /feed/v1/calendar/chaptarr.ics",
+      "method": "GET",
+      "path": "/feed/v1/calendar/chaptarr.ics",
+      "tags": [
+        "CalendarFeed"
+      ],
+      "contract_fingerprint": "db1ac3ecf5d7a9be8a0da5ad3162a72c9f0daf30af379702cdc707ad4cad9028",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_calendar_feed",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /feed/v1/calendar/readarr.ics",
+      "method": "GET",
+      "path": "/feed/v1/calendar/readarr.ics",
+      "tags": [
+        "CalendarFeed"
+      ],
+      "contract_fingerprint": "db1ac3ecf5d7a9be8a0da5ad3162a72c9f0daf30af379702cdc707ad4cad9028",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_calendar_feed",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /login",
+      "method": "GET",
+      "path": "/login",
+      "tags": [
+        "StaticResource"
+      ],
+      "contract_fingerprint": "5a9ab3986fd01d6b0d329906925bfcf8cf53063f0d376a123aaf6b769a23d17b",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Web UI static content is unrelated to infrastructure state."
+    },
+    {
+      "key": "GET /logout",
+      "method": "GET",
+      "path": "/logout",
+      "tags": [
+        "Authentication"
+      ],
+      "contract_fingerprint": "75791387dd6818767611d7c10b3126827ce205676d4a2757cc3719d275fedc8b",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Browser login/session APIs are not provider authentication; the provider uses X-Api-Key only."
+    },
+    {
+      "key": "GET /ping",
+      "method": "GET",
+      "path": "/ping",
+      "tags": [
+        "Ping"
+      ],
+      "contract_fingerprint": "b16d6144ad53f42a5e6a771bee56446eefdba2c3fd0617375218ec864a96691a",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_ping",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "GET /{path}",
+      "method": "GET",
+      "path": "/{path}",
+      "tags": [
+        "StaticResource"
+      ],
+      "contract_fingerprint": "480eb1484926110e44411707bb8a3ad4cbb2397833998166106ad28439caafdd",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Web UI static content is unrelated to infrastructure state."
+    },
+    {
+      "key": "HEAD /ping",
+      "method": "HEAD",
+      "path": "/ping",
+      "tags": [
+        "Ping"
+      ],
+      "contract_fingerprint": "b16d6144ad53f42a5e6a771bee56446eefdba2c3fd0617375218ec864a96691a",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_ping",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "POST /api/v1/author",
+      "method": "POST",
+      "path": "/api/v1/author",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "0bb334f913322b0be0c6bc33426b42cf6065aedb937d72312f3c55559d391e14",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "POST /api/v1/author/import",
+      "method": "POST",
+      "path": "/api/v1/author/import",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "7fb1d3f333bad18f10887d6691b4aea033b62ad4c05096c03c91d7d609cfadb7",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "POST /api/v1/author/statistics/aggregate",
+      "method": "POST",
+      "path": "/api/v1/author/statistics/aggregate",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "e3466d8d8c259d699bcbe3477a00d2ed85cae48ffe0a633f7851113933d09d21",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_author_statistics",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "POST /api/v1/author/{id}/downloadmedia",
+      "method": "POST",
+      "path": "/api/v1/author/{id}/downloadmedia",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "f198d29054d0c68342e56ec7c59a520b96b090de8632a39c0bad23bf91efd5dc",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/author/{id}/loadimage",
+      "method": "POST",
+      "path": "/api/v1/author/{id}/loadimage",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "daa0a92d62c2320b98ff146cdd601175d9f58a1239dfe35efbe3978057e2a130",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/book",
+      "method": "POST",
+      "path": "/api/v1/book",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "48ef1dbcfed53d3db5b93f9449b12bef7a5567e4c01f4b1e45964307cb4809cd",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "POST /api/v1/book/import",
+      "method": "POST",
+      "path": "/api/v1/book/import",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "2ca11fadc715a0bd69d11a6530f7515c9b679c27eb5bd830727d2d240e4ead87",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "POST /api/v1/book/{id}/downloadmedia",
+      "method": "POST",
+      "path": "/api/v1/book/{id}/downloadmedia",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "a4a948141078f3a5237ebb5fc1f2787861c563f4999919aabff20b6f0ec5ddbc",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/book/{id}/editions/wanted",
+      "method": "POST",
+      "path": "/api/v1/book/{id}/editions/wanted",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "b815432aac3d7303640953b8059d11cc52e83f376e2fa7b14d24be662b6d9efc",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "POST /api/v1/bookshelf",
+      "method": "POST",
+      "path": "/api/v1/bookshelf",
+      "tags": [
+        "Bookshelf"
+      ],
+      "contract_fingerprint": "4a8cda3519179f99903bc652ff405939fb1cebbcb89b7b1e3798ece0e00dab04",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_bookshelf",
+      "tracking_issue": "#10"
+    },
+    {
+      "key": "POST /api/v1/command",
+      "method": "POST",
+      "path": "/api/v1/command",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "21eaadc27c2e61836042df65749672675ffd237e4851416734e6d2d7d8701ac7",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    {
+      "key": "POST /api/v1/command/cancel/all",
+      "method": "POST",
+      "path": "/api/v1/command/cancel/all",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "229aca361f5f205480ea4083113e8c1b9e7479b531e1f9b87f69a9a38f44f004",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    {
+      "key": "POST /api/v1/command/pause/all",
+      "method": "POST",
+      "path": "/api/v1/command/pause/all",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "229aca361f5f205480ea4083113e8c1b9e7479b531e1f9b87f69a9a38f44f004",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    {
+      "key": "POST /api/v1/command/resume/all",
+      "method": "POST",
+      "path": "/api/v1/command/resume/all",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "229aca361f5f205480ea4083113e8c1b9e7479b531e1f9b87f69a9a38f44f004",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    {
+      "key": "POST /api/v1/command/{id}/pause",
+      "method": "POST",
+      "path": "/api/v1/command/{id}/pause",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "d8ca0120df497a176d12a55799fd6c76b37aeedc9764178e67d0dc4319c48ca9",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    {
+      "key": "POST /api/v1/command/{id}/resume",
+      "method": "POST",
+      "path": "/api/v1/command/{id}/resume",
+      "tags": [
+        "Command"
+      ],
+      "contract_fingerprint": "d8ca0120df497a176d12a55799fd6c76b37aeedc9764178e67d0dc4319c48ca9",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh."
+    },
+    {
+      "key": "POST /api/v1/config/development/test",
+      "method": "POST",
+      "path": "/api/v1/config/development/test",
+      "tags": [
+        "DevelopmentConfig"
+      ],
+      "contract_fingerprint": "95da993ead397cd6c2c7a0fa2bf5112556b95d080d40e0af4bc3ea64b719eaf5",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/config/hardcover",
+      "method": "POST",
+      "path": "/api/v1/config/hardcover",
+      "tags": [
+        "HardcoverConfig"
+      ],
+      "contract_fingerprint": "26e1742e4d0dfa89d66c30d1c9f2b6d3710188a6ec3900be8d6cb84370cbc55e",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_hardcover_config",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "POST /api/v1/config/host/test/proxy",
+      "method": "POST",
+      "path": "/api/v1/config/host/test/proxy",
+      "tags": [
+        "HostConfig"
+      ],
+      "contract_fingerprint": "3aa3c1bd77a79443b11ce06bd2fec72ad0f90631c437f717858fac9476310d7a",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/config/naming-pattern/compile",
+      "method": "POST",
+      "path": "/api/v1/config/naming-pattern/compile",
+      "tags": [
+        "NamingPattern"
+      ],
+      "contract_fingerprint": "c69c5869199b124fe703e8ff4cd19debb187ee2ee4335f1bf7e6c69c1f38e379",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_naming_pattern",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "POST /api/v1/config/naming-pattern/decompile",
+      "method": "POST",
+      "path": "/api/v1/config/naming-pattern/decompile",
+      "tags": [
+        "NamingPattern"
+      ],
+      "contract_fingerprint": "70cac901aa621c94c3baab187be0a33a2b483f3ca6a3d82b2b983e26a595461b",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_naming_pattern",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "POST /api/v1/config/naming-pattern/preview",
+      "method": "POST",
+      "path": "/api/v1/config/naming-pattern/preview",
+      "tags": [
+        "NamingPattern"
+      ],
+      "contract_fingerprint": "c19dca16bbc8a98ee33e4b36715c3d39663ead2272163c59e12b52e8efe9f676",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_naming_pattern",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "POST /api/v1/config/naming-pattern/validate",
+      "method": "POST",
+      "path": "/api/v1/config/naming-pattern/validate",
+      "tags": [
+        "NamingPattern"
+      ],
+      "contract_fingerprint": "4f9b2ee9f12c4573913f986570efe2787b2253082a812825367c910ce6930e2c",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_naming_pattern",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "POST /api/v1/customfilter",
+      "method": "POST",
+      "path": "/api/v1/customfilter",
+      "tags": [
+        "CustomFilter"
+      ],
+      "contract_fingerprint": "b4fcbe41983b0f01147c3d1b1353a09d4cf18881ba6f602f9994c83542307b48",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "POST /api/v1/customformat",
+      "method": "POST",
+      "path": "/api/v1/customformat",
+      "tags": [
+        "CustomFormat"
+      ],
+      "contract_fingerprint": "cad913ae2d2e575873f4eb120bcbe37af56a99ba3a15dfc15dd2fd317ecdde94",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "POST /api/v1/delayprofile",
+      "method": "POST",
+      "path": "/api/v1/delayprofile",
+      "tags": [
+        "DelayProfile"
+      ],
+      "contract_fingerprint": "446742170d7b9273d8f610d13c030cae2f52e166da2b5849583e6db00c20d65a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "POST /api/v1/downloadclient",
+      "method": "POST",
+      "path": "/api/v1/downloadclient",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "82ae11afcfa1de408602f03977393b9b3e4ca7518bd4b86c41ce83fe8d4e29c3",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "POST /api/v1/downloadclient/action/{name}",
+      "method": "POST",
+      "path": "/api/v1/downloadclient/action/{name}",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "0b91e84b29e605d25fb063d048a48c028b7b08f7ca86747e17d2cea8c17cd383",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/downloadclient/test",
+      "method": "POST",
+      "path": "/api/v1/downloadclient/test",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "65a3160945a91b91f19ba4c61e668534163cc04bc7e6444abb1dc2657ea1e688",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/downloadclient/testall",
+      "method": "POST",
+      "path": "/api/v1/downloadclient/testall",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "c6b4ffee5c9177cc040771b3eaad3e68fe0668fb33d440162b9cc53c73dc7e86",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/history/failed/{id}",
+      "method": "POST",
+      "path": "/api/v1/history/failed/{id}",
+      "tags": [
+        "History"
+      ],
+      "contract_fingerprint": "72a2ae096ee68036730e4f7c16634e20bdf548e4ebede6a295cd7492ad3d0feb",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Marking a history item failed changes operational state and must be explicit."
+    },
+    {
+      "key": "POST /api/v1/importlist",
+      "method": "POST",
+      "path": "/api/v1/importlist",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "782ff6fb78f406dda29fb82484085ec88d16a5526f5efaf411ef123cc021f65a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "POST /api/v1/importlist/action/{name}",
+      "method": "POST",
+      "path": "/api/v1/importlist/action/{name}",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "ea10f8ed01c5c655a2d0b09c4173558ceeda825e53ba6e499a00eceb869b5993",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/importlist/test",
+      "method": "POST",
+      "path": "/api/v1/importlist/test",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "47773eade934d9cb765777bc3edf2b92621f926c686b0c803d372539c394c340",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/importlist/testall",
+      "method": "POST",
+      "path": "/api/v1/importlist/testall",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "170e6949594ce8f1f60857d8e5337cf60c35777fe0a87ce7f3c375d71fe02087",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/importlistexclusion",
+      "method": "POST",
+      "path": "/api/v1/importlistexclusion",
+      "tags": [
+        "ImportListExclusion"
+      ],
+      "contract_fingerprint": "c69177671dba1402415437342e04675caec947010bb275382e506f429b3b3982",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "POST /api/v1/indexer",
+      "method": "POST",
+      "path": "/api/v1/indexer",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "8834a8325710f4ce1c8383d55cfdb375b19e02216ec26a8952174d4b54932ac4",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "POST /api/v1/indexer/action/{name}",
+      "method": "POST",
+      "path": "/api/v1/indexer/action/{name}",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "ca4a2d95110b4e5854a15d1c99b611754adbf262551ab36b942a6a38543e1c9e",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/indexer/test",
+      "method": "POST",
+      "path": "/api/v1/indexer/test",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "3f003bfb415a7c62f028d6f21f5da949e2503dd95abba2dd03887a74b2c0befc",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/indexer/testall",
+      "method": "POST",
+      "path": "/api/v1/indexer/testall",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "1f8aaa6561a21c322d85a4c27225b28b330eab76e0642c6bdd2a0488a87c8bda",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/manualimport",
+      "method": "POST",
+      "path": "/api/v1/manualimport",
+      "tags": [
+        "ManualImport"
+      ],
+      "contract_fingerprint": "0ea02db9178db6d1a890168ee038f68e067e2ff08cc10793d906b7cde94e39f0",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Manual import moves files and must never occur during plan or refresh."
+    },
+    {
+      "key": "POST /api/v1/matchinglog/preview",
+      "method": "POST",
+      "path": "/api/v1/matchinglog/preview",
+      "tags": [
+        "MatchingLog"
+      ],
+      "contract_fingerprint": "3fc2ad8d9885d385f930021f84267841a6371cf6b82854b3e59168e1d9b144cf",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Log matching previews may expose operational or sensitive data and are not Terraform state."
+    },
+    {
+      "key": "POST /api/v1/metadata",
+      "method": "POST",
+      "path": "/api/v1/metadata",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "da8c1bf7cdaad8999cf3f0085e8dbb62a57f0a4f8aef835af28782c1422feaca",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "POST /api/v1/metadata/action/{name}",
+      "method": "POST",
+      "path": "/api/v1/metadata/action/{name}",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "8d5457ae178182b899cf277086712a4b2d06194982b98b2f96893bdf50812c33",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/metadata/test",
+      "method": "POST",
+      "path": "/api/v1/metadata/test",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "fae0dde5c69f2e1bd00bd2f96e59f3a3eb4ba7c608b84317edd6390f26988f20",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/metadata/testall",
+      "method": "POST",
+      "path": "/api/v1/metadata/testall",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "cfbd8fd71f4278294db31849135fccbb439c904d66480df41081bc2009ec01d1",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/metadataprofile",
+      "method": "POST",
+      "path": "/api/v1/metadataprofile",
+      "tags": [
+        "MetadataProfile"
+      ],
+      "contract_fingerprint": "5d9866d6c99fdd29e978e489203d43ab7fe277623b37fad2d8937fdfe77b62ba",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "POST /api/v1/notification",
+      "method": "POST",
+      "path": "/api/v1/notification",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "d828b282300645af1ee4ee4c2adec5981f8f74467221eb870883a405f168ac26",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "POST /api/v1/notification/action/{name}",
+      "method": "POST",
+      "path": "/api/v1/notification/action/{name}",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "def90a8d83cecb06c25a3aa8bf1f80b0d50ef9cf84f75db4b9b65b9aaae660bd",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/notification/test",
+      "method": "POST",
+      "path": "/api/v1/notification/test",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "c7ae4e29c119f3a9a460c0cf9d71653bf79eecc4fca27920a95ab55bd3607dd8",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/notification/testall",
+      "method": "POST",
+      "path": "/api/v1/notification/testall",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "6b550725409c76174e2db2e1993037d00852c98c4b32f23816c92a3ce5799a30",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/pendingauthorimport/author/queue",
+      "method": "POST",
+      "path": "/api/v1/pendingauthorimport/author/queue",
+      "tags": [
+        "PendingAuthorImport"
+      ],
+      "contract_fingerprint": "3c3684662a12e6fc15cea111efdde65af2e8b4bac429a453345aa430fc87b0a9",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue, retry, and delete operations change import state and require explicit operational tooling."
+    },
+    {
+      "key": "POST /api/v1/pendingauthorimport/{id}/retry",
+      "method": "POST",
+      "path": "/api/v1/pendingauthorimport/{id}/retry",
+      "tags": [
+        "PendingAuthorImport"
+      ],
+      "contract_fingerprint": "cea2a78e83fafae683f3e0cb2aae05ba45fcc61d80013458dd9a43300b17965f",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue, retry, and delete operations change import state and require explicit operational tooling."
+    },
+    {
+      "key": "POST /api/v1/qualityprofile",
+      "method": "POST",
+      "path": "/api/v1/qualityprofile",
+      "tags": [
+        "QualityProfile"
+      ],
+      "contract_fingerprint": "91d5abe03ab2f70d93fc2317772c863d497795729822e9f36d82307cb1b46a08",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "POST /api/v1/queue/cancelconversion/{id}",
+      "method": "POST",
+      "path": "/api/v1/queue/cancelconversion/{id}",
+      "tags": [
+        "Queue"
+      ],
+      "contract_fingerprint": "759b610e1b0bae3d0f4ee1859f95b2d0e5e81491a48ddf2842c0a8705ab66ad4",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Queue cancellation/removal is destructive operational behavior and requires explicit tooling."
+    },
+    {
+      "key": "POST /api/v1/queue/grab/bulk",
+      "method": "POST",
+      "path": "/api/v1/queue/grab/bulk",
+      "tags": [
+        "QueueAction"
+      ],
+      "contract_fingerprint": "717f1149d41b8eeaa51add7f7db8777383ef6e3a03c444ca870bc7a16f5f8abd",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Grabbing queued releases triggers downloads and must never run during plan or refresh."
+    },
+    {
+      "key": "POST /api/v1/queue/grab/{id}",
+      "method": "POST",
+      "path": "/api/v1/queue/grab/{id}",
+      "tags": [
+        "QueueAction"
+      ],
+      "contract_fingerprint": "01de7d78f05de68af3327190f12e786487cca826770a4be4350d87cfda079c07",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Grabbing queued releases triggers downloads and must never run during plan or refresh."
+    },
+    {
+      "key": "POST /api/v1/release",
+      "method": "POST",
+      "path": "/api/v1/release",
+      "tags": [
+        "Release"
+      ],
+      "contract_fingerprint": "bce6d09bf8c8ed2e3322d2064c7fee30937c0da0d5b52545998794e73c9ae456",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Grabbing a release triggers a download and must be explicit and disabled by default."
+    },
+    {
+      "key": "POST /api/v1/release/push",
+      "method": "POST",
+      "path": "/api/v1/release/push",
+      "tags": [
+        "ReleasePush"
+      ],
+      "contract_fingerprint": "12d6f5b6f541145a349c9cadb3a58fb054439d8a566071b38fa15a59182f25c9",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Pushing a release can trigger acquisition/import and must be an explicit opt-in action."
+    },
+    {
+      "key": "POST /api/v1/releaseprofile",
+      "method": "POST",
+      "path": "/api/v1/releaseprofile",
+      "tags": [
+        "ReleaseProfile"
+      ],
+      "contract_fingerprint": "2d53117fcb9f5e05431b414f335a26736ad8e6d4f466ec9514f9a2d67c23ab4c",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "POST /api/v1/remotepathmapping",
+      "method": "POST",
+      "path": "/api/v1/remotepathmapping",
+      "tags": [
+        "RemotePathMapping"
+      ],
+      "contract_fingerprint": "e5add80122bc3b3eb6b1388790cfeb2f98fd303aeb3bd370d2f211a038545a65",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "POST /api/v1/remotepathmapping/test",
+      "method": "POST",
+      "path": "/api/v1/remotepathmapping/test",
+      "tags": [
+        "RemotePathMapping"
+      ],
+      "contract_fingerprint": "63836074a3805a73d0c3437cbe93545a5f64c427193b95c4c1cd5ec90d29ee2b",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/rootfolder",
+      "method": "POST",
+      "path": "/api/v1/rootfolder",
+      "tags": [
+        "RootFolder"
+      ],
+      "contract_fingerprint": "907eafd4cbd8124a0daf22c0a2d29d984b9fa3881859b21ed4c0f6c99887573f",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "POST /api/v1/rootfolder/{id}/link-author",
+      "method": "POST",
+      "path": "/api/v1/rootfolder/{id}/link-author",
+      "tags": [
+        "RootFolder"
+      ],
+      "contract_fingerprint": "b7b34006fc312321c09c40ea9e98852106d04fa554669e0f801a9d8f96b7fde8",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/series/add",
+      "method": "POST",
+      "path": "/api/v1/series/add",
+      "tags": [
+        "AddSeries"
+      ],
+      "contract_fingerprint": "436bae9dd0fa0ce0cb30e074a1e929fd5e82441ad026427143ced954f1bccd27",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "POST /api/v1/series/{seriesId}/narrators/discover",
+      "method": "POST",
+      "path": "/api/v1/series/{seriesId}/narrators/discover",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "247122ba34c95854cc94393867b249290a2764f38865e1d7b54a7f43250da2c7",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_series_narrator_discovery",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "POST /api/v1/series/{seriesId}/narrators/search",
+      "method": "POST",
+      "path": "/api/v1/series/{seriesId}/narrators/search",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "bf37e1089d44039821f7543cd6954b8aaf39fa7c3f80c0a594a33bae785eac9e",
+      "classification": "data-source",
+      "status": "planned",
+      "target": "chaptarr_series_narrator_discovery",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "POST /api/v1/settings/proxy",
+      "method": "POST",
+      "path": "/api/v1/settings/proxy",
+      "tags": [
+        "Proxy"
+      ],
+      "contract_fingerprint": "ecb2cc6531444f66d4af3d202d3af6d4f6bd2f8da6207c82641f35ee333c702d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "POST /api/v1/settings/proxy/test",
+      "method": "POST",
+      "path": "/api/v1/settings/proxy/test",
+      "tags": [
+        "Proxy"
+      ],
+      "contract_fingerprint": "02ccc41b9a3ce3134be71bf75c47e2ab32dcd7447c18f5386e4475afecf16c61",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request."
+    },
+    {
+      "key": "POST /api/v1/system/backup/restore/upload",
+      "method": "POST",
+      "path": "/api/v1/system/backup/restore/upload",
+      "tags": [
+        "Backup"
+      ],
+      "contract_fingerprint": "4553b4bea7c19e88915c2eb3941044289985ba0e27a354aedf16384c961dd386",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Backup deletion or restoration is imperative maintenance and must never run during plan or refresh."
+    },
+    {
+      "key": "POST /api/v1/system/backup/restore/{id}",
+      "method": "POST",
+      "path": "/api/v1/system/backup/restore/{id}",
+      "tags": [
+        "Backup"
+      ],
+      "contract_fingerprint": "79d71f8e275d3a5c6cb6c165ec2d5be157766c26d4687f6716005bf501a14f1e",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Backup deletion or restoration is imperative maintenance and must never run during plan or refresh."
+    },
+    {
+      "key": "POST /api/v1/system/reset",
+      "method": "POST",
+      "path": "/api/v1/system/reset",
+      "tags": [
+        "System"
+      ],
+      "contract_fingerprint": "a24e83e99c772b4c620043fe1b0da815ead2f2f8df6e5e8f41108760fd56cc6c",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Reset, shutdown, and restart are destructive operational actions and never run during plan or refresh."
+    },
+    {
+      "key": "POST /api/v1/system/restart",
+      "method": "POST",
+      "path": "/api/v1/system/restart",
+      "tags": [
+        "System"
+      ],
+      "contract_fingerprint": "7aad40f96609356210bb07d93a8b1dd465a4afdb65f8048feafbddee6015d211",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Reset, shutdown, and restart are destructive operational actions and never run during plan or refresh."
+    },
+    {
+      "key": "POST /api/v1/system/settingsbackup/create",
+      "method": "POST",
+      "path": "/api/v1/system/settingsbackup/create",
+      "tags": [
+        "SettingsBackup"
+      ],
+      "contract_fingerprint": "a8a409ac965c37df669afac7ea1b2a41712ec04f0f1697f903c283e82489b47e",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Creating or restoring settings backups is imperative maintenance, not desired state."
+    },
+    {
+      "key": "POST /api/v1/system/settingsbackup/restore",
+      "method": "POST",
+      "path": "/api/v1/system/settingsbackup/restore",
+      "tags": [
+        "SettingsBackup"
+      ],
+      "contract_fingerprint": "28c71892f16ad9bb7529c7e6dae76950bc7347f6f4a5ba66e18b2515956b0172",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Creating or restoring settings backups is imperative maintenance, not desired state."
+    },
+    {
+      "key": "POST /api/v1/system/shutdown",
+      "method": "POST",
+      "path": "/api/v1/system/shutdown",
+      "tags": [
+        "System"
+      ],
+      "contract_fingerprint": "02bcbe7bf1c11e3fc47f95fd7a998c1db43259d8f873f67ff49739cd3dd771b2",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#11",
+      "rationale": "Reset, shutdown, and restart are destructive operational actions and never run during plan or refresh."
+    },
+    {
+      "key": "POST /api/v1/tag",
+      "method": "POST",
+      "path": "/api/v1/tag",
+      "tags": [
+        "Tag"
+      ],
+      "contract_fingerprint": "02811d82ac8768a1877d615d0cac0b466467e59aed83b925e7d76ad191477e2f",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "POST /login",
+      "method": "POST",
+      "path": "/login",
+      "tags": [
+        "Authentication"
+      ],
+      "contract_fingerprint": "32aea9e7c78f6a8361614094209592b49c2a60f83bc025b56ff8591aea213ffa",
+      "classification": "out-of-scope",
+      "status": "excluded",
+      "rationale": "Browser login/session APIs are not provider authentication; the provider uses X-Api-Key only."
+    },
+    {
+      "key": "PUT /api/v1/author/editor",
+      "method": "PUT",
+      "path": "/api/v1/author/editor",
+      "tags": [
+        "AuthorEditor"
+      ],
+      "contract_fingerprint": "2c5a38ed65344b4e59c453233bceb32969f9fe570587aa83d9fac1f65fe38b87",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "PUT /api/v1/author/{id}",
+      "method": "PUT",
+      "path": "/api/v1/author/{id}",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "6dd9f9972ef11bf71e262b570e3a0514d91d7b6a21a5d710ecc9cb8d55c1d15a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "PUT /api/v1/author/{id}/monitor/{mediaType}",
+      "method": "PUT",
+      "path": "/api/v1/author/{id}/monitor/{mediaType}",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "b04804bd3ad21a121b147d23b745956edb6a5365c19243d2b11cb801d3cda850",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "PUT /api/v1/author/{id}/primaryphoto",
+      "method": "PUT",
+      "path": "/api/v1/author/{id}/primaryphoto",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "d39e0fb05ff915be9a1ecf4d5612687b7c12f75a98efc6bb6d7d5318ead2fce3",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "PUT /api/v1/author/{id}/selectedmediatype/{mediaType}",
+      "method": "PUT",
+      "path": "/api/v1/author/{id}/selectedmediatype/{mediaType}",
+      "tags": [
+        "Author"
+      ],
+      "contract_fingerprint": "a0d8f65b4c053cb9b7155d94aef6b97e271aaf769ec269d11b6e03f15eced2bf",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_author",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "PUT /api/v1/book",
+      "method": "PUT",
+      "path": "/api/v1/book",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "3c4aed5572c5a17accd6d2bbdacf2e6ef70a5627dcba3d10adb30f67ecf7e195",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "PUT /api/v1/book/editor",
+      "method": "PUT",
+      "path": "/api/v1/book/editor",
+      "tags": [
+        "BookEditor"
+      ],
+      "contract_fingerprint": "e75a4429aac13474392d218e4cbbc2b2d22d93335597abd8dab47ea5398d41d4",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "PUT /api/v1/book/monitor",
+      "method": "PUT",
+      "path": "/api/v1/book/monitor",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "7f0e442d67e645cad9023e6ab2d75306f27bc85155f554ebe72807b0e325a252",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "PUT /api/v1/book/{id}",
+      "method": "PUT",
+      "path": "/api/v1/book/{id}",
+      "tags": [
+        "Book"
+      ],
+      "contract_fingerprint": "0ca2851a1d919039978e1c9e015a7d5cbc5bbedc71158f89d44ea1ba744a8267",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_book",
+      "tracking_issue": "#9"
+    },
+    {
+      "key": "PUT /api/v1/bookfile/editor",
+      "method": "PUT",
+      "path": "/api/v1/bookfile/editor",
+      "tags": [
+        "BookFile"
+      ],
+      "contract_fingerprint": "46084991c5581a5292a3e47c564076cd291fcd29c72755a3491da7a03b6ff178",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#9",
+      "rationale": "Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards."
+    },
+    {
+      "key": "PUT /api/v1/bookfile/{id}",
+      "method": "PUT",
+      "path": "/api/v1/bookfile/{id}",
+      "tags": [
+        "BookFile"
+      ],
+      "contract_fingerprint": "bdce5a2719c81d3b5ec6dbc5675037882e0570a645cc25cb05a35d156563bbb3",
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#9",
+      "rationale": "Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards."
+    },
+    {
+      "key": "PUT /api/v1/config/conversion/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/conversion/{id}",
+      "tags": [
+        "ConversionConfig"
+      ],
+      "contract_fingerprint": "25d950918044def89300dcc32f50c010720838ff0479aee670636906fe5f2bd6",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_conversion_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/config/development/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/development/{id}",
+      "tags": [
+        "DevelopmentConfig"
+      ],
+      "contract_fingerprint": "2c319ca64808fbdc9fe2e03369d4f42d33483685e72beb6d039d09177febf7e1",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_development_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/config/downloadclient/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/downloadclient/{id}",
+      "tags": [
+        "DownloadClientConfig"
+      ],
+      "contract_fingerprint": "b6036815ccd25f3951d6370c40f19c4d21389685e628846fb073f8f6a4cf594b",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/config/host/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/host/{id}",
+      "tags": [
+        "HostConfig"
+      ],
+      "contract_fingerprint": "4413443f7360fc47a1527af2cef5425e96c118d532aa9b3e97a064c9ad6c4422",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_host_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/config/indexer/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/indexer/{id}",
+      "tags": [
+        "IndexerConfig"
+      ],
+      "contract_fingerprint": "8e2abf58ae6d2a1d2158b0f3d6263cafc0666e93a67e666c1aeadfab25832b03",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/config/mediamanagement/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/mediamanagement/{id}",
+      "tags": [
+        "MediaManagementConfig"
+      ],
+      "contract_fingerprint": "8f4011be299bb1a1b1b5255c2215abd294e4137c20c230231a4c702e66f8e359",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_media_management_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/config/metadataprovider/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/metadataprovider/{id}",
+      "tags": [
+        "MetadataProviderConfig"
+      ],
+      "contract_fingerprint": "0c0061588f1730d8c00cd5c485498b9004d6b23bbfb681466411e63b26144e6a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_provider_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/config/naming/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/naming/{id}",
+      "tags": [
+        "NamingConfig"
+      ],
+      "contract_fingerprint": "e69b0f08f6c8e5d395cded182e60bc1da929be6830ab6a87a24943eecc673540",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_naming_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/config/ui/{id}",
+      "method": "PUT",
+      "path": "/api/v1/config/ui/{id}",
+      "tags": [
+        "UiConfig"
+      ],
+      "contract_fingerprint": "77d0411ff96f259ae596923665b7f0e7ea83a5937d286f8999ca103822ef3f75",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_ui_config",
+      "tracking_issue": "#2"
+    },
+    {
+      "key": "PUT /api/v1/customfilter/{id}",
+      "method": "PUT",
+      "path": "/api/v1/customfilter/{id}",
+      "tags": [
+        "CustomFilter"
+      ],
+      "contract_fingerprint": "74102fb555af07f4e1062b4cc0f3adeaa8c7032f4afc440b04f7ef23226449f3",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_filter",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "PUT /api/v1/customformat/{id}",
+      "method": "PUT",
+      "path": "/api/v1/customformat/{id}",
+      "tags": [
+        "CustomFormat"
+      ],
+      "contract_fingerprint": "f85c846dac801c9d2aa187b0d299712199c7ebe7c9ce6e34dd7d43b927d7e12c",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_custom_format",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "PUT /api/v1/delayprofile/reorder/{id}",
+      "method": "PUT",
+      "path": "/api/v1/delayprofile/reorder/{id}",
+      "tags": [
+        "DelayProfile"
+      ],
+      "contract_fingerprint": "c091445cb7c97fa7a55fb5ec9d7d1abac4066cda2703e1b3db3a89f711b3e640",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "PUT /api/v1/delayprofile/{id}",
+      "method": "PUT",
+      "path": "/api/v1/delayprofile/{id}",
+      "tags": [
+        "DelayProfile"
+      ],
+      "contract_fingerprint": "1a41488d707050bd90d1c0d79d0d84d4bed7cfe5bca4bd2c17df666cc8d9e8d3",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_delay_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "PUT /api/v1/downloadclient/bulk",
+      "method": "PUT",
+      "path": "/api/v1/downloadclient/bulk",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "af043a0d809fff46e9bd13640746c47c6be81b1ae35f81ba3732cdcc44e0262e",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "PUT /api/v1/downloadclient/{id}",
+      "method": "PUT",
+      "path": "/api/v1/downloadclient/{id}",
+      "tags": [
+        "DownloadClient"
+      ],
+      "contract_fingerprint": "bd3d620d9244212b11b960581c5f6ad7bd9f2867f7a73774331358426f0bb63c",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_download_client",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "PUT /api/v1/importlist/bulk",
+      "method": "PUT",
+      "path": "/api/v1/importlist/bulk",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "0a76c8ef574fef995b86b5cf00b00b2cff262705f0a4087cfbedca0e2481e9f1",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "PUT /api/v1/importlist/{id}",
+      "method": "PUT",
+      "path": "/api/v1/importlist/{id}",
+      "tags": [
+        "ImportList"
+      ],
+      "contract_fingerprint": "f5a9777b6207d3c7a9e5d5ad1168d1e9cf79503ec67dba7cf7d7eee3919a0aa1",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "PUT /api/v1/importlistexclusion/{id}",
+      "method": "PUT",
+      "path": "/api/v1/importlistexclusion/{id}",
+      "tags": [
+        "ImportListExclusion"
+      ],
+      "contract_fingerprint": "320543b7f3133e2bb70292b340b9b8297aee65bae0c5e22d066278903841ef33",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_import_list_exclusion",
+      "tracking_issue": "#6"
+    },
+    {
+      "key": "PUT /api/v1/indexer/bulk",
+      "method": "PUT",
+      "path": "/api/v1/indexer/bulk",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "dd548c3fe8be1d86c271b0e8b44e610da1a9cf9d7c582ca297a2f95b74e1192d",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "PUT /api/v1/indexer/{id}",
+      "method": "PUT",
+      "path": "/api/v1/indexer/{id}",
+      "tags": [
+        "Indexer"
+      ],
+      "contract_fingerprint": "91807de49581300f5844cfc8ffca4a3d32b75d5f2e72f102b7beb8fdf71018a1",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_indexer",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "PUT /api/v1/metadata/{id}",
+      "method": "PUT",
+      "path": "/api/v1/metadata/{id}",
+      "tags": [
+        "Metadata"
+      ],
+      "contract_fingerprint": "ed17dddbd4ad493a113c2d71dccd17f474799e9aed3b9f635476b66a0773c14a",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "PUT /api/v1/metadataprofile/{id}",
+      "method": "PUT",
+      "path": "/api/v1/metadataprofile/{id}",
+      "tags": [
+        "MetadataProfile"
+      ],
+      "contract_fingerprint": "e4e3209082e6f74c800e6e11746ff3bd46eb9972e931e298cd3927eae7eee675",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_metadata_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "PUT /api/v1/notification/{id}",
+      "method": "PUT",
+      "path": "/api/v1/notification/{id}",
+      "tags": [
+        "Notification"
+      ],
+      "contract_fingerprint": "5f484222ca4e49fe90cfe4d49a0a37111565f3d56e939d82566f2cfb69cb4529",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_notification",
+      "tracking_issue": "#5"
+    },
+    {
+      "key": "PUT /api/v1/qualitydefinition/update",
+      "method": "PUT",
+      "path": "/api/v1/qualitydefinition/update",
+      "tags": [
+        "QualityDefinition"
+      ],
+      "contract_fingerprint": "106bc4a8e67d58a785053cdb25199ae63b7f24e46e9c787564441f24c73be958",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_definition",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "PUT /api/v1/qualitydefinition/{id}",
+      "method": "PUT",
+      "path": "/api/v1/qualitydefinition/{id}",
+      "tags": [
+        "QualityDefinition"
+      ],
+      "contract_fingerprint": "5c508217505835e43a93635b0b346973303e76296e4c0eeddeb3f97068cdbe14",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_definition",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "PUT /api/v1/qualityprofile/{id}",
+      "method": "PUT",
+      "path": "/api/v1/qualityprofile/{id}",
+      "tags": [
+        "QualityProfile"
+      ],
+      "contract_fingerprint": "38c14a8b70c707b110f56651ade6bbf78df5cd4fce5e075d7daa4e14bf5aa0d8",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_quality_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "PUT /api/v1/releaseprofile/{id}",
+      "method": "PUT",
+      "path": "/api/v1/releaseprofile/{id}",
+      "tags": [
+        "ReleaseProfile"
+      ],
+      "contract_fingerprint": "a3670037f70ae5c94e091b68a69e9d5526ca1d7f580192b4a1846957a77c95ea",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_release_profile",
+      "tracking_issue": "#4"
+    },
+    {
+      "key": "PUT /api/v1/remotepathmapping/{id}",
+      "method": "PUT",
+      "path": "/api/v1/remotepathmapping/{id}",
+      "tags": [
+        "RemotePathMapping"
+      ],
+      "contract_fingerprint": "12746ba91a1f73512901f3dc717853c6c1bc9ef0e62626caa00f8cf7e7b5c56f",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_remote_path_mapping",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "PUT /api/v1/rootfolder/{id}",
+      "method": "PUT",
+      "path": "/api/v1/rootfolder/{id}",
+      "tags": [
+        "RootFolder"
+      ],
+      "contract_fingerprint": "7b00820d50c4024b4e60903dcf9885a7eff1d6fe53bfb38c6181ecd555b14d78",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_root_folder",
+      "tracking_issue": "#3"
+    },
+    {
+      "key": "PUT /api/v1/series/{seriesId}/narrators/preferred",
+      "method": "PUT",
+      "path": "/api/v1/series/{seriesId}/narrators/preferred",
+      "tags": [
+        "Series"
+      ],
+      "contract_fingerprint": "1da362544b06bd1e57b4c378b09ea0e0b7ae33e8b6aecb8bf9036a4cf0279584",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_series",
+      "tracking_issue": "#8"
+    },
+    {
+      "key": "PUT /api/v1/settings/proxy/{id}",
+      "method": "PUT",
+      "path": "/api/v1/settings/proxy/{id}",
+      "tags": [
+        "Proxy"
+      ],
+      "contract_fingerprint": "4d282f29fe51ef98196a9ff78e71d8188d82481b9c2733041f2e4e77a7991cd6",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_proxy",
+      "tracking_issue": "#7"
+    },
+    {
+      "key": "PUT /api/v1/tag/{id}",
+      "method": "PUT",
+      "path": "/api/v1/tag/{id}",
+      "tags": [
+        "Tag"
+      ],
+      "contract_fingerprint": "8c393913c2f9f0bff5c141f23d5cdde8c978939c174d3a64ef2aef81443205f0",
+      "classification": "resource",
+      "status": "planned",
+      "target": "chaptarr_tag",
+      "tracking_issue": "#7"
+    }
+  ]
+}
