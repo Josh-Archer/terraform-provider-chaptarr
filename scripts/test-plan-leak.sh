@@ -64,6 +64,12 @@ variable "metadata_api_key" {
   ephemeral = true
 }
 
+variable "integration_token" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
 resource "chaptarr_host_config" "leak_test" {
   instance_name      = "plan-leak-test"
   oidc_client_secret = var.oidc_client_secret
@@ -99,6 +105,19 @@ resource "chaptarr_metadata" "fixture" {
   field_values_json = jsonencode({ baseUrl = "https://metadata.example.test" })
   secret_fields     = { apiKey = var.metadata_api_key }
 }
+
+resource "chaptarr_indexer" "fixture" {
+  name                      = "Plan leak indexer"
+  implementation            = "FixtureIndexer"
+  config_contract           = "FixtureIndexerSettings"
+  enable                    = false
+  enable_rss                = false
+  enable_automatic_search   = false
+  enable_interactive_search = false
+  priority                  = 25
+  field_values_json         = jsonencode({ baseUrl = "https://indexer.example.test" })
+  secret_fields             = { apiToken = var.integration_token }
+}
 EOF
 
 sentinel='CHAPTARR_TEST_API_KEY_SENTINEL_DO_NOT_USE_79f6f1d2'
@@ -106,11 +125,13 @@ host_sentinel='CHAPTARR_HOST_WRITE_ONLY_SENTINEL_DO_NOT_USE_913ad7c4'
 calibre_sentinel='CHAPTARR_TEST_CALIBRE_PASSWORD_SENTINEL_DO_NOT_USE_3b4e911c'
 proxy_sentinel='CHAPTARR_TEST_PROXY_PASSWORD_SENTINEL_DO_NOT_USE_46b2c884'
 metadata_sentinel='CHAPTARR_TEST_METADATA_API_KEY_SENTINEL_DO_NOT_USE_8d187ab2'
+integration_sentinel='CHAPTARR_TEST_INTEGRATION_TOKEN_SENTINEL_DO_NOT_USE_91dc63af'
 export CHAPTARR_API_KEY="${sentinel}"
 export TF_VAR_oidc_client_secret="${host_sentinel}"
 export TF_VAR_calibre_password="${calibre_sentinel}"
 export TF_VAR_proxy_password="${proxy_sentinel}"
 export TF_VAR_metadata_api_key="${metadata_sentinel}"
+export TF_VAR_integration_token="${integration_sentinel}"
 export TF_CLI_CONFIG_FILE="${test_root}/tofurc"
 unset TF_LOG TF_LOG_PATH
 
@@ -130,7 +151,8 @@ tofu -chdir="${test_root}/configuration" show -json "${test_root}/plan.tfplan" \
   >"${test_root}/plan.json" 2>"${test_root}/show-stderr.txt"
 
 if grep -F -R -e "${sentinel}" -e "${host_sentinel}" -e "${calibre_sentinel}" \
-  -e "${proxy_sentinel}" -e "${metadata_sentinel}" -- \
+  -e "${proxy_sentinel}" -e "${metadata_sentinel}" \
+  -e "${integration_sentinel}" -- \
   "${test_root}/stdout.txt" "${test_root}/stderr.txt" \
   "${test_root}/plan.json" "${test_root}/show-stderr.txt" >/dev/null; then
   echo "Synthetic API key leaked into OpenTofu output." >&2

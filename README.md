@@ -60,6 +60,8 @@ Typed quality, metadata, release, delay, and quality-definition management is
 documented in the [profile resource guide](docs/resources/profiles.md).
 Tags, custom filters and formats, metadata providers, and outbound proxies are
 documented in the [library customization guide](docs/resources/customization.md).
+Indexer, download-client, and notification management is documented in the
+[external integrations guide](docs/resources/integrations.md).
 
 ## Development
 

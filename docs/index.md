@@ -61,6 +61,10 @@ The [library customization guide](resources/customization.md) documents tags,
 custom filters and formats, metadata providers, outbound proxies, stable JSON
 fingerprints, association preservation, and apply-only credentials.
 
+The [external integrations guide](resources/integrations.md) documents
+indexers, download clients, notifications, schema-driven settings, Prowlarr
+compatibility, suppressed connection tests, and release-action boundaries.
+
 ## Coverage status
 
 The [generated coverage matrix](openapi-coverage.md) classifies every pinned
