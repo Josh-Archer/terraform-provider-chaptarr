@@ -115,7 +115,7 @@ func TestEnabledIndexerWithoutTestAuthorizationMakesNoRequest(t *testing.T) {
 	model := indexerModel{ID: types.StringNull(), Name: types.StringValue("blocked"), ImplementationName: types.StringNull(), Implementation: types.StringValue("Fixture"), ConfigContract: types.StringValue("FixtureSettings"), Enable: types.BoolValue(true), TestOnApply: types.BoolNull(), Tags: types.SetNull(types.Int64Type), FieldValuesJSON: types.StringValue(`{}`), FieldValuesSHA256: types.StringNull(), SecretFields: types.MapNull(types.StringType), ProtectedFieldNames: types.SetNull(types.StringType), EnableRSS: types.BoolValue(false), EnableAutomaticSearch: types.BoolValue(false), EnableInteractiveSearch: types.BoolValue(false), SupportsRSS: types.BoolNull(), SupportsSearch: types.BoolNull(), Protocol: types.StringNull(), Priority: types.Int64Value(25), DownloadClientID: types.Int64Value(0), ProxyID: types.Int64Null()}
 	planState := stateForResource(t, instance, model)
 	response := &resource.CreateResponse{State: emptyStateForResource(t, instance)}
-	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan(planState), Config: tfsdk.Config{Raw: planState.Raw, Schema: planState.Schema}}, response)
+	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan(planState), Config: tfsdk.Config(planState)}, response)
 	if !response.Diagnostics.HasError() || requests != 0 {
 		t.Fatalf("enabled provider without opt-in made requests=%d diagnostics=%v", requests, response.Diagnostics)
 	}
@@ -155,7 +155,7 @@ func TestDisabledIndexerLifecycleDoesNotInvokeTestsAndRefreshes(t *testing.T) {
 	model := indexerModel{ID: types.StringNull(), Name: types.StringValue("configured"), ImplementationName: types.StringNull(), Implementation: types.StringValue("Prowlarr"), ConfigContract: types.StringValue("ProwlarrSettings"), Enable: types.BoolValue(false), TestOnApply: types.BoolNull(), Tags: types.SetNull(types.Int64Type), FieldValuesJSON: types.StringValue(`{"baseUrl":"https://prowlarr.example.test"}`), FieldValuesSHA256: types.StringNull(), SecretFields: types.MapNull(types.StringType), ProtectedFieldNames: types.SetNull(types.StringType), EnableRSS: types.BoolValue(true), EnableAutomaticSearch: types.BoolValue(true), EnableInteractiveSearch: types.BoolValue(true), SupportsRSS: types.BoolNull(), SupportsSearch: types.BoolNull(), Protocol: types.StringNull(), Priority: types.Int64Value(25), DownloadClientID: types.Int64Value(0), ProxyID: types.Int64Null()}
 	planState := stateForResource(t, instance, model)
 	response := &resource.CreateResponse{State: emptyStateForResource(t, instance)}
-	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan(planState), Config: tfsdk.Config{Raw: planState.Raw, Schema: planState.Schema}}, response)
+	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan(planState), Config: tfsdk.Config(planState)}, response)
 	if response.Diagnostics.HasError() {
 		t.Fatalf("create failed: %v", response.Diagnostics)
 	}
