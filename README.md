@@ -35,6 +35,8 @@ configuration performs no network request.
 
 See [provider documentation](docs/index.md) and the generated
 [OpenAPI coverage matrix](docs/openapi-coverage.md).
+Imperative queue, import, backup, upgrade, and process operations follow the
+[operational API policy](docs/operational-api-policy.md).
 
 Singleton resource behavior, imports, credential handling, and naming helpers
 are documented in

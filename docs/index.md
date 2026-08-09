@@ -52,3 +52,7 @@ The [generated coverage matrix](openapi-coverage.md) classifies every pinned
 API operation. A `planned` row is not implemented functionality. Imperative or
 destructive APIs remain action-only or out of scope unless a later issue adds
 explicit safeguards.
+
+The [operational API policy](operational-api-policy.md) records why queue,
+import, backup/restore, upgrade, process, log, and release-push operations are
+not Terraform resources and recommends access-controlled operational tooling.
