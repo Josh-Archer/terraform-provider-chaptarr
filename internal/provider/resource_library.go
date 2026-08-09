@@ -422,7 +422,7 @@ func (r *seriesResource) findSeries(ctx context.Context, foreign string, authors
 		}
 		var values []seriesAPI
 		if json.Unmarshal(response.Body, &values) != nil {
-			return 0, fmt.Errorf("Chaptarr returned an invalid series list")
+			return 0, fmt.Errorf("chaptarr returned an invalid series list")
 		}
 		for _, v := range values {
 			if strings.EqualFold(v.ForeignSeriesID, foreign) {
@@ -430,7 +430,7 @@ func (r *seriesResource) findSeries(ctx context.Context, foreign string, authors
 			}
 		}
 	}
-	return 0, fmt.Errorf("Chaptarr applied the request but did not return a local series matching %q", foreign)
+	return 0, fmt.Errorf("chaptarr applied the request but did not return a local series matching %q", foreign)
 }
 func (r *seriesResource) refresh(ctx context.Context, state *seriesModel, target *tfsdk.State, d *diag.Diagnostics) {
 	id, ok := positiveModelID(state.ID)
