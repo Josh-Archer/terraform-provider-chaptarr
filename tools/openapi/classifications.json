@@ -89,7 +89,7 @@
     },
     "DELETE /api/v1/delayprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_delay_profile",
       "tracking_issue": "#4"
     },
@@ -161,7 +161,7 @@
     },
     "DELETE /api/v1/metadataprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_profile",
       "tracking_issue": "#4"
     },
@@ -185,7 +185,7 @@
     },
     "DELETE /api/v1/qualityprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_quality_profile",
       "tracking_issue": "#4"
     },
@@ -203,7 +203,7 @@
     },
     "DELETE /api/v1/releaseprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_release_profile",
       "tracking_issue": "#4"
     },
@@ -538,7 +538,7 @@
     },
     "GET /api/v1/delayprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_delay_profile",
       "tracking_issue": "#4"
     },
@@ -778,20 +778,20 @@
       "tracking_issue": "#4"
     },
     "GET /api/v1/metadataprofile/languages": {
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_metadata_profile",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_metadata_profile_schema",
       "tracking_issue": "#4"
     },
     "GET /api/v1/metadataprofile/schema": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_profile_schema",
       "tracking_issue": "#4"
     },
     "GET /api/v1/metadataprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_profile",
       "tracking_issue": "#4"
     },
@@ -845,13 +845,13 @@
     },
     "GET /api/v1/qualitydefinition": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_quality_definition",
       "tracking_issue": "#4"
     },
     "GET /api/v1/qualitydefinition/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_quality_definition",
       "tracking_issue": "#4"
     },
@@ -863,13 +863,13 @@
     },
     "GET /api/v1/qualityprofile/schema": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_quality_profile_schema",
       "tracking_issue": "#4"
     },
     "GET /api/v1/qualityprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_quality_profile",
       "tracking_issue": "#4"
     },
@@ -905,7 +905,7 @@
     },
     "GET /api/v1/releaseprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_release_profile",
       "tracking_issue": "#4"
     },
@@ -1329,7 +1329,7 @@
     },
     "POST /api/v1/delayprofile": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_delay_profile",
       "tracking_issue": "#4"
     },
@@ -1454,7 +1454,7 @@
     },
     "POST /api/v1/metadataprofile": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_profile",
       "tracking_issue": "#4"
     },
@@ -1496,7 +1496,7 @@
     },
     "POST /api/v1/qualityprofile": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_quality_profile",
       "tracking_issue": "#4"
     },
@@ -1532,7 +1532,7 @@
     },
     "POST /api/v1/releaseprofile": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_release_profile",
       "tracking_issue": "#4"
     },
@@ -1784,7 +1784,7 @@
     },
     "PUT /api/v1/delayprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_delay_profile",
       "tracking_issue": "#4"
     },
@@ -1838,7 +1838,7 @@
     },
     "PUT /api/v1/metadataprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_profile",
       "tracking_issue": "#4"
     },
@@ -1856,19 +1856,19 @@
     },
     "PUT /api/v1/qualitydefinition/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_quality_definition",
       "tracking_issue": "#4"
     },
     "PUT /api/v1/qualityprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_quality_profile",
       "tracking_issue": "#4"
     },
     "PUT /api/v1/releaseprofile/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_release_profile",
       "tracking_issue": "#4"
     },
