@@ -122,7 +122,7 @@ func (p *ChaptarrProvider) Configure(ctx context.Context, req provider.Configure
 }
 
 func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource {
-	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+8)
+	resources := make([]func() resource.Resource, 0, len(singletonConfigDefinitions)+13)
 	for _, definition := range singletonConfigDefinitions {
 		resources = append(resources, newSingletonConfigResource(definition))
 	}
@@ -136,6 +136,11 @@ func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource
 		newDelayProfileResource,
 		newQualityDefinitionResource,
 		newPostgresDatabaseResource,
+		newMetadataResource,
+		newCustomFormatResource,
+		newCustomFilterResource,
+		newTagResource,
+		newProxyResource,
 	)
 	return resources
 }
@@ -151,6 +156,9 @@ func (p *ChaptarrProvider) DataSources(context.Context) []func() datasource.Data
 	dataSources = append(dataSources,
 		newQualityProfileSchemaDataSource,
 		newMetadataProfileSchemaDataSource,
+		newMetadataSchemaDataSource,
+		newCustomFormatSchemaDataSource,
+		newTagDetailsDataSource,
 	)
 	return dataSources
 }

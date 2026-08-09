@@ -77,13 +77,13 @@
     },
     "DELETE /api/v1/customfilter/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_custom_filter",
       "tracking_issue": "#7"
     },
     "DELETE /api/v1/customformat/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_custom_format",
       "tracking_issue": "#7"
     },
@@ -155,7 +155,7 @@
     },
     "DELETE /api/v1/metadata/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata",
       "tracking_issue": "#7"
     },
@@ -227,7 +227,7 @@
     },
     "DELETE /api/v1/settings/proxy/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_proxy",
       "tracking_issue": "#7"
     },
@@ -239,7 +239,7 @@
     },
     "DELETE /api/v1/tag/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_tag",
       "tracking_issue": "#7"
     },
@@ -508,7 +508,7 @@
     },
     "GET /api/v1/customfilter/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_custom_filter",
       "tracking_issue": "#7"
     },
@@ -519,14 +519,14 @@
       "tracking_issue": "#7"
     },
     "GET /api/v1/customformat/schema": {
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_custom_format",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_custom_format_schema",
       "tracking_issue": "#7"
     },
     "GET /api/v1/customformat/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_custom_format",
       "tracking_issue": "#7"
     },
@@ -760,14 +760,14 @@
       "tracking_issue": "#7"
     },
     "GET /api/v1/metadata/schema": {
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_metadata",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_metadata_schema",
       "tracking_issue": "#7"
     },
     "GET /api/v1/metadata/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata",
       "tracking_issue": "#7"
     },
@@ -1001,7 +1001,7 @@
     },
     "GET /api/v1/settings/proxy/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_proxy",
       "tracking_issue": "#7"
     },
@@ -1072,19 +1072,19 @@
     },
     "GET /api/v1/tag/detail": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_tag_details",
       "tracking_issue": "#7"
     },
     "GET /api/v1/tag/detail/{id}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_tag_details",
       "tracking_issue": "#7"
     },
     "GET /api/v1/tag/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_tag",
       "tracking_issue": "#7"
     },
@@ -1317,13 +1317,13 @@
     },
     "POST /api/v1/customfilter": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_custom_filter",
       "tracking_issue": "#7"
     },
     "POST /api/v1/customformat": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_custom_format",
       "tracking_issue": "#7"
     },
@@ -1430,7 +1430,7 @@
     },
     "POST /api/v1/metadata": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata",
       "tracking_issue": "#7"
     },
@@ -1581,7 +1581,7 @@
     },
     "POST /api/v1/settings/proxy": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_proxy",
       "tracking_issue": "#7"
     },
@@ -1635,7 +1635,7 @@
     },
     "POST /api/v1/tag": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_tag",
       "tracking_issue": "#7"
     },
@@ -1766,13 +1766,13 @@
     },
     "PUT /api/v1/customfilter/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_custom_filter",
       "tracking_issue": "#7"
     },
     "PUT /api/v1/customformat/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_custom_format",
       "tracking_issue": "#7"
     },
@@ -1832,7 +1832,7 @@
     },
     "PUT /api/v1/metadata/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata",
       "tracking_issue": "#7"
     },
@@ -1892,13 +1892,13 @@
     },
     "PUT /api/v1/settings/proxy/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_proxy",
       "tracking_issue": "#7"
     },
     "PUT /api/v1/tag/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_tag",
       "tracking_issue": "#7"
     }
