@@ -164,7 +164,7 @@ func TestProfileSchemasExposeNoSensitiveAttributes(t *testing.T) {
 	for _, instance := range resources {
 		response := &resource.SchemaResponse{}
 		instance.Schema(t.Context(), resource.SchemaRequest{}, response)
-		diagnostics := append(response.Schema.Validate(), response.Schema.ValidateImplementation(t.Context())...)
+		diagnostics := response.Schema.ValidateImplementation(t.Context())
 		if diagnostics.HasError() {
 			t.Fatalf("invalid resource schema: %v", diagnostics)
 		}
@@ -182,7 +182,7 @@ func TestProfileDataSourceSchemasAreValid(t *testing.T) {
 	for _, instance := range dataSources {
 		response := &datasource.SchemaResponse{}
 		instance.Schema(t.Context(), datasource.SchemaRequest{}, response)
-		diagnostics := append(response.Schema.Validate(), response.Schema.ValidateImplementation(t.Context())...)
+		diagnostics := response.Schema.ValidateImplementation(t.Context())
 		if diagnostics.HasError() {
 			t.Fatalf("invalid data-source schema: %v", diagnostics)
 		}
