@@ -47,7 +47,7 @@ func (d *customizationSchemaDataSource) Metadata(_ context.Context, req datasour
 	resp.TypeName = req.ProviderTypeName + "_" + d.kind + "_schema"
 }
 func (d *customizationSchemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = schema.Schema{MarkdownDescription: "Fetch the current Chaptarr customization template contract as deterministic canonical JSON. Metadata password/API-key values are removed while field privacy/type metadata remains available.", Attributes: map[string]schema.Attribute{"id": schema.StringAttribute{Computed: true}, "templates_json": schema.StringAttribute{Computed: true}, "templates_sha256": schema.StringAttribute{Computed: true}}}
+	resp.Schema = schema.Schema{MarkdownDescription: "Fetch the current Chaptarr customization template contract as deterministic canonical JSON. Protected credential values are removed while field privacy/type metadata remains available.", Attributes: map[string]schema.Attribute{"id": schema.StringAttribute{Computed: true}, "templates_json": schema.StringAttribute{Computed: true}, "templates_sha256": schema.StringAttribute{Computed: true}}}
 }
 func (d *customizationSchemaDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {

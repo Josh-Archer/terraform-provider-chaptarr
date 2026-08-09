@@ -29,7 +29,6 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 	if metadata.TypeName != "chaptarr" || metadata.Version != "test-version" {
 		t.Fatalf("unexpected metadata: %#v", metadata)
 	}
-<<<<<<< HEAD
 	if resources := p.Resources(context.Background()); len(resources) != 26 {
 		t.Fatalf("registered %d resources, want 26", len(resources))
 	}
@@ -54,6 +53,7 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 	} {
 		if _, ok := registeredDataSources[typeName]; !ok {
 			t.Fatalf("missing customization data source %q", typeName)
+		}
 	}
 }
 
