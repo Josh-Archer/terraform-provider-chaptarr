@@ -71,9 +71,9 @@
     },
     "DELETE /api/v1/config/hardcover": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_hardcover_config",
-      "tracking_issue": "#6"
+      "tracking_issue": "#2"
     },
     "DELETE /api/v1/customfilter/{id}": {
       "classification": "resource",
@@ -382,121 +382,121 @@
     },
     "GET /api/v1/config/conversion": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_conversion_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/conversion/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_conversion_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/development": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_development_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/development/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_development_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/downloadclient": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/downloadclient/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/hardcover": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_hardcover_config",
-      "tracking_issue": "#6"
+      "tracking_issue": "#2"
     },
     "GET /api/v1/config/host": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_host_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/host/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_host_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/indexer": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/indexer/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/mediamanagement": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_management_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/mediamanagement/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_management_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/metadataprovider": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_provider_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/metadataprovider/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_provider_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/naming": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/naming/examples": {
-      "classification": "resource",
-      "status": "planned",
-      "target": "chaptarr_naming_config",
+      "classification": "data-source",
+      "status": "implemented",
+      "target": "chaptarr_naming_examples",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/naming/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/ui": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ui_config",
       "tracking_issue": "#2"
     },
     "GET /api/v1/config/ui/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ui_config",
       "tracking_issue": "#2"
     },
@@ -1281,9 +1281,9 @@
     },
     "POST /api/v1/config/hardcover": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_hardcover_config",
-      "tracking_issue": "#6"
+      "tracking_issue": "#2"
     },
     "POST /api/v1/config/host/test/proxy": {
       "classification": "action-only",
@@ -1293,25 +1293,25 @@
     },
     "POST /api/v1/config/naming-pattern/compile": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_pattern",
       "tracking_issue": "#2"
     },
     "POST /api/v1/config/naming-pattern/decompile": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_pattern",
       "tracking_issue": "#2"
     },
     "POST /api/v1/config/naming-pattern/preview": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_pattern",
       "tracking_issue": "#2"
     },
     "POST /api/v1/config/naming-pattern/validate": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_pattern",
       "tracking_issue": "#2"
     },
@@ -1711,55 +1711,55 @@
     },
     "PUT /api/v1/config/conversion/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_conversion_config",
       "tracking_issue": "#2"
     },
     "PUT /api/v1/config/development/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_development_config",
       "tracking_issue": "#2"
     },
     "PUT /api/v1/config/downloadclient/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_download_client_config",
       "tracking_issue": "#2"
     },
     "PUT /api/v1/config/host/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_host_config",
       "tracking_issue": "#2"
     },
     "PUT /api/v1/config/indexer/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_indexer_config",
       "tracking_issue": "#2"
     },
     "PUT /api/v1/config/mediamanagement/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_management_config",
       "tracking_issue": "#2"
     },
     "PUT /api/v1/config/metadataprovider/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_metadata_provider_config",
       "tracking_issue": "#2"
     },
     "PUT /api/v1/config/naming/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_naming_config",
       "tracking_issue": "#2"
     },
     "PUT /api/v1/config/ui/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ui_config",
       "tracking_issue": "#2"
     },

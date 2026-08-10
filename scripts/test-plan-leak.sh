@@ -26,6 +26,9 @@ EOF
 
 cat >"${test_root}/configuration/main.tf" <<'EOF'
 terraform {
+
+  required_version = ">= 1.11.2"
+
   required_providers {
     chaptarr = {
       source = "josh-archer/chaptarr"
@@ -36,10 +39,23 @@ terraform {
 provider "chaptarr" {
   url = "https://chaptarr.example.test/reverse-proxy"
 }
+
+variable "oidc_client_secret" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
+resource "chaptarr_host_config" "leak_test" {
+  instance_name      = "plan-leak-test"
+  oidc_client_secret = var.oidc_client_secret
+}
 EOF
 
 sentinel='CHAPTARR_TEST_API_KEY_SENTINEL_DO_NOT_USE_79f6f1d2'
+host_sentinel='CHAPTARR_HOST_WRITE_ONLY_SENTINEL_DO_NOT_USE_913ad7c4'
 export CHAPTARR_API_KEY="${sentinel}"
+export TF_VAR_oidc_client_secret="${host_sentinel}"
 export TF_CLI_CONFIG_FILE="${test_root}/tofurc"
 unset TF_LOG TF_LOG_PATH
 
@@ -58,7 +74,7 @@ fi
 tofu -chdir="${test_root}/configuration" show -json "${test_root}/plan.tfplan" \
   >"${test_root}/plan.json" 2>"${test_root}/show-stderr.txt"
 
-if grep -F -R -- "${sentinel}" \
+if grep -F -R -e "${sentinel}" -e "${host_sentinel}" -- \
   "${test_root}/stdout.txt" "${test_root}/stderr.txt" \
   "${test_root}/plan.json" "${test_root}/show-stderr.txt" >/dev/null; then
   echo "Synthetic API key leaked into OpenTofu output." >&2

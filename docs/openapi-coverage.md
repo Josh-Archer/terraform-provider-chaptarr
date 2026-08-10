@@ -13,9 +13,11 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | Classification | Status | Operations |
 |---|---|---:|
 | action-only | excluded | 58 |
-| data-source | planned | 74 |
+| data-source | implemented | 5 |
+| data-source | planned | 70 |
 | out-of-scope | excluded | 16 |
-| resource | planned | 169 |
+| resource | implemented | 30 |
+| resource | planned | 138 |
 
 ## Operation inventory
 
@@ -30,7 +32,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/bookfile/bulk` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `46084991c558` |
 | `DELETE /api/v1/bookfile/{id}` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `b43c16988af3` |
 | `DELETE /api/v1/command/{id}` | Command | action-only | excluded | Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh. | #11 | `d8ca0120df49` |
-| `DELETE /api/v1/config/hardcover` | HardcoverConfig | resource | planned | chaptarr_hardcover_config | #6 | `00dd4e0cbe5e` |
+| `DELETE /api/v1/config/hardcover` | HardcoverConfig | resource | implemented | chaptarr_hardcover_config | #2 | `00dd4e0cbe5e` |
 | `DELETE /api/v1/customfilter/{id}` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `e8bfeed5d96b` |
 | `DELETE /api/v1/customformat/{id}` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `7e44142adc91` |
 | `DELETE /api/v1/delayprofile/{id}` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `edda2080a0fc` |
@@ -82,26 +84,26 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/calendar/{id}` | Calendar | data-source | planned | chaptarr_calendar | #10 | `7852aa78ae48` |
 | `GET /api/v1/command` | Command | data-source | planned | chaptarr_commands | #11 | `efefa80f8fb9` |
 | `GET /api/v1/command/{id}` | Command | data-source | planned | chaptarr_commands | #11 | `396939337e09` |
-| `GET /api/v1/config/conversion` | ConversionConfig | resource | planned | chaptarr_conversion_config | #2 | `1e68ff850f6b` |
-| `GET /api/v1/config/conversion/{id}` | ConversionConfig | resource | planned | chaptarr_conversion_config | #2 | `833e31fac204` |
-| `GET /api/v1/config/development` | DevelopmentConfig | resource | planned | chaptarr_development_config | #2 | `e7739e0bc9e4` |
-| `GET /api/v1/config/development/{id}` | DevelopmentConfig | resource | planned | chaptarr_development_config | #2 | `14e6e89d0ad7` |
-| `GET /api/v1/config/downloadclient` | DownloadClientConfig | resource | planned | chaptarr_download_client_config | #2 | `c355201502ff` |
-| `GET /api/v1/config/downloadclient/{id}` | DownloadClientConfig | resource | planned | chaptarr_download_client_config | #2 | `b1f11ab7925d` |
-| `GET /api/v1/config/hardcover` | HardcoverConfig | resource | planned | chaptarr_hardcover_config | #6 | `0cdfab8f2d9c` |
-| `GET /api/v1/config/host` | HostConfig | resource | planned | chaptarr_host_config | #2 | `3bf7437e7ac6` |
-| `GET /api/v1/config/host/{id}` | HostConfig | resource | planned | chaptarr_host_config | #2 | `e02936b0b0ce` |
-| `GET /api/v1/config/indexer` | IndexerConfig | resource | planned | chaptarr_indexer_config | #2 | `7115942ce2fa` |
-| `GET /api/v1/config/indexer/{id}` | IndexerConfig | resource | planned | chaptarr_indexer_config | #2 | `098f356ae8d9` |
-| `GET /api/v1/config/mediamanagement` | MediaManagementConfig | resource | planned | chaptarr_media_management_config | #2 | `9df7108771b0` |
-| `GET /api/v1/config/mediamanagement/{id}` | MediaManagementConfig | resource | planned | chaptarr_media_management_config | #2 | `5e09c77f3d7b` |
-| `GET /api/v1/config/metadataprovider` | MetadataProviderConfig | resource | planned | chaptarr_metadata_provider_config | #2 | `e7fd44a7a055` |
-| `GET /api/v1/config/metadataprovider/{id}` | MetadataProviderConfig | resource | planned | chaptarr_metadata_provider_config | #2 | `f8f852051a26` |
-| `GET /api/v1/config/naming` | NamingConfig | resource | planned | chaptarr_naming_config | #2 | `9c9dda0378ae` |
-| `GET /api/v1/config/naming/examples` | NamingConfig | resource | planned | chaptarr_naming_config | #2 | `dfff798d8996` |
-| `GET /api/v1/config/naming/{id}` | NamingConfig | resource | planned | chaptarr_naming_config | #2 | `7f0654430342` |
-| `GET /api/v1/config/ui` | UiConfig | resource | planned | chaptarr_ui_config | #2 | `b0b7e49e5bc7` |
-| `GET /api/v1/config/ui/{id}` | UiConfig | resource | planned | chaptarr_ui_config | #2 | `f23fefb03830` |
+| `GET /api/v1/config/conversion` | ConversionConfig | resource | implemented | chaptarr_conversion_config | #2 | `1e68ff850f6b` |
+| `GET /api/v1/config/conversion/{id}` | ConversionConfig | resource | implemented | chaptarr_conversion_config | #2 | `833e31fac204` |
+| `GET /api/v1/config/development` | DevelopmentConfig | resource | implemented | chaptarr_development_config | #2 | `e7739e0bc9e4` |
+| `GET /api/v1/config/development/{id}` | DevelopmentConfig | resource | implemented | chaptarr_development_config | #2 | `14e6e89d0ad7` |
+| `GET /api/v1/config/downloadclient` | DownloadClientConfig | resource | implemented | chaptarr_download_client_config | #2 | `c355201502ff` |
+| `GET /api/v1/config/downloadclient/{id}` | DownloadClientConfig | resource | implemented | chaptarr_download_client_config | #2 | `b1f11ab7925d` |
+| `GET /api/v1/config/hardcover` | HardcoverConfig | resource | implemented | chaptarr_hardcover_config | #2 | `0cdfab8f2d9c` |
+| `GET /api/v1/config/host` | HostConfig | resource | implemented | chaptarr_host_config | #2 | `3bf7437e7ac6` |
+| `GET /api/v1/config/host/{id}` | HostConfig | resource | implemented | chaptarr_host_config | #2 | `e02936b0b0ce` |
+| `GET /api/v1/config/indexer` | IndexerConfig | resource | implemented | chaptarr_indexer_config | #2 | `7115942ce2fa` |
+| `GET /api/v1/config/indexer/{id}` | IndexerConfig | resource | implemented | chaptarr_indexer_config | #2 | `098f356ae8d9` |
+| `GET /api/v1/config/mediamanagement` | MediaManagementConfig | resource | implemented | chaptarr_media_management_config | #2 | `9df7108771b0` |
+| `GET /api/v1/config/mediamanagement/{id}` | MediaManagementConfig | resource | implemented | chaptarr_media_management_config | #2 | `5e09c77f3d7b` |
+| `GET /api/v1/config/metadataprovider` | MetadataProviderConfig | resource | implemented | chaptarr_metadata_provider_config | #2 | `e7fd44a7a055` |
+| `GET /api/v1/config/metadataprovider/{id}` | MetadataProviderConfig | resource | implemented | chaptarr_metadata_provider_config | #2 | `f8f852051a26` |
+| `GET /api/v1/config/naming` | NamingConfig | resource | implemented | chaptarr_naming_config | #2 | `9c9dda0378ae` |
+| `GET /api/v1/config/naming/examples` | NamingConfig | data-source | implemented | chaptarr_naming_examples | #2 | `dfff798d8996` |
+| `GET /api/v1/config/naming/{id}` | NamingConfig | resource | implemented | chaptarr_naming_config | #2 | `7f0654430342` |
+| `GET /api/v1/config/ui` | UiConfig | resource | implemented | chaptarr_ui_config | #2 | `b0b7e49e5bc7` |
+| `GET /api/v1/config/ui/{id}` | UiConfig | resource | implemented | chaptarr_ui_config | #2 | `f23fefb03830` |
 | `GET /api/v1/customfilter` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `1cfe530a185a` |
 | `GET /api/v1/customfilter/{id}` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `5e53161e4b68` |
 | `GET /api/v1/customformat` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `324cb80f7d59` |
@@ -234,12 +236,12 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/command/{id}/pause` | Command | action-only | excluded | Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh. | #11 | `d8ca0120df49` |
 | `POST /api/v1/command/{id}/resume` | Command | action-only | excluded | Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh. | #11 | `d8ca0120df49` |
 | `POST /api/v1/config/development/test` | DevelopmentConfig | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `95da993ead39` |
-| `POST /api/v1/config/hardcover` | HardcoverConfig | resource | planned | chaptarr_hardcover_config | #6 | `26e1742e4d0d` |
+| `POST /api/v1/config/hardcover` | HardcoverConfig | resource | implemented | chaptarr_hardcover_config | #2 | `26e1742e4d0d` |
 | `POST /api/v1/config/host/test/proxy` | HostConfig | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `3aa3c1bd77a7` |
-| `POST /api/v1/config/naming-pattern/compile` | NamingPattern | data-source | planned | chaptarr_naming_pattern | #2 | `c69c5869199b` |
-| `POST /api/v1/config/naming-pattern/decompile` | NamingPattern | data-source | planned | chaptarr_naming_pattern | #2 | `70cac901aa62` |
-| `POST /api/v1/config/naming-pattern/preview` | NamingPattern | data-source | planned | chaptarr_naming_pattern | #2 | `c19dca16bbc8` |
-| `POST /api/v1/config/naming-pattern/validate` | NamingPattern | data-source | planned | chaptarr_naming_pattern | #2 | `4f9b2ee9f12c` |
+| `POST /api/v1/config/naming-pattern/compile` | NamingPattern | data-source | implemented | chaptarr_naming_pattern | #2 | `c69c5869199b` |
+| `POST /api/v1/config/naming-pattern/decompile` | NamingPattern | data-source | implemented | chaptarr_naming_pattern | #2 | `70cac901aa62` |
+| `POST /api/v1/config/naming-pattern/preview` | NamingPattern | data-source | implemented | chaptarr_naming_pattern | #2 | `c19dca16bbc8` |
+| `POST /api/v1/config/naming-pattern/validate` | NamingPattern | data-source | implemented | chaptarr_naming_pattern | #2 | `4f9b2ee9f12c` |
 | `POST /api/v1/customfilter` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `b4fcbe41983b` |
 | `POST /api/v1/customformat` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `cad913ae2d2e` |
 | `POST /api/v1/delayprofile` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `446742170d7b` |
@@ -306,15 +308,15 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/book/{id}` | Book | resource | planned | chaptarr_book | #9 | `0ca2851a1d91` |
 | `PUT /api/v1/bookfile/editor` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `46084991c558` |
 | `PUT /api/v1/bookfile/{id}` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `bdce5a2719c8` |
-| `PUT /api/v1/config/conversion/{id}` | ConversionConfig | resource | planned | chaptarr_conversion_config | #2 | `25d950918044` |
-| `PUT /api/v1/config/development/{id}` | DevelopmentConfig | resource | planned | chaptarr_development_config | #2 | `2c319ca64808` |
-| `PUT /api/v1/config/downloadclient/{id}` | DownloadClientConfig | resource | planned | chaptarr_download_client_config | #2 | `b6036815ccd2` |
-| `PUT /api/v1/config/host/{id}` | HostConfig | resource | planned | chaptarr_host_config | #2 | `4413443f7360` |
-| `PUT /api/v1/config/indexer/{id}` | IndexerConfig | resource | planned | chaptarr_indexer_config | #2 | `8e2abf58ae6d` |
-| `PUT /api/v1/config/mediamanagement/{id}` | MediaManagementConfig | resource | planned | chaptarr_media_management_config | #2 | `8f4011be299b` |
-| `PUT /api/v1/config/metadataprovider/{id}` | MetadataProviderConfig | resource | planned | chaptarr_metadata_provider_config | #2 | `0c0061588f17` |
-| `PUT /api/v1/config/naming/{id}` | NamingConfig | resource | planned | chaptarr_naming_config | #2 | `e69b0f08f6c8` |
-| `PUT /api/v1/config/ui/{id}` | UiConfig | resource | planned | chaptarr_ui_config | #2 | `77d0411ff96f` |
+| `PUT /api/v1/config/conversion/{id}` | ConversionConfig | resource | implemented | chaptarr_conversion_config | #2 | `25d950918044` |
+| `PUT /api/v1/config/development/{id}` | DevelopmentConfig | resource | implemented | chaptarr_development_config | #2 | `2c319ca64808` |
+| `PUT /api/v1/config/downloadclient/{id}` | DownloadClientConfig | resource | implemented | chaptarr_download_client_config | #2 | `b6036815ccd2` |
+| `PUT /api/v1/config/host/{id}` | HostConfig | resource | implemented | chaptarr_host_config | #2 | `4413443f7360` |
+| `PUT /api/v1/config/indexer/{id}` | IndexerConfig | resource | implemented | chaptarr_indexer_config | #2 | `8e2abf58ae6d` |
+| `PUT /api/v1/config/mediamanagement/{id}` | MediaManagementConfig | resource | implemented | chaptarr_media_management_config | #2 | `8f4011be299b` |
+| `PUT /api/v1/config/metadataprovider/{id}` | MetadataProviderConfig | resource | implemented | chaptarr_metadata_provider_config | #2 | `0c0061588f17` |
+| `PUT /api/v1/config/naming/{id}` | NamingConfig | resource | implemented | chaptarr_naming_config | #2 | `e69b0f08f6c8` |
+| `PUT /api/v1/config/ui/{id}` | UiConfig | resource | implemented | chaptarr_ui_config | #2 | `77d0411ff96f` |
 | `PUT /api/v1/customfilter/{id}` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `74102fb555af` |
 | `PUT /api/v1/customformat/{id}` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `f85c846dac80` |
 | `PUT /api/v1/delayprofile/reorder/{id}` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `c091445cb7c9` |
