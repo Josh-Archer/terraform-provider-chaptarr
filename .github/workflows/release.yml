@@ -1,20 +1,23 @@
 name: Release
-run-name: Release ${{ inputs.release_tag }}
+run-name: ${{ inputs.release_tag != '' && format('Release {0}', inputs.release_tag) || 'Automated SemVer Release' }}
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Existing exact SemVer tag to build and publish
-        required: true
+        description: Explicit SemVer tag override (e.g. v0.2.0)
+        required: false
         type: string
 
 concurrency:
-  group: release-${{ inputs.release_tag }}
+  group: release-main
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   GOTOOLCHAIN: local
@@ -28,82 +31,39 @@ jobs:
     environment: release
     permissions:
       contents: write
-    env:
-      RELEASE_TAG: ${{ inputs.release_tag }}
     steps:
-      - name: Validate exact release tag
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          prerelease_identifier='(0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)'
-          semver_pattern="^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-${prerelease_identifier}(\.${prerelease_identifier})*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$"
-          if [[ ! "${RELEASE_TAG}" =~ ${semver_pattern} ]]; then
-            echo "release_tag must be an exact v-prefixed SemVer tag" >&2
-            exit 1
-          fi
-          gh api --silent "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}"
-
-      - name: Check out release controls from the default branch
+      - name: Check out default branch source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.sha }}
-          path: release-control
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true
 
-      - name: Check out exact tagged source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: refs/tags/${{ env.RELEASE_TAG }}
-          path: source
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Verify tagged commit belongs to default-branch history
-        shell: bash
-        env:
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-        run: |
-          set -euo pipefail
-          git -C source fetch --no-tags origin "${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
-          tagged_commit="$(git -C source rev-parse HEAD)"
-          git -C source merge-base --is-ancestor "${tagged_commit}" "refs/remotes/origin/${DEFAULT_BRANCH}"
-
-      - name: Check existing release state
-        id: release_state
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Calculate next SemVer tag
+        id: semver
         shell: bash
         run: |
+          bash ./scripts/calculate-next-version.sh "${{ inputs.release_tag }}"
+
+      - name: Create and push git tag
+        if: steps.semver.outputs.should_release == 'true'
+        shell: bash
+        env:
+          NEXT_TAG: ${{ steps.semver.outputs.next_tag }}
+        run: |
           set -euo pipefail
-          if response="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq '.draft' 2>&1)"; then
-            case "${response}" in
-              false)
-                assets="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq '.assets[].name')"
-                printf '%s\n' "${assets}" | bash release-control/scripts/validate-release-assets.sh "${RELEASE_TAG}"
-                echo "published=true" >> "${GITHUB_OUTPUT}"
-                echo "${RELEASE_TAG} is already published with every required asset name; no release action is needed."
-                ;;
-              true)
-                echo "published=false" >> "${GITHUB_OUTPUT}"
-                echo "Resuming the existing draft for ${RELEASE_TAG}."
-                ;;
-              *)
-                echo "Unexpected GitHub Release state." >&2
-                exit 1
-                ;;
-            esac
-          elif [[ "${response}" == *"(HTTP 404)"* ]]; then
-            echo "published=false" >> "${GITHUB_OUTPUT}"
+          if git rev-parse "${NEXT_TAG}" >/dev/null 2>&1; then
+            echo "Tag ${NEXT_TAG} already exists locally."
           else
-            echo "Unable to inspect the GitHub Release state." >&2
-            exit 1
+            echo "Tagging commit with ${NEXT_TAG}..."
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "${NEXT_TAG}" -m "Release ${NEXT_TAG}"
+            git push origin "${NEXT_TAG}"
           fi
+          echo "RELEASE_TAG=${NEXT_TAG}" >> "${GITHUB_ENV}"
 
-      - name: Require protected-environment signing configuration
-        if: steps.release_state.outputs.published != 'true'
+      - name: Require release environment signing configuration
+        if: steps.semver.outputs.should_release == 'true'
         shell: bash
         env:
           GPG_PRIVATE_KEY_CONFIGURED: ${{ secrets.GPG_PRIVATE_KEY != '' }}
@@ -111,12 +71,12 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "${GPG_PRIVATE_KEY_CONFIGURED}" != "true" || "${PASSPHRASE_CONFIGURED}" != "true" ]]; then
-            echo "Signed release prerequisites are not configured in the protected release environment." >&2
+            echo "Signed release prerequisites are not configured in the release environment." >&2
             exit 1
           fi
 
       - name: Import release signing key
-        if: steps.release_state.outputs.published != 'true'
+        if: steps.semver.outputs.should_release == 'true'
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
         with:
@@ -124,21 +84,20 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
 
       - name: Set up Go
-        if: steps.release_state.outputs.published != 'true'
+        if: steps.semver.outputs.should_release == 'true'
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version-file: source/go.mod
-          cache-dependency-path: source/go.sum
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
           cache: true
 
       - name: Publish signed provider release
-        if: steps.release_state.outputs.published != 'true'
+        if: steps.semver.outputs.should_release == 'true'
         uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
         with:
           distribution: goreleaser
           version: v2.17.1
-          workdir: source
-          args: release --clean --parallelism=2 --config ../release-control/.goreleaser.yml
+          args: release --clean --parallelism=2 --config .goreleaser.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
