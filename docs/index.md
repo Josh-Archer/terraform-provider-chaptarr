@@ -73,6 +73,10 @@ The [library ownership guide](resources/library.md) documents authors, series
 monitoring intent, provider-prefixed lookup identities, imports, and the
 explicit controls that keep searches, file moves, and file deletion disabled.
 
+The [book and edition guide](resources/books.md) documents apply-only lookup
+candidates, monitored-edition selection, narrator state, conservative destroy
+controls, and GET-only book-file/rename/retag inspection.
+
 ## Coverage status
 
 The [generated coverage matrix](openapi-coverage.md) classifies every pinned

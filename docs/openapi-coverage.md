@@ -13,11 +13,11 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | Classification | Status | Operations |
 |---|---|---:|
 | action-only | excluded | 58 |
-| data-source | implemented | 46 |
-| data-source | planned | 38 |
+| data-source | implemented | 52 |
+| data-source | planned | 32 |
 | out-of-scope | excluded | 16 |
-| resource | implemented | 106 |
-| resource | planned | 53 |
+| resource | implemented | 111 |
+| resource | planned | 48 |
 
 ## Operation inventory
 
@@ -28,7 +28,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/blocklist/bulk` | Blocklist | action-only | excluded | Blocklist removal is an imperative queue/history action, not declarative infrastructure. | #11 | `0cb87cd7f529` |
 | `DELETE /api/v1/blocklist/{id}` | Blocklist | action-only | excluded | Blocklist removal is an imperative queue/history action, not declarative infrastructure. | #11 | `05c9940da5f1` |
 | `DELETE /api/v1/book/editor` | BookEditor | resource | planned | chaptarr_book | #9 | `e75a4429aac1` |
-| `DELETE /api/v1/book/{id}` | Book | resource | planned | chaptarr_book | #9 | `a373fdd26a30` |
+| `DELETE /api/v1/book/{id}` | Book | resource | implemented | chaptarr_book | #9 | `a373fdd26a30` |
 | `DELETE /api/v1/bookfile/bulk` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `46084991c558` |
 | `DELETE /api/v1/bookfile/{id}` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `b43c16988af3` |
 | `DELETE /api/v1/command/{id}` | Command | action-only | excluded | Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh. | #11 | `d8ca0120df49` |
@@ -72,14 +72,14 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/book` | Book | resource | planned | chaptarr_book | #9 | `df1ca665201f` |
 | `GET /api/v1/book/buckets` | Book | resource | planned | chaptarr_book | #9 | `e61f46a83461` |
 | `GET /api/v1/book/ids` | Book | resource | planned | chaptarr_book | #9 | `a10ae089f148` |
-| `GET /api/v1/book/lookup` | BookLookup | data-source | planned | chaptarr_book_lookup | #9 | `68b96c3a1440` |
+| `GET /api/v1/book/lookup` | BookLookup | data-source | implemented | chaptarr_book_lookup | #9 | `68b96c3a1440` |
 | `GET /api/v1/book/paged` | Book | resource | planned | chaptarr_book | #9 | `b29855f4b873` |
-| `GET /api/v1/book/{bookId}` | Book | resource | planned | chaptarr_book | #9 | `a3a9f2065622` |
+| `GET /api/v1/book/{bookId}` | Book | resource | implemented | chaptarr_book | #9 | `a3a9f2065622` |
 | `GET /api/v1/book/{bookId}/siblings` | Book | resource | planned | chaptarr_book | #9 | `96998ef08e28` |
-| `GET /api/v1/book/{id}` | Book | resource | planned | chaptarr_book | #9 | `6b0962069a20` |
+| `GET /api/v1/book/{id}` | Book | resource | implemented | chaptarr_book | #9 | `6b0962069a20` |
 | `GET /api/v1/book/{id}/overview` | Book | resource | planned | chaptarr_book | #9 | `ea766f3d6247` |
-| `GET /api/v1/bookfile` | BookFile | data-source | planned | chaptarr_book_file | #9 | `cfb675c56bea` |
-| `GET /api/v1/bookfile/{id}` | BookFile | data-source | planned | chaptarr_book_file | #9 | `12894d975b1b` |
+| `GET /api/v1/bookfile` | BookFile | data-source | implemented | chaptarr_book_file | #9 | `cfb675c56bea` |
+| `GET /api/v1/bookfile/{id}` | BookFile | data-source | implemented | chaptarr_book_file | #9 | `12894d975b1b` |
 | `GET /api/v1/calendar` | Calendar | data-source | implemented | chaptarr_calendar | #10 | `eba179c41717` |
 | `GET /api/v1/calendar/{id}` | Calendar | data-source | implemented | chaptarr_calendar | #10 | `7852aa78ae48` |
 | `GET /api/v1/command` | Command | data-source | planned | chaptarr_commands | #11 | `efefa80f8fb9` |
@@ -115,7 +115,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/downloadclient` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `a4fc4fcb0dfd` |
 | `GET /api/v1/downloadclient/schema` | DownloadClient | data-source | implemented | chaptarr_download_client_schema | #5 | `a4fc4fcb0dfd` |
 | `GET /api/v1/downloadclient/{id}` | DownloadClient | resource | implemented | chaptarr_download_client | #5 | `e63aec50afb4` |
-| `GET /api/v1/edition` | Edition | data-source | planned | chaptarr_editions | #9 | `1ef568b59172` |
+| `GET /api/v1/edition` | Edition | data-source | implemented | chaptarr_editions | #9 | `1ef568b59172` |
 | `GET /api/v1/filesystem` | FileSystem | data-source | implemented | chaptarr_file_system | #10 | `d66c20be634c` |
 | `GET /api/v1/filesystem/mediafiles` | FileSystem | data-source | implemented | chaptarr_file_system | #10 | `3fb9113d4790` |
 | `GET /api/v1/filesystem/type` | FileSystem | data-source | implemented | chaptarr_file_system | #10 | `3fb9113d4790` |
@@ -176,8 +176,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/remotepathmapping` | RemotePathMapping | data-source | implemented | chaptarr_remote_path_mappings | #3 | `ca1f912a5f93` |
 | `GET /api/v1/remotepathmapping/suggestions` | RemotePathMapping | data-source | planned | chaptarr_remote_path_mapping_suggestions | #3 | `ff0adb132bd5` |
 | `GET /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `f0cdb4a80f1e` |
-| `GET /api/v1/rename` | RenameBook | data-source | planned | chaptarr_rename_book_preview | #9 | `03493bbd1990` |
-| `GET /api/v1/retag` | RetagBook | data-source | planned | chaptarr_retag_book_preview | #9 | `681a9f868238` |
+| `GET /api/v1/rename` | RenameBook | data-source | implemented | chaptarr_rename_book_preview | #9 | `03493bbd1990` |
+| `GET /api/v1/retag` | RetagBook | data-source | implemented | chaptarr_retag_book_preview | #9 | `681a9f868238` |
 | `GET /api/v1/rootfolder` | RootFolder | data-source | implemented | chaptarr_root_folders | #3 | `5bb05f44666c` |
 | `GET /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `c50e18443ca7` |
 | `GET /api/v1/search` | Search | data-source | implemented | chaptarr_search | #10 | `505aa248d2a8` |
@@ -224,7 +224,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/author/statistics/aggregate` | Author | data-source | planned | chaptarr_author_statistics | #8 | `e3466d8d8c25` |
 | `POST /api/v1/author/{id}/downloadmedia` | Author | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `f198d29054d0` |
 | `POST /api/v1/author/{id}/loadimage` | Author | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `daa0a92d62c2` |
-| `POST /api/v1/book` | Book | resource | planned | chaptarr_book | #9 | `48ef1dbcfed5` |
+| `POST /api/v1/book` | Book | resource | implemented | chaptarr_book | #9 | `48ef1dbcfed5` |
 | `POST /api/v1/book/import` | Book | resource | planned | chaptarr_book | #9 | `2ca11fadc715` |
 | `POST /api/v1/book/{id}/downloadmedia` | Book | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `a4a948141078` |
 | `POST /api/v1/book/{id}/editions/wanted` | Book | resource | planned | chaptarr_book | #9 | `b815432aac3d` |
@@ -305,7 +305,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/book` | Book | resource | planned | chaptarr_book | #9 | `3c4aed5572c5` |
 | `PUT /api/v1/book/editor` | BookEditor | resource | planned | chaptarr_book | #9 | `e75a4429aac1` |
 | `PUT /api/v1/book/monitor` | Book | resource | planned | chaptarr_book | #9 | `7f0e442d67e6` |
-| `PUT /api/v1/book/{id}` | Book | resource | planned | chaptarr_book | #9 | `0ca2851a1d91` |
+| `PUT /api/v1/book/{id}` | Book | resource | implemented | chaptarr_book | #9 | `0ca2851a1d91` |
 | `PUT /api/v1/bookfile/editor` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `46084991c558` |
 | `PUT /api/v1/bookfile/{id}` | BookFile | action-only | excluded | Book-file update or deletion can move or remove media and requires explicit destructive-action safeguards. | #9 | `bdce5a2719c8` |
 | `PUT /api/v1/config/conversion/{id}` | ConversionConfig | resource | implemented | chaptarr_conversion_config | #2 | `25d950918044` |
