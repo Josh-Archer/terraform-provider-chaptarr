@@ -10,15 +10,25 @@ fi
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 test_root="$(mktemp -d)"
+tofu_test_root="${test_root}"
 trap 'rm -rf -- "${test_root}"' EXIT
 
 mkdir -p "${test_root}/bin" "${test_root}/configuration"
-go build -trimpath -o "${test_root}/bin/terraform-provider-chaptarr" "${repo_root}"
+provider_binary="${test_root}/bin/terraform-provider-chaptarr"
+if [[ "$(go env GOOS)" == "windows" ]]; then
+  if ! command -v cygpath >/dev/null 2>&1; then
+    echo "cygpath is required to normalize temporary paths for Windows OpenTofu." >&2
+    exit 1
+  fi
+  tofu_test_root="$(cygpath -m -- "${test_root}")"
+  provider_binary="${provider_binary}.exe"
+fi
+go build -trimpath -o "${provider_binary}" "${repo_root}"
 
 cat >"${test_root}/tofurc" <<EOF
 provider_installation {
   dev_overrides {
-    "josh-archer/chaptarr" = "${test_root}/bin"
+    "josh-archer/chaptarr" = "${tofu_test_root}/bin"
   }
   direct {}
 }
@@ -146,12 +156,12 @@ export TF_VAR_proxy_password="${proxy_sentinel}"
 export TF_VAR_metadata_api_key="${metadata_sentinel}"
 export TF_VAR_integration_token="${integration_sentinel}"
 export TF_VAR_hardcover_token="${hardcover_sentinel}"
-export TF_CLI_CONFIG_FILE="${test_root}/tofurc"
+export TF_CLI_CONFIG_FILE="${tofu_test_root}/tofurc"
 unset TF_LOG TF_LOG_PATH
 
 set +e
-tofu -chdir="${test_root}/configuration" plan \
-  -input=false -no-color -out="${test_root}/plan.tfplan" \
+tofu -chdir="${tofu_test_root}/configuration" plan \
+  -input=false -no-color -out="${tofu_test_root}/plan.tfplan" \
   >"${test_root}/stdout.txt" 2>"${test_root}/stderr.txt"
 plan_status=$?
 set -e
@@ -161,7 +171,7 @@ if [[ ${plan_status} -ne 0 ]]; then
   exit "${plan_status}"
 fi
 
-tofu -chdir="${test_root}/configuration" show -json "${test_root}/plan.tfplan" \
+tofu -chdir="${tofu_test_root}/configuration" show -json "${tofu_test_root}/plan.tfplan" \
   >"${test_root}/plan.json" 2>"${test_root}/show-stderr.txt"
 
 if grep -F -R -e "${sentinel}" -e "${host_sentinel}" -e "${calibre_sentinel}" \

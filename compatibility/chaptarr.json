@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "contract": {
+    "chaptarr_version": "0.9.925",
+    "tag": "v0.9.925",
+    "commit": "29853a2e4024b61857bfd64be200832beabf6938",
+    "openapi_sha256": "00bb24c49621bcfc682720c2f4dcddde58a142e878935f21e112c410f9f9c6d4"
+  },
+  "versions": [
+    {
+      "chaptarr_version": "0.9.925",
+      "api_version": "v1",
+      "image": "chaptarr/chaptarr:0.9.925@sha256:8e29f4941acaf74c80bba4322237dfd2549816b3dd1b581f176b1be5d1ccb46b",
+      "contract_status": "pinned-contract",
+      "acceptance_status": "live-verified",
+      "verified_resources": ["chaptarr_tag"],
+      "verified_data_sources": ["chaptarr_api_info", "chaptarr_system_status"],
+      "evidence": "Disposable tag CRUD/import plus API/system reads passed locally against this exact image digest on 2026-08-10; CI re-verifies each provider head."
+    },
+    {
+      "chaptarr_version": "0.9.914",
+      "api_version": "v1",
+      "image": "chaptarr/chaptarr:0.9.914@sha256:4780b36440dc055a404f86da089f124d41e3330d32eeb92837f65fb5c82a348c",
+      "contract_status": "compatibility-candidate",
+      "acceptance_status": "live-verified",
+      "verified_resources": ["chaptarr_tag"],
+      "verified_data_sources": ["chaptarr_api_info", "chaptarr_system_status"],
+      "evidence": "Disposable tag CRUD/import plus API/system reads passed locally against this exact image digest on 2026-08-10; this version does not supply the pinned provider contract."
+    }
+  ]
+}

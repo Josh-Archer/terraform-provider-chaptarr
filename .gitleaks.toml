@@ -22,3 +22,12 @@ paths = [
   '''internal/client/client_test\.go''',
   '''internal/provider/provider_test\.go'''
 ]
+
+[[allowlists]]
+description = "Allow only the pinned public OpenAPI contract digest"
+regexes = [
+  '''00bb24c49621bcfc682720c2f4dcddde58a142e878935f21e112c410f9f9c6d4'''
+]
+paths = [
+  '''compatibility/chaptarr\.json'''
+]

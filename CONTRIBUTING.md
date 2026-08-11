@@ -12,6 +12,14 @@ bash ./scripts/test-all-locally.sh
 go test -race ./...
 ```
 
+Changes to resources, data sources, compatibility claims, or the acceptance
+harness must also run `go run ./tools/compatibility check` and the relevant
+immutable-image lane in `scripts/test-acceptance.sh`. The harness must use only
+its generated API key and disposable empty volumes; never point it at a local
+or production Chaptarr configuration or media path.
+On Windows, run the shell gates from Git Bash so `bash`, Docker, Go, and
+OpenTofu share the same Windows environment.
+
 Do not commit credentials, Terraform state, plan files, raw Chaptarr logs, or
 provider response bodies. Tests must use unmistakably synthetic values and
 must assert that those values do not appear in diagnostics or plan output.
