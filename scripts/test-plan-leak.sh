@@ -46,9 +46,28 @@ variable "oidc_client_secret" {
   ephemeral = true
 }
 
+variable "calibre_password" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
 resource "chaptarr_host_config" "leak_test" {
   instance_name      = "plan-leak-test"
   oidc_client_secret = var.oidc_client_secret
+}
+
+resource "chaptarr_root_folder" "calibre" {
+  name               = "Plan leak fixture"
+  path               = "/library/plan-leak-fixture"
+  folder_type        = "ebook"
+  is_calibre_library = true
+  host               = "calibre.example.test"
+  port               = 8080
+  library            = "fixture"
+  output_profile     = "default"
+  username           = "fixture"
+  password           = var.calibre_password
 }
 EOF
 
@@ -56,6 +75,8 @@ sentinel='CHAPTARR_TEST_API_KEY_SENTINEL_DO_NOT_USE_79f6f1d2'
 host_sentinel='CHAPTARR_HOST_WRITE_ONLY_SENTINEL_DO_NOT_USE_913ad7c4'
 export CHAPTARR_API_KEY="${sentinel}"
 export TF_VAR_oidc_client_secret="${host_sentinel}"
+calibre_sentinel='CHAPTARR_TEST_CALIBRE_PASSWORD_SENTINEL_DO_NOT_USE_3b4e911c'
+export TF_VAR_calibre_password="${calibre_sentinel}"
 export TF_CLI_CONFIG_FILE="${test_root}/tofurc"
 unset TF_LOG TF_LOG_PATH
 
@@ -74,11 +95,11 @@ fi
 tofu -chdir="${test_root}/configuration" show -json "${test_root}/plan.tfplan" \
   >"${test_root}/plan.json" 2>"${test_root}/show-stderr.txt"
 
-if grep -F -R -e "${sentinel}" -e "${host_sentinel}" -- \
+if grep -F -R -e "${sentinel}" -e "${host_sentinel}" -e "${calibre_sentinel}" -- \
   "${test_root}/stdout.txt" "${test_root}/stderr.txt" \
   "${test_root}/plan.json" "${test_root}/show-stderr.txt" >/dev/null; then
   echo "Synthetic API key leaked into OpenTofu output." >&2
   exit 1
 fi
 
-echo "OpenTofu plan output contains no synthetic API key."
+echo "OpenTofu plan output contains no synthetic credentials."

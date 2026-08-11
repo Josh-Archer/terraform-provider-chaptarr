@@ -4,9 +4,10 @@
 provider for declaratively managing [Chaptarr](https://github.com/Chaptarr/chaptarr).
 
 The provider includes hardened client behavior, operation-level OpenAPI
-coverage, singleton application configuration resources, and read-only naming
-pattern helpers. Resource credentials use OpenTofu write-only attributes so
-they are not retained in state.
+coverage, singleton application configuration resources, read-only naming
+helpers, and read-only discovery and observability data sources. Resource
+credentials use OpenTofu write-only attributes so they are not retained in
+state, and changing runtime observations are data sources rather than resources.
 
 ## Provider configuration
 
@@ -34,6 +35,8 @@ configuration performs no network request.
 
 See [provider documentation](docs/index.md) and the generated
 [OpenAPI coverage matrix](docs/openapi-coverage.md).
+Imperative queue, import, backup, upgrade, and process operations follow the
+[operational API policy](docs/operational-api-policy.md).
 
 Singleton resource behavior, imports, credential handling, and naming helpers
 are documented in
@@ -41,10 +44,23 @@ are documented in
 representative audiobook/ebook configuration is available under
 [`examples/configuration`](examples/configuration).
 
+## Read-only discovery
+
+The provider exposes API/version capability, language, search, calendar,
+health, system, task, update, disk, filesystem, and media-cover observations.
+Health and system summaries deliberately omit raw messages, logs, installation
+identifiers, and internal application paths. Binary cover and calendar-feed
+responses are represented by their content type, byte length, and SHA-256
+fingerprint instead of being stored in Terraform state.
+
+See the [read-only data source guide](docs/data-sources/read-only.md).
+Storage lifecycle and conservative delete behavior are documented in the
+[storage resource guide](docs/resources/storage.md).
+
 ## Development
 
 Prerequisites are Go 1.25.12 and OpenTofu 1.11.2 or newer. OpenTofu 1.11 is
-required for write-only configuration attributes. Run:
+required for write-only configuration and Calibre credential attributes. Run:
 
 ```shell
 go mod download
