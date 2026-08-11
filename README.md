@@ -67,6 +67,8 @@ the [import and Hardcover guide](docs/resources/imports.md).
 Author and series collection intent, lookup-assisted identity selection, and
 safe media-operation controls are documented in the
 [library ownership guide](docs/resources/library.md).
+Book and monitored-edition lifecycle plus GET-only book-file, rename, and retag
+inspection are documented in the [book and edition guide](docs/resources/books.md).
 
 ## Development
 

@@ -89,7 +89,7 @@
       ],
       "contract_fingerprint": "a373fdd26a30278fd8bb314ecec214d14c4f21ad2f7e8001224013b70b9da868",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
@@ -660,7 +660,7 @@
       ],
       "contract_fingerprint": "68b96c3a14404b326b238a0b7e5e0c59ff2011aa40e5329ef7535d7888476ef9",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book_lookup",
       "tracking_issue": "#9"
     },
@@ -686,7 +686,7 @@
       ],
       "contract_fingerprint": "a3a9f20656220792ac1dc176301f47866c02371a1fcf92030a91bd858508c41d",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
@@ -712,7 +712,7 @@
       ],
       "contract_fingerprint": "6b0962069a20843c28c2c033b07cbfe65c6b701949a965a37a8c2c5ac95cadaa",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
@@ -738,7 +738,7 @@
       ],
       "contract_fingerprint": "cfb675c56beaa3223e2957ac39a8ebbd19bf9ce1115b80b285e2784ba7adf92b",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book_file",
       "tracking_issue": "#9"
     },
@@ -751,7 +751,7 @@
       ],
       "contract_fingerprint": "12894d975b1b51488a58a681329e83902e8cbe2878381efd1dfd61d2ca7cba38",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book_file",
       "tracking_issue": "#9"
     },
@@ -1219,7 +1219,7 @@
       ],
       "contract_fingerprint": "1ef568b59172378403577357ae72ce235ba02f7771f51a2d3696d310247fc255",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_editions",
       "tracking_issue": "#9"
     },
@@ -2007,7 +2007,7 @@
       ],
       "contract_fingerprint": "03493bbd199000c1d4222051394c897168a1fa0cb984820ff47737d694599c95",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_rename_book_preview",
       "tracking_issue": "#9"
     },
@@ -2020,7 +2020,7 @@
       ],
       "contract_fingerprint": "681a9f868238504975f8bc31d496e7b6de63e6593cd2e163c256dda42c46ebf2",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_retag_book_preview",
       "tracking_issue": "#9"
     },
@@ -2623,7 +2623,7 @@
       ],
       "contract_fingerprint": "48ef1dbcfed53d3db5b93f9449b12bef7a5567e4c01f4b1e45964307cb4809cd",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
@@ -3675,7 +3675,7 @@
       ],
       "contract_fingerprint": "0ca2851a1d919039978e1c9e015a7d5cbc5bbedc71158f89d44ea1ba744a8267",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },

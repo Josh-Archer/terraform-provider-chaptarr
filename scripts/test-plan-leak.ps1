@@ -183,6 +183,32 @@ resource "chaptarr_series" "fixture" {
     foreign_author_id = "hc:191785"
   }]
 }
+
+resource "chaptarr_book" "fixture" {
+  lookup_json = jsonencode({
+    foreignBookId = "hc:11"
+    author        = { id = 7 }
+    editions = [{
+      id               = 61
+      foreignEditionId = "hc:edition:22"
+      monitored        = true
+    }]
+  })
+  foreign_book_id       = "hc:11"
+  author_id             = 7
+  media_type            = "audiobook"
+  monitored             = true
+  any_edition_ok        = false
+  monitored_edition_id  = "hc:edition:22"
+  search_for_new_book   = false
+  delete_files_on_destroy = false
+}
+
+resource "chaptarr_edition" "fixture" {
+  book_id    = 51
+  edition_id = 61
+  monitored  = true
+}
 '@ | Set-Content -Encoding ascii (Join-Path $configurationDirectory 'main.tf')
 
     $sentinel = 'CHAPTARR_TEST_API_KEY_SENTINEL_DO_NOT_USE_79f6f1d2'
