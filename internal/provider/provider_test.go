@@ -31,8 +31,8 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 	if resources := p.Resources(context.Background()); len(resources) != 12 {
 		t.Fatalf("registered %d resources, want 12", len(resources))
 	}
-	if dataSources := p.DataSources(context.Background()); len(dataSources) != 21 {
-		t.Fatalf("registered %d data sources, want 21", len(dataSources))
+	if dataSources := p.DataSources(context.Background()); len(dataSources) != 22 {
+		t.Fatalf("registered %d data sources, want 22", len(dataSources))
 	}
 }
 
