@@ -259,6 +259,16 @@ func readOnlyDefinitions() []readOnlyDefinition {
 				"author_count": schema.Int64Attribute{Computed: true},
 			}, request: statisticsRequest, decode: decodeStatistics,
 		},
+		{
+			name: "database_status", description: "Read Chaptarr's active database engine, version, and schema migration health status.",
+			attributes: map[string]schema.Attribute{
+				"database_type":     schema.StringAttribute{Computed: true, MarkdownDescription: "Active database engine (e.g. postgres or sqlite)."},
+				"database_version":  schema.StringAttribute{Computed: true, MarkdownDescription: "Database server or engine version."},
+				"is_postgres":       schema.BoolAttribute{Computed: true, MarkdownDescription: "Whether Chaptarr is running against PostgreSQL."},
+				"is_healthy":        schema.BoolAttribute{Computed: true, MarkdownDescription: "Whether the database connection and schema are healthy."},
+				"migration_version": schema.StringAttribute{Computed: true, MarkdownDescription: "Active schema migration version / application build tag."},
+			}, request: noQuery("/api/v1/system/status", "database-status"), decode: decodeDatabaseStatus,
+		},
 	}
 	return append(definitions, storageReadOnlyDefinitions()...)
 }
@@ -491,4 +501,24 @@ func decodeStatistics(response *client.Response) (map[string]any, error) {
 		return nil, fmt.Errorf("chaptarr returned invalid system statistics")
 	}
 	return map[string]any{"total_books": value.TotalBooks, "monitored_books": value.MonitoredBooks, "file_count": value.FileCount, "total_file_size": value.TotalFileSize, "author_count": value.AuthorCount}, nil
+}
+
+func decodeDatabaseStatus(response *client.Response) (map[string]any, error) {
+	var value struct {
+		DatabaseType    string `json:"databaseType"`
+		DatabaseVersion string `json:"databaseVersion"`
+		Version         string `json:"version"`
+	}
+	if err := json.Unmarshal(response.Body, &value); err != nil {
+		return nil, fmt.Errorf("chaptarr returned invalid database status")
+	}
+	isPostgres := strings.EqualFold(value.DatabaseType, "postgres")
+	isHealthy := value.DatabaseType != ""
+	return map[string]any{
+		"database_type":     value.DatabaseType,
+		"database_version":  value.DatabaseVersion,
+		"is_postgres":       isPostgres,
+		"is_healthy":        isHealthy,
+		"migration_version": value.Version,
+	}, nil
 }

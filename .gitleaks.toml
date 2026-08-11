@@ -22,3 +22,10 @@ paths = [
   '''internal/client/client_test\.go''',
   '''internal/provider/provider_test\.go'''
 ]
+
+[[allowlists]]
+description = "Allow compatibility metadata json files"
+paths = [
+  '''compatibility/.*\.json'''
+]
+

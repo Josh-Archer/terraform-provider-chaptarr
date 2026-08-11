@@ -16,6 +16,7 @@ destroying their Terraform state never changes Chaptarr.
   version, branch, database type, authentication mode, process mode, OS name,
   and runtime version. Installation identifiers, application paths, and URL
   base values are not stored.
+- `chaptarr_database_status` exposes active database engine (`database_type`), engine version (`database_version`), `is_postgres` boolean flag, schema migration status, and connection health (`is_healthy`).
 - `chaptarr_system_statistics` exposes aggregate counts and accepts an optional
   `media_type` of `all`, `audiobook`, or `ebook`.
 

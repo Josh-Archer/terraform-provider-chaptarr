@@ -25,9 +25,10 @@ func TestReadOnlyDefinitionsAreUniqueAndNonMutating(t *testing.T) {
 	t.Parallel()
 
 	want := []string{
-		"api_info", "calendar", "calendar_feed", "disk_space", "file_system", "health", "languages",
-		"library_search", "localization", "media_cover", "parse", "remote_path_mappings", "root_folders",
-		"search", "system_routes", "system_statistics", "system_status", "tasks", "updates",
+		"api_info", "calendar", "calendar_feed", "database_status", "disk_space", "file_system", "health",
+		"languages", "library_search", "localization", "media_cover", "parse",
+		"remote_path_mappings", "root_folders", "search", "system_routes",
+		"system_statistics", "system_status", "tasks", "updates",
 	}
 	definitions := readOnlyDefinitions()
 	got := make([]string, 0, len(definitions))
@@ -87,6 +88,21 @@ func TestSystemStatusDecoderWhitelistsCapabilityFields(t *testing.T) {
 		if strings.Contains(serialized, forbidden) {
 			t.Fatalf("system state leaked excluded value %q", forbidden)
 		}
+	}
+}
+
+func TestDatabaseStatusDecoder(t *testing.T) {
+	t.Parallel()
+
+	state, err := decodeDatabaseStatus(jsonResponse(`{
+		"appName":"Chaptarr","version":"0.9.925","branch":"main","databaseType":"postgres",
+		"databaseVersion":"15.4"
+	}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state["database_type"] != "postgres" || state["database_version"] != "15.4" || state["is_postgres"] != true || state["is_healthy"] != true {
+		t.Fatalf("unexpected database status state: %#v", state)
 	}
 }
 
