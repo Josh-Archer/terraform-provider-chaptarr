@@ -35,6 +35,10 @@ configuration performs no network request.
 
 See [provider documentation](docs/index.md) and the generated
 [OpenAPI coverage matrix](docs/openapi-coverage.md).
+Supported-version evidence is recorded in the generated
+[Chaptarr compatibility matrix](docs/compatibility.md), and configuration,
+migration, destructive-control, and release boundaries are documented in the
+[consumer readiness guide](docs/consumer-readiness.md).
 Imperative queue, import, backup, upgrade, and process operations follow the
 [operational API policy](docs/operational-api-policy.md).
 
@@ -87,8 +91,19 @@ go run ./tools/openapi generate
 go run ./tools/openapi check
 ```
 
-No live Chaptarr acceptance environment is used in the bootstrap. That work is
-tracked in issue #12.
+Run a disposable acceptance lane with an immutable matrix image, for example:
+
+```shell
+CHAPTARR_IMAGE='chaptarr/chaptarr:0.9.925@sha256:8e29f4941acaf74c80bba4322237dfd2549816b3dd1b581f176b1be5d1ccb46b' \
+CHAPTARR_VERSION='0.9.925' \
+bash ./scripts/test-acceptance.sh
+```
+
+On Windows, run this command from Git Bash; `bash.exe` may otherwise resolve to
+WSL and use a different Docker or Go environment.
+
+The harness uses only synthetic runtime credentials and empty ephemeral media
+volumes. It never targets an existing Chaptarr instance.
 
 ## Security and releases
 

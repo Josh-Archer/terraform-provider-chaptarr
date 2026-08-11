@@ -84,6 +84,13 @@ API operation. A `planned` row is not implemented functionality. Imperative or
 destructive APIs remain action-only or out of scope unless a later issue adds
 explicit safeguards.
 
+The generated [compatibility matrix](compatibility.md) separates pinned
+contract coverage, compatibility candidates, and live disposable acceptance
+evidence. The [consumer readiness guide](consumer-readiness.md) covers provider
+configuration, imports, sensitive settings, destructive controls, Readarr
+migration boundaries, Registry ownership, and the deferred `terraform/arr-config`
+integration gate.
+
 The [operational API policy](operational-api-policy.md) records why queue,
 import, backup/restore, upgrade, process, log, and release-push operations are
 not Terraform resources and recommends access-controlled operational tooling.
