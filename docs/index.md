@@ -91,6 +91,11 @@ configuration, imports, sensitive settings, destructive controls, Readarr
 migration boundaries, Registry ownership, and the deferred `terraform/arr-config`
 integration gate.
 
+The [Azure PostgreSQL composition boundary](guides/azure-postgresql.md)
+documents the startup contract and assigns cloud, database, secret-delivery,
+workload, migration, and live-validation responsibilities to their owning
+deployment repositories.
+
 The [operational API policy](operational-api-policy.md) records why queue,
 import, backup/restore, upgrade, process, log, and release-push operations are
 not Terraform resources and recommends access-controlled operational tooling.

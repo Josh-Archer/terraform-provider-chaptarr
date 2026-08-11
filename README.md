@@ -39,6 +39,8 @@ Supported-version evidence is recorded in the generated
 [Chaptarr compatibility matrix](docs/compatibility.md), and configuration,
 migration, destructive-control, and release boundaries are documented in the
 [consumer readiness guide](docs/consumer-readiness.md).
+Azure PostgreSQL provisioning and workload composition ownership are clarified
+in the [Azure PostgreSQL boundary guide](docs/guides/azure-postgresql.md).
 Imperative queue, import, backup, upgrade, and process operations follow the
 [operational API policy](docs/operational-api-policy.md).
 
