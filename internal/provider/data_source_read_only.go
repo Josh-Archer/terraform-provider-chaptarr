@@ -522,4 +522,3 @@ func decodeDatabaseStatus(response *client.Response) (map[string]any, error) {
 		"migration_version": value.Version,
 	}, nil
 }
-
