@@ -96,6 +96,22 @@ func TestMetadataProfileSetNormalizationIsStable(t *testing.T) {
 	}
 }
 
+func TestMetadataProfilePayloadNormalizesRawConfiguredSets(t *testing.T) {
+	t.Parallel()
+	var diagnostics diag.Diagnostics
+	raw, converted := types.SetValueFrom(t.Context(), types.StringType, []string{" French ", "english", "ENGLISH", "  ", "null"})
+	diagnostics.Append(converted...)
+	values := setStringValues(t.Context(), raw, &diagnostics)
+	if diagnostics.HasError() || strings.Join(values, ",") != "english,French,null" {
+		t.Fatalf("unexpected raw configured languages %v diagnostics=%v", values, diagnostics)
+	}
+	model := metadataProfileModel{Name: types.StringValue("Books"), ProfileType: types.StringValue("ebook"), AllowedLanguages: raw, Ignored: types.SetNull(types.StringType)}
+	payload := metadataProfilePayload(t.Context(), model, 0, &diagnostics)
+	if diagnostics.HasError() || payload.AllowedLanguages != "english,French,null" {
+		t.Fatalf("unexpected normalized metadata payload: %#v diagnostics=%v", payload, diagnostics)
+	}
+}
+
 func TestReleaseProfilePreservesOrderedTerms(t *testing.T) {
 	t.Parallel()
 	var diagnostics diag.Diagnostics

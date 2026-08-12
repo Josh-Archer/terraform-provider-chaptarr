@@ -278,30 +278,48 @@ func setStringValues(ctx context.Context, value types.Set, diagnostics *diag.Dia
 	}
 	var values []string
 	diagnostics.Append(value.ElementsAs(ctx, &values, false)...)
-	for index := range values {
-		values[index] = strings.TrimSpace(values[index])
-	}
-	sort.Slice(values, func(i, j int) bool { return strings.ToLower(values[i]) < strings.ToLower(values[j]) })
-	return values
+	return normalizeStringValues(values)
 }
 
 func setStringState(ctx context.Context, values []string, diagnostics *diag.Diagnostics) types.Set {
-	normalized := make([]string, 0, len(values))
-	seen := map[string]struct{}{}
-	for _, value := range values {
-		trimmed := strings.TrimSpace(value)
-		key := strings.ToLower(trimmed)
-		if trimmed != "" {
-			if _, exists := seen[key]; !exists {
-				seen[key] = struct{}{}
-				normalized = append(normalized, trimmed)
-			}
-		}
-	}
-	sort.Slice(normalized, func(i, j int) bool { return strings.ToLower(normalized[i]) < strings.ToLower(normalized[j]) })
+	normalized := normalizeStringValues(values)
 	result, converted := types.SetValueFrom(ctx, types.StringType, normalized)
 	diagnostics.Append(converted...)
 	return result
+}
+
+func normalizeStringValues(values []string) []string {
+	byKey := make(map[string]string, len(values))
+	for _, value := range values {
+		trimmed := strings.TrimSpace(value)
+		key := strings.ToLower(trimmed)
+		if trimmed == "" {
+			continue
+		}
+		current, exists := byKey[key]
+		if !exists || preferredStringRepresentative(trimmed, current, key) {
+			byKey[key] = trimmed
+		}
+	}
+	keys := make([]string, 0, len(byKey))
+	for key := range byKey {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	normalized := make([]string, 0, len(keys))
+	for _, key := range keys {
+		normalized = append(normalized, byKey[key])
+	}
+	return normalized
+}
+
+func preferredStringRepresentative(candidate, current, folded string) bool {
+	candidateIsFolded := candidate == folded
+	currentIsFolded := current == folded
+	if candidateIsFolded != currentIsFolded {
+		return candidateIsFolded
+	}
+	return candidate < current
 }
 
 func splitCanonicalCSV(value string) []string { return strings.Split(value, ",") }
