@@ -53,6 +53,10 @@ The [storage resource guide](resources/storage.md) documents root folders,
 remote-path mappings, imports, opt-in connection probes, and conservative
 delete semantics.
 
+The [profile resource guide](resources/profiles.md) documents typed quality,
+metadata, release, and delay profiles; server schema data sources; ordered-list
+normalization; and built-in quality-definition adoption.
+
 ## Coverage status
 
 The [generated coverage matrix](openapi-coverage.md) classifies every pinned
