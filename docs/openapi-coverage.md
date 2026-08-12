@@ -13,11 +13,11 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | Classification | Status | Operations |
 |---|---|---:|
 | action-only | excluded | 58 |
-| data-source | implemented | 5 |
-| data-source | planned | 70 |
+| data-source | implemented | 35 |
+| data-source | planned | 43 |
 | out-of-scope | excluded | 16 |
-| resource | implemented | 30 |
-| resource | planned | 138 |
+| resource | implemented | 58 |
+| resource | planned | 107 |
 
 ## Operation inventory
 
@@ -35,7 +35,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/config/hardcover` | HardcoverConfig | resource | implemented | chaptarr_hardcover_config | #2 | `00dd4e0cbe5e` |
 | `DELETE /api/v1/customfilter/{id}` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `e8bfeed5d96b` |
 | `DELETE /api/v1/customformat/{id}` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `7e44142adc91` |
-| `DELETE /api/v1/delayprofile/{id}` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `edda2080a0fc` |
+| `DELETE /api/v1/delayprofile/{id}` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `edda2080a0fc` |
 | `DELETE /api/v1/downloadclient/bulk` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `3147f68ac1e8` |
 | `DELETE /api/v1/downloadclient/{id}` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `46ab689a6eb7` |
 | `DELETE /api/v1/ignored/bulk` | Ignored | action-only | excluded | Removing ignored records is imperative maintenance and must never run during plan or refresh. | #11 | `2baf51ea9979` |
@@ -47,22 +47,22 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/indexer/bulk` | Indexer | resource | planned | chaptarr_indexer | #5 | `12a7d3d9b805` |
 | `DELETE /api/v1/indexer/{id}` | Indexer | resource | planned | chaptarr_indexer | #5 | `4fd4572456f2` |
 | `DELETE /api/v1/metadata/{id}` | Metadata | resource | planned | chaptarr_metadata | #7 | `35ebb5bc49a7` |
-| `DELETE /api/v1/metadataprofile/{id}` | MetadataProfile | resource | planned | chaptarr_metadata_profile | #4 | `835d9a15fe53` |
+| `DELETE /api/v1/metadataprofile/{id}` | MetadataProfile | resource | implemented | chaptarr_metadata_profile | #4 | `835d9a15fe53` |
 | `DELETE /api/v1/notification/bulk` | Notification | resource | planned | chaptarr_notification | #5 | `66ace462567e` |
 | `DELETE /api/v1/notification/{id}` | Notification | resource | planned | chaptarr_notification | #5 | `32ae0bf60de4` |
 | `DELETE /api/v1/pendingauthorimport/{id}` | PendingAuthorImport | action-only | excluded | Queue, retry, and delete operations change import state and require explicit operational tooling. | #11 | `cea2a78e83fa` |
-| `DELETE /api/v1/qualityprofile/{id}` | QualityProfile | resource | planned | chaptarr_quality_profile | #4 | `e935d614ae71` |
+| `DELETE /api/v1/qualityprofile/{id}` | QualityProfile | resource | implemented | chaptarr_quality_profile | #4 | `e935d614ae71` |
 | `DELETE /api/v1/queue/bulk` | Queue | action-only | excluded | Queue cancellation/removal is destructive operational behavior and requires explicit tooling. | #11 | `976db35a6fcb` |
 | `DELETE /api/v1/queue/{id}` | Queue | action-only | excluded | Queue cancellation/removal is destructive operational behavior and requires explicit tooling. | #11 | `8798d6ad442d` |
-| `DELETE /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `dc08eccf2d7b` |
-| `DELETE /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `547d9a343763` |
-| `DELETE /api/v1/rootfolder/{id}` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `6e32c0e56b72` |
+| `DELETE /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | implemented | chaptarr_release_profile | #4 | `dc08eccf2d7b` |
+| `DELETE /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `547d9a343763` |
+| `DELETE /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `6e32c0e56b72` |
 | `DELETE /api/v1/series/{seriesId}/variants/{variantId}` | Series | resource | planned | chaptarr_series | #8 | `78087eff25b4` |
 | `DELETE /api/v1/settings/proxy/{id}` | Proxy | resource | planned | chaptarr_proxy | #7 | `f951e710fe0d` |
 | `DELETE /api/v1/system/backup/{id}` | Backup | action-only | excluded | Backup deletion or restoration is imperative maintenance and must never run during plan or refresh. | #11 | `79d71f8e275d` |
 | `DELETE /api/v1/tag/{id}` | Tag | resource | planned | chaptarr_tag | #7 | `0389dacc955d` |
 | `GET /` | StaticResource | out-of-scope | excluded | Web UI static content is unrelated to infrastructure state. |  | `c3d13a469f71` |
-| `GET /api` | ApiInfo | data-source | planned | chaptarr_api_info | #10 | `c409f455bc84` |
+| `GET /api` | ApiInfo | data-source | implemented | chaptarr_api_info | #10 | `c409f455bc84` |
 | `GET /api/v1/author` | Author | resource | planned | chaptarr_author | #8 | `324cd3f0ab3f` |
 | `GET /api/v1/author/lookup` | AuthorLookup | data-source | planned | chaptarr_author_lookup | #8 | `4409a8f7af15` |
 | `GET /api/v1/author/{authorId}` | Author | resource | planned | chaptarr_author | #8 | `19d8bcc9929f` |
@@ -80,8 +80,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/book/{id}/overview` | Book | resource | planned | chaptarr_book | #9 | `ea766f3d6247` |
 | `GET /api/v1/bookfile` | BookFile | data-source | planned | chaptarr_book_file | #9 | `cfb675c56bea` |
 | `GET /api/v1/bookfile/{id}` | BookFile | data-source | planned | chaptarr_book_file | #9 | `12894d975b1b` |
-| `GET /api/v1/calendar` | Calendar | data-source | planned | chaptarr_calendar | #10 | `eba179c41717` |
-| `GET /api/v1/calendar/{id}` | Calendar | data-source | planned | chaptarr_calendar | #10 | `7852aa78ae48` |
+| `GET /api/v1/calendar` | Calendar | data-source | implemented | chaptarr_calendar | #10 | `eba179c41717` |
+| `GET /api/v1/calendar/{id}` | Calendar | data-source | implemented | chaptarr_calendar | #10 | `7852aa78ae48` |
 | `GET /api/v1/command` | Command | data-source | planned | chaptarr_commands | #11 | `efefa80f8fb9` |
 | `GET /api/v1/command/{id}` | Command | data-source | planned | chaptarr_commands | #11 | `396939337e09` |
 | `GET /api/v1/config/conversion` | ConversionConfig | resource | implemented | chaptarr_conversion_config | #2 | `1e68ff850f6b` |
@@ -110,16 +110,16 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/customformat/schema` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `965f4fd22baa` |
 | `GET /api/v1/customformat/{id}` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `9c103e6c51f4` |
 | `GET /api/v1/delayprofile` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `548fefa62913` |
-| `GET /api/v1/delayprofile/{id}` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `11aaf675f8e7` |
-| `GET /api/v1/diskspace` | DiskSpace | data-source | planned | chaptarr_disk_space | #3 | `cd448801b856` |
+| `GET /api/v1/delayprofile/{id}` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `11aaf675f8e7` |
+| `GET /api/v1/diskspace` | DiskSpace | data-source | implemented | chaptarr_disk_space | #10 | `cd448801b856` |
 | `GET /api/v1/downloadclient` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `a4fc4fcb0dfd` |
 | `GET /api/v1/downloadclient/schema` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `a4fc4fcb0dfd` |
 | `GET /api/v1/downloadclient/{id}` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `e63aec50afb4` |
 | `GET /api/v1/edition` | Edition | data-source | planned | chaptarr_editions | #9 | `1ef568b59172` |
-| `GET /api/v1/filesystem` | FileSystem | data-source | planned | chaptarr_file_system | #3 | `d66c20be634c` |
-| `GET /api/v1/filesystem/mediafiles` | FileSystem | data-source | planned | chaptarr_file_system | #3 | `3fb9113d4790` |
-| `GET /api/v1/filesystem/type` | FileSystem | data-source | planned | chaptarr_file_system | #3 | `3fb9113d4790` |
-| `GET /api/v1/health` | Health | data-source | planned | chaptarr_health | #10 | `4a359b3a4bf2` |
+| `GET /api/v1/filesystem` | FileSystem | data-source | implemented | chaptarr_file_system | #10 | `d66c20be634c` |
+| `GET /api/v1/filesystem/mediafiles` | FileSystem | data-source | implemented | chaptarr_file_system | #10 | `3fb9113d4790` |
+| `GET /api/v1/filesystem/type` | FileSystem | data-source | implemented | chaptarr_file_system | #10 | `3fb9113d4790` |
+| `GET /api/v1/health` | Health | data-source | implemented | chaptarr_health | #10 | `4a359b3a4bf2` |
 | `GET /api/v1/history` | History | data-source | planned | chaptarr_history | #11 | `03a7fc4c03cd` |
 | `GET /api/v1/history/author` | History | data-source | planned | chaptarr_history | #11 | `731950500f6e` |
 | `GET /api/v1/history/since` | History | data-source | planned | chaptarr_history | #11 | `d1d23b56e547` |
@@ -133,54 +133,54 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/indexer/schema` | Indexer | resource | planned | chaptarr_indexer | #5 | `c766b99cf5f4` |
 | `GET /api/v1/indexer/{id}` | Indexer | resource | planned | chaptarr_indexer | #5 | `1b3e1d9d1881` |
 | `GET /api/v1/indexerflag` | IndexerFlag | data-source | planned | chaptarr_indexer_flags | #5 | `d31bc47ce358` |
-| `GET /api/v1/language` | Language | data-source | planned | chaptarr_language | #10 | `d24dbec28342` |
-| `GET /api/v1/language/{id}` | Language | data-source | planned | chaptarr_language | #10 | `0e9683ebfcbb` |
-| `GET /api/v1/library/search` | LibrarySearch | data-source | planned | chaptarr_library_search | #10 | `6bdd38ab2329` |
-| `GET /api/v1/localization` | Localization | data-source | planned | chaptarr_localization | #10 | `e7c740682d98` |
+| `GET /api/v1/language` | Language | data-source | implemented | chaptarr_languages | #10 | `d24dbec28342` |
+| `GET /api/v1/language/{id}` | Language | data-source | implemented | chaptarr_languages | #10 | `0e9683ebfcbb` |
+| `GET /api/v1/library/search` | LibrarySearch | data-source | implemented | chaptarr_library_search | #10 | `6bdd38ab2329` |
+| `GET /api/v1/localization` | Localization | data-source | implemented | chaptarr_localization | #10 | `e7c740682d98` |
 | `GET /api/v1/log` | Log | out-of-scope | excluded | Raw application logs are operational data and may contain sensitive values; use observability tooling. |  | `d2858b445744` |
 | `GET /api/v1/log/file` | LogFile | out-of-scope | excluded | Raw log files may contain sensitive values; use access-controlled observability tooling. |  | `d5b106ed0008` |
 | `GET /api/v1/log/file/update` | UpdateLogFile | out-of-scope | excluded | Raw update logs may contain sensitive values; use access-controlled observability tooling. |  | `08cb91336671` |
 | `GET /api/v1/log/file/update/{filename}` | UpdateLogFile | out-of-scope | excluded | Raw update logs may contain sensitive values; use access-controlled observability tooling. |  | `173fe4b6d7b9` |
 | `GET /api/v1/log/file/{filename}` | LogFile | out-of-scope | excluded | Raw log files may contain sensitive values; use access-controlled observability tooling. |  | `3f5a672bb94c` |
 | `GET /api/v1/manualimport` | ManualImport | data-source | planned | chaptarr_manual_import_candidates | #11 | `d964caab68d3` |
-| `GET /api/v1/mediacover/author/{authorId}/{filename}` | MediaCover | data-source | planned | chaptarr_media_cover | #10 | `23927348c310` |
-| `GET /api/v1/mediacover/book/{bookId}/{filename}` | MediaCover | data-source | planned | chaptarr_media_cover | #10 | `0d74ded37d06` |
+| `GET /api/v1/mediacover/author/{authorId}/{filename}` | MediaCover | data-source | implemented | chaptarr_media_cover | #10 | `23927348c310` |
+| `GET /api/v1/mediacover/book/{bookId}/{filename}` | MediaCover | data-source | implemented | chaptarr_media_cover | #10 | `0d74ded37d06` |
 | `GET /api/v1/mediacover/books/{bookId}/{filename}` | MediaCover | data-source | planned | chaptarr_media_cover | #10 | `0d74ded37d06` |
 | `GET /api/v1/mediacover/{authorId}/{filename}` | MediaCover | data-source | planned | chaptarr_media_cover | #10 | `23927348c310` |
 | `GET /api/v1/metadata` | Metadata | resource | planned | chaptarr_metadata | #7 | `cf380bfc3e4f` |
 | `GET /api/v1/metadata/schema` | Metadata | resource | planned | chaptarr_metadata | #7 | `cf380bfc3e4f` |
 | `GET /api/v1/metadata/{id}` | Metadata | resource | planned | chaptarr_metadata | #7 | `03f22a530414` |
 | `GET /api/v1/metadataprofile` | MetadataProfile | resource | planned | chaptarr_metadata_profile | #4 | `f96cd7a03ddb` |
-| `GET /api/v1/metadataprofile/languages` | MetadataProfile | resource | planned | chaptarr_metadata_profile | #4 | `fa074c5e1b22` |
-| `GET /api/v1/metadataprofile/schema` | MetadataProfileSchema | data-source | planned | chaptarr_metadata_profile_schema | #4 | `0bd48c4aa737` |
-| `GET /api/v1/metadataprofile/{id}` | MetadataProfile | resource | planned | chaptarr_metadata_profile | #4 | `424c58d156d4` |
+| `GET /api/v1/metadataprofile/languages` | MetadataProfile | data-source | implemented | chaptarr_metadata_profile_schema | #4 | `fa074c5e1b22` |
+| `GET /api/v1/metadataprofile/schema` | MetadataProfileSchema | data-source | implemented | chaptarr_metadata_profile_schema | #4 | `0bd48c4aa737` |
+| `GET /api/v1/metadataprofile/{id}` | MetadataProfile | resource | implemented | chaptarr_metadata_profile | #4 | `424c58d156d4` |
 | `GET /api/v1/notification` | Notification | resource | planned | chaptarr_notification | #5 | `19e3708de3e1` |
 | `GET /api/v1/notification/schema` | Notification | resource | planned | chaptarr_notification | #5 | `19e3708de3e1` |
 | `GET /api/v1/notification/{id}` | Notification | resource | planned | chaptarr_notification | #5 | `36145461e500` |
-| `GET /api/v1/parse` | Parse | data-source | planned | chaptarr_parse | #10 | `983debd8319c` |
+| `GET /api/v1/parse` | Parse | data-source | implemented | chaptarr_parse | #10 | `983debd8319c` |
 | `GET /api/v1/pendingauthorimport` | PendingAuthorImport | data-source | planned | chaptarr_pending_author_import | #11 | `008d9e72e294` |
 | `GET /api/v1/pendingauthorimport/author/exists/{providerId}` | PendingAuthorImport | data-source | planned | chaptarr_pending_author_import | #11 | `cf618c309ca1` |
 | `GET /api/v1/pendingauthorimport/profiles/options` | PendingAuthorImport | data-source | planned | chaptarr_pending_author_import | #11 | `eddeee82e792` |
 | `GET /api/v1/pendingauthorimport/{id}` | PendingAuthorImport | data-source | planned | chaptarr_pending_author_import | #11 | `902c9b2558a4` |
-| `GET /api/v1/qualitydefinition` | QualityDefinition | resource | planned | chaptarr_quality_definition | #4 | `187c275e2a44` |
-| `GET /api/v1/qualitydefinition/{id}` | QualityDefinition | resource | planned | chaptarr_quality_definition | #4 | `19af7037fb85` |
+| `GET /api/v1/qualitydefinition` | QualityDefinition | resource | implemented | chaptarr_quality_definition | #4 | `187c275e2a44` |
+| `GET /api/v1/qualitydefinition/{id}` | QualityDefinition | resource | implemented | chaptarr_quality_definition | #4 | `19af7037fb85` |
 | `GET /api/v1/qualityprofile` | QualityProfile | resource | planned | chaptarr_quality_profile | #4 | `a71a0ea426a5` |
-| `GET /api/v1/qualityprofile/schema` | QualityProfileSchema | data-source | planned | chaptarr_quality_profile_schema | #4 | `06d14457231a` |
-| `GET /api/v1/qualityprofile/{id}` | QualityProfile | resource | planned | chaptarr_quality_profile | #4 | `eb50c19bfe2b` |
+| `GET /api/v1/qualityprofile/schema` | QualityProfileSchema | data-source | implemented | chaptarr_quality_profile_schema | #4 | `06d14457231a` |
+| `GET /api/v1/qualityprofile/{id}` | QualityProfile | resource | implemented | chaptarr_quality_profile | #4 | `eb50c19bfe2b` |
 | `GET /api/v1/queue` | Queue | data-source | planned | chaptarr_queue | #11 | `3f6e25d27786` |
 | `GET /api/v1/queue/details` | QueueDetails | data-source | planned | chaptarr_queue_details | #11 | `a60dced36271` |
 | `GET /api/v1/queue/status` | QueueStatus | data-source | planned | chaptarr_queue_status | #11 | `c4fc28051a62` |
 | `GET /api/v1/release` | Release | data-source | planned | chaptarr_release_search | #5 | `a45ef8624d3e` |
 | `GET /api/v1/releaseprofile` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `c8476e69a698` |
-| `GET /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `f5559fd58837` |
-| `GET /api/v1/remotepathmapping` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `ca1f912a5f93` |
-| `GET /api/v1/remotepathmapping/suggestions` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `ff0adb132bd5` |
-| `GET /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `f0cdb4a80f1e` |
+| `GET /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | implemented | chaptarr_release_profile | #4 | `f5559fd58837` |
+| `GET /api/v1/remotepathmapping` | RemotePathMapping | data-source | implemented | chaptarr_remote_path_mappings | #3 | `ca1f912a5f93` |
+| `GET /api/v1/remotepathmapping/suggestions` | RemotePathMapping | data-source | planned | chaptarr_remote_path_mapping_suggestions | #3 | `ff0adb132bd5` |
+| `GET /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `f0cdb4a80f1e` |
 | `GET /api/v1/rename` | RenameBook | data-source | planned | chaptarr_rename_book_preview | #9 | `03493bbd1990` |
 | `GET /api/v1/retag` | RetagBook | data-source | planned | chaptarr_retag_book_preview | #9 | `681a9f868238` |
-| `GET /api/v1/rootfolder` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `5bb05f44666c` |
-| `GET /api/v1/rootfolder/{id}` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `c50e18443ca7` |
-| `GET /api/v1/search` | Search | data-source | planned | chaptarr_search | #10 | `505aa248d2a8` |
+| `GET /api/v1/rootfolder` | RootFolder | data-source | implemented | chaptarr_root_folders | #3 | `5bb05f44666c` |
+| `GET /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `c50e18443ca7` |
+| `GET /api/v1/search` | Search | data-source | implemented | chaptarr_search | #10 | `505aa248d2a8` |
 | `GET /api/v1/series` | Series | resource | planned | chaptarr_series | #8 | `2cd3176e3d44` |
 | `GET /api/v1/series/lookup` | SeriesLookup | data-source | planned | chaptarr_series_lookup | #8 | `5659bf7bb9b1` |
 | `GET /api/v1/series/{seriesId}` | Series | resource | planned | chaptarr_series | #8 | `565b6861e16d` |
@@ -191,19 +191,19 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/settings/proxy/{id}` | Proxy | resource | planned | chaptarr_proxy | #7 | `91251ce8ddcb` |
 | `GET /api/v1/system/backup` | Backup | data-source | planned | chaptarr_backups | #11 | `b60c7fc62722` |
 | `GET /api/v1/system/proxy/debug` | ProxyDebug | out-of-scope | excluded | Proxy debug output may expose network and credential-adjacent data; use controlled diagnostics. |  | `e926822b839d` |
-| `GET /api/v1/system/routes` | System | data-source | planned | chaptarr_system | #10 | `0aa98792b803` |
-| `GET /api/v1/system/routes/duplicate` | System | data-source | planned | chaptarr_system | #10 | `0aa98792b803` |
+| `GET /api/v1/system/routes` | System | data-source | implemented | chaptarr_system_routes | #10 | `0aa98792b803` |
+| `GET /api/v1/system/routes/duplicate` | System | data-source | implemented | chaptarr_system_routes | #10 | `0aa98792b803` |
 | `GET /api/v1/system/settingsbackup/files` | SettingsBackup | data-source | planned | chaptarr_settings_backups | #11 | `e468ddaead91` |
 | `GET /api/v1/system/settingsbackup/locations` | SettingsBackup | data-source | planned | chaptarr_settings_backups | #11 | `ef9950a11f12` |
-| `GET /api/v1/system/statistics` | System | data-source | planned | chaptarr_system | #10 | `19d0ca5aaea3` |
-| `GET /api/v1/system/status` | System | data-source | planned | chaptarr_system | #10 | `a4ceab853ca1` |
-| `GET /api/v1/system/task` | Task | data-source | planned | chaptarr_tasks | #10 | `ee273f3fa4c2` |
-| `GET /api/v1/system/task/{id}` | Task | data-source | planned | chaptarr_tasks | #10 | `f395e094ffb1` |
+| `GET /api/v1/system/statistics` | System | data-source | implemented | chaptarr_system_statistics | #10 | `19d0ca5aaea3` |
+| `GET /api/v1/system/status` | System | data-source | implemented | chaptarr_system_status | #10 | `a4ceab853ca1` |
+| `GET /api/v1/system/task` | Task | data-source | implemented | chaptarr_tasks | #10 | `ee273f3fa4c2` |
+| `GET /api/v1/system/task/{id}` | Task | data-source | implemented | chaptarr_tasks | #10 | `f395e094ffb1` |
 | `GET /api/v1/tag` | Tag | resource | planned | chaptarr_tag | #7 | `d9a70d53645d` |
 | `GET /api/v1/tag/detail` | TagDetails | data-source | planned | chaptarr_tag_details | #7 | `b8372219ea39` |
 | `GET /api/v1/tag/detail/{id}` | TagDetails | data-source | planned | chaptarr_tag_details | #7 | `2df6abb4c360` |
 | `GET /api/v1/tag/{id}` | Tag | resource | planned | chaptarr_tag | #7 | `3dd144b8d94f` |
-| `GET /api/v1/update` | Update | data-source | planned | chaptarr_updates | #10 | `7112b7d88ec9` |
+| `GET /api/v1/update` | Update | data-source | implemented | chaptarr_updates | #10 | `7112b7d88ec9` |
 | `GET /api/v1/wanted/cutoff` | Cutoff | data-source | planned | chaptarr_cutoff_wanted | #11 | `1e64d2e53e72` |
 | `GET /api/v1/wanted/cutoff/{id}` | Cutoff | data-source | planned | chaptarr_cutoff_wanted | #11 | `fcdc7bc85c66` |
 | `GET /api/v1/wanted/missing` | Missing | data-source | planned | chaptarr_missing | #11 | `336bce2da250` |
@@ -212,8 +212,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /auth/plex` | PlexAuthentication | out-of-scope | excluded | Interactive Plex login and callbacks belong to the Chaptarr UI, not Terraform. |  | `741ed0c80712` |
 | `GET /auth/plex/callback` | PlexAuthentication | out-of-scope | excluded | Interactive Plex login and callbacks belong to the Chaptarr UI, not Terraform. |  | `095d55bd6544` |
 | `GET /content/{path}` | StaticResource | out-of-scope | excluded | Web UI static content is unrelated to infrastructure state. |  | `cafde46b4f72` |
-| `GET /feed/v1/calendar/chaptarr.ics` | CalendarFeed | data-source | planned | chaptarr_calendar_feed | #10 | `db1ac3ecf5d7` |
-| `GET /feed/v1/calendar/readarr.ics` | CalendarFeed | data-source | planned | chaptarr_calendar_feed | #10 | `db1ac3ecf5d7` |
+| `GET /feed/v1/calendar/chaptarr.ics` | CalendarFeed | data-source | implemented | chaptarr_calendar_feed | #10 | `db1ac3ecf5d7` |
+| `GET /feed/v1/calendar/readarr.ics` | CalendarFeed | data-source | implemented | chaptarr_calendar_feed | #10 | `db1ac3ecf5d7` |
 | `GET /login` | StaticResource | out-of-scope | excluded | Web UI static content is unrelated to infrastructure state. |  | `5a9ab3986fd0` |
 | `GET /logout` | Authentication | out-of-scope | excluded | Browser login/session APIs are not provider authentication; the provider uses X-Api-Key only. |  | `75791387dd68` |
 | `GET /ping` | Ping | data-source | planned | chaptarr_ping | #10 | `b16d6144ad53` |
@@ -228,7 +228,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/book/import` | Book | resource | planned | chaptarr_book | #9 | `2ca11fadc715` |
 | `POST /api/v1/book/{id}/downloadmedia` | Book | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `a4a948141078` |
 | `POST /api/v1/book/{id}/editions/wanted` | Book | resource | planned | chaptarr_book | #9 | `b815432aac3d` |
-| `POST /api/v1/bookshelf` | Bookshelf | data-source | planned | chaptarr_bookshelf | #10 | `4a8cda351917` |
+| `POST /api/v1/bookshelf` | Bookshelf | action-only | excluded | Bookshelf updates author and book monitoring state; it is a mutating bulk action, not read-only discovery. | #11 | `4a8cda351917` |
 | `POST /api/v1/command` | Command | action-only | excluded | Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh. | #11 | `21eaadc27c2e` |
 | `POST /api/v1/command/cancel/all` | Command | action-only | excluded | Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh. | #11 | `229aca361f5f` |
 | `POST /api/v1/command/pause/all` | Command | action-only | excluded | Command lifecycle controls searches and maintenance and must be explicitly invoked outside refresh. | #11 | `229aca361f5f` |
@@ -244,7 +244,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/config/naming-pattern/validate` | NamingPattern | data-source | implemented | chaptarr_naming_pattern | #2 | `4f9b2ee9f12c` |
 | `POST /api/v1/customfilter` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `b4fcbe41983b` |
 | `POST /api/v1/customformat` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `cad913ae2d2e` |
-| `POST /api/v1/delayprofile` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `446742170d7b` |
+| `POST /api/v1/delayprofile` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `446742170d7b` |
 | `POST /api/v1/downloadclient` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `82ae11afcfa1` |
 | `POST /api/v1/downloadclient/action/{name}` | DownloadClient | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `0b91e84b29e6` |
 | `POST /api/v1/downloadclient/test` | DownloadClient | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `65a3160945a9` |
@@ -265,23 +265,23 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/metadata/action/{name}` | Metadata | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `8d5457ae1781` |
 | `POST /api/v1/metadata/test` | Metadata | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `fae0dde5c69f` |
 | `POST /api/v1/metadata/testall` | Metadata | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `cfbd8fd71f42` |
-| `POST /api/v1/metadataprofile` | MetadataProfile | resource | planned | chaptarr_metadata_profile | #4 | `5d9866d6c99f` |
+| `POST /api/v1/metadataprofile` | MetadataProfile | resource | implemented | chaptarr_metadata_profile | #4 | `5d9866d6c99f` |
 | `POST /api/v1/notification` | Notification | resource | planned | chaptarr_notification | #5 | `d828b2823006` |
 | `POST /api/v1/notification/action/{name}` | Notification | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `def90a8d83ce` |
 | `POST /api/v1/notification/test` | Notification | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `c7ae4e29c119` |
 | `POST /api/v1/notification/testall` | Notification | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `6b550725409c` |
 | `POST /api/v1/pendingauthorimport/author/queue` | PendingAuthorImport | action-only | excluded | Queue, retry, and delete operations change import state and require explicit operational tooling. | #11 | `3c3684662a12` |
 | `POST /api/v1/pendingauthorimport/{id}/retry` | PendingAuthorImport | action-only | excluded | Queue, retry, and delete operations change import state and require explicit operational tooling. | #11 | `cea2a78e83fa` |
-| `POST /api/v1/qualityprofile` | QualityProfile | resource | planned | chaptarr_quality_profile | #4 | `91d5abe03ab2` |
+| `POST /api/v1/qualityprofile` | QualityProfile | resource | implemented | chaptarr_quality_profile | #4 | `91d5abe03ab2` |
 | `POST /api/v1/queue/cancelconversion/{id}` | Queue | action-only | excluded | Queue cancellation/removal is destructive operational behavior and requires explicit tooling. | #11 | `759b610e1b0b` |
 | `POST /api/v1/queue/grab/bulk` | QueueAction | action-only | excluded | Grabbing queued releases triggers downloads and must never run during plan or refresh. | #11 | `717f1149d41b` |
 | `POST /api/v1/queue/grab/{id}` | QueueAction | action-only | excluded | Grabbing queued releases triggers downloads and must never run during plan or refresh. | #11 | `01de7d78f05d` |
 | `POST /api/v1/release` | Release | action-only | excluded | Grabbing a release triggers a download and must be explicit and disabled by default. | #11 | `bce6d09bf8c8` |
 | `POST /api/v1/release/push` | ReleasePush | action-only | excluded | Pushing a release can trigger acquisition/import and must be an explicit opt-in action. | #11 | `12d6f5b6f541` |
-| `POST /api/v1/releaseprofile` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `2d53117fcb9f` |
-| `POST /api/v1/remotepathmapping` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `e5add80122bc` |
-| `POST /api/v1/remotepathmapping/test` | RemotePathMapping | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `63836074a380` |
-| `POST /api/v1/rootfolder` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `907eafd4cbd8` |
+| `POST /api/v1/releaseprofile` | ReleaseProfile | resource | implemented | chaptarr_release_profile | #4 | `2d53117fcb9f` |
+| `POST /api/v1/remotepathmapping` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `e5add80122bc` |
+| `POST /api/v1/remotepathmapping/test` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `63836074a380` |
+| `POST /api/v1/rootfolder` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `907eafd4cbd8` |
 | `POST /api/v1/rootfolder/{id}/link-author` | RootFolder | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `b7b34006fc31` |
 | `POST /api/v1/series/add` | AddSeries | resource | planned | chaptarr_series | #8 | `436bae9dd0fa` |
 | `POST /api/v1/series/{seriesId}/narrators/discover` | Series | data-source | planned | chaptarr_series_narrator_discovery | #8 | `247122ba34c9` |
@@ -320,7 +320,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/customfilter/{id}` | CustomFilter | resource | planned | chaptarr_custom_filter | #7 | `74102fb555af` |
 | `PUT /api/v1/customformat/{id}` | CustomFormat | resource | planned | chaptarr_custom_format | #7 | `f85c846dac80` |
 | `PUT /api/v1/delayprofile/reorder/{id}` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `c091445cb7c9` |
-| `PUT /api/v1/delayprofile/{id}` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `1a41488d7070` |
+| `PUT /api/v1/delayprofile/{id}` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `1a41488d7070` |
 | `PUT /api/v1/downloadclient/bulk` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `af043a0d809f` |
 | `PUT /api/v1/downloadclient/{id}` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `bd3d620d9244` |
 | `PUT /api/v1/importlist/bulk` | ImportList | resource | planned | chaptarr_import_list | #6 | `0a76c8ef574f` |
@@ -329,14 +329,14 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/indexer/bulk` | Indexer | resource | planned | chaptarr_indexer | #5 | `dd548c3fe8be` |
 | `PUT /api/v1/indexer/{id}` | Indexer | resource | planned | chaptarr_indexer | #5 | `91807de49581` |
 | `PUT /api/v1/metadata/{id}` | Metadata | resource | planned | chaptarr_metadata | #7 | `ed17dddbd4ad` |
-| `PUT /api/v1/metadataprofile/{id}` | MetadataProfile | resource | planned | chaptarr_metadata_profile | #4 | `e4e3209082e6` |
+| `PUT /api/v1/metadataprofile/{id}` | MetadataProfile | resource | implemented | chaptarr_metadata_profile | #4 | `e4e3209082e6` |
 | `PUT /api/v1/notification/{id}` | Notification | resource | planned | chaptarr_notification | #5 | `5f484222ca4e` |
 | `PUT /api/v1/qualitydefinition/update` | QualityDefinition | resource | planned | chaptarr_quality_definition | #4 | `106bc4a8e67d` |
-| `PUT /api/v1/qualitydefinition/{id}` | QualityDefinition | resource | planned | chaptarr_quality_definition | #4 | `5c5082175058` |
-| `PUT /api/v1/qualityprofile/{id}` | QualityProfile | resource | planned | chaptarr_quality_profile | #4 | `38c14a8b70c7` |
-| `PUT /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `a3670037f70a` |
-| `PUT /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | planned | chaptarr_remote_path_mapping | #3 | `12746ba91a1f` |
-| `PUT /api/v1/rootfolder/{id}` | RootFolder | resource | planned | chaptarr_root_folder | #3 | `7b00820d50c4` |
+| `PUT /api/v1/qualitydefinition/{id}` | QualityDefinition | resource | implemented | chaptarr_quality_definition | #4 | `5c5082175058` |
+| `PUT /api/v1/qualityprofile/{id}` | QualityProfile | resource | implemented | chaptarr_quality_profile | #4 | `38c14a8b70c7` |
+| `PUT /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | implemented | chaptarr_release_profile | #4 | `a3670037f70a` |
+| `PUT /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `12746ba91a1f` |
+| `PUT /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `7b00820d50c4` |
 | `PUT /api/v1/series/{seriesId}/narrators/preferred` | Series | resource | planned | chaptarr_series | #8 | `1da362544b06` |
 | `PUT /api/v1/settings/proxy/{id}` | Proxy | resource | planned | chaptarr_proxy | #7 | `4d282f29fe51` |
 | `PUT /api/v1/tag/{id}` | Tag | resource | planned | chaptarr_tag | #7 | `8c393913c2f9` |

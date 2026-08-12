@@ -28,11 +28,11 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 	if metadata.TypeName != "chaptarr" || metadata.Version != "test-version" {
 		t.Fatalf("unexpected metadata: %#v", metadata)
 	}
-	if resources := p.Resources(context.Background()); len(resources) != 10 {
-		t.Fatalf("registered %d resources, want 10", len(resources))
+	if resources := p.Resources(context.Background()); len(resources) != 18 {
+		t.Fatalf("registered %d resources, want 18", len(resources))
 	}
-	if dataSources := p.DataSources(context.Background()); len(dataSources) != 2 {
-		t.Fatalf("registered %d data sources, want 2", len(dataSources))
+	if dataSources := p.DataSources(context.Background()); len(dataSources) != 24 {
+		t.Fatalf("registered %d data sources, want 24", len(dataSources))
 	}
 }
 

@@ -12,7 +12,7 @@ if (-not $resolvedTestRoot.StartsWith($systemTemp, [StringComparison]::OrdinalIg
     throw 'Refusing to use a test directory outside the system temporary directory.'
 }
 
-$environmentNames = @('CHAPTARR_API_KEY', 'TF_VAR_oidc_client_secret', 'TF_CLI_CONFIG_FILE', 'TF_LOG', 'TF_LOG_PATH', 'GOTOOLCHAIN')
+$environmentNames = @('CHAPTARR_API_KEY', 'TF_VAR_oidc_client_secret', 'TF_VAR_calibre_password', 'TF_CLI_CONFIG_FILE', 'TF_LOG', 'TF_LOG_PATH', 'GOTOOLCHAIN')
 $previousEnvironment = @{}
 foreach ($name in $environmentNames) {
     $item = Get-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
@@ -70,16 +70,37 @@ variable "oidc_client_secret" {
   ephemeral = true
 }
 
+variable "calibre_password" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
 resource "chaptarr_host_config" "leak_test" {
   instance_name     = "plan-leak-test"
   oidc_client_secret = var.oidc_client_secret
+}
+
+resource "chaptarr_root_folder" "calibre" {
+  name               = "Plan leak fixture"
+  path               = "/library/plan-leak-fixture"
+  folder_type        = "ebook"
+  is_calibre_library = true
+  host               = "calibre.example.test"
+  port               = 8080
+  library            = "fixture"
+  output_profile     = "default"
+  username           = "fixture"
+  password           = var.calibre_password
 }
 '@ | Set-Content -Encoding ascii (Join-Path $configurationDirectory 'main.tf')
 
     $sentinel = 'CHAPTARR_TEST_API_KEY_SENTINEL_DO_NOT_USE_79f6f1d2'
 	$hostSentinel = 'CHAPTARR_HOST_WRITE_ONLY_SENTINEL_DO_NOT_USE_913ad7c4'
+	$calibreSentinel = 'CHAPTARR_TEST_CALIBRE_PASSWORD_SENTINEL_DO_NOT_USE_3b4e911c'
     $env:CHAPTARR_API_KEY = $sentinel
 	$env:TF_VAR_oidc_client_secret = $hostSentinel
+	$env:TF_VAR_calibre_password = $calibreSentinel
     $env:TF_CLI_CONFIG_FILE = Join-Path $resolvedTestRoot 'tofurc'
     Remove-Item Env:TF_LOG -ErrorAction SilentlyContinue
     Remove-Item Env:TF_LOG_PATH -ErrorAction SilentlyContinue
@@ -107,12 +128,14 @@ resource "chaptarr_host_config" "leak_test" {
 
     foreach ($path in @($planOutput, $showOutput)) {
 		$content = Get-Content -Raw $path
-		if ($content.Contains($sentinel) -or $content.Contains($hostSentinel)) {
-            throw "Synthetic credential leaked into $(Split-Path -Leaf $path)."
-        }
-    }
+		foreach ($secret in @($sentinel, $hostSentinel, $calibreSentinel)) {
+			if ($content.Contains($secret)) {
+				throw "Synthetic credential leaked into $(Split-Path -Leaf $path)."
+			}
+		}
+	}
 
-    Write-Output 'OpenTofu plan output contains no synthetic API key.'
+	Write-Output 'OpenTofu plan output contains no synthetic credentials.'
 }
 finally {
     foreach ($name in $environmentNames) {
