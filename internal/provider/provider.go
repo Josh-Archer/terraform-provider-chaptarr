@@ -135,6 +135,7 @@ func (p *ChaptarrProvider) Resources(context.Context) []func() resource.Resource
 		newReleaseProfileResource,
 		newDelayProfileResource,
 		newQualityDefinitionResource,
+		newPostgresDatabaseResource,
 	)
 	return resources
 }
