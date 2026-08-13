@@ -47,7 +47,7 @@
     },
     "DELETE /api/v1/book/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
@@ -310,7 +310,7 @@
     },
     "GET /api/v1/book/lookup": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book_lookup",
       "tracking_issue": "#9"
     },
@@ -322,7 +322,7 @@
     },
     "GET /api/v1/book/{bookId}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
@@ -334,7 +334,7 @@
     },
     "GET /api/v1/book/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
@@ -346,13 +346,13 @@
     },
     "GET /api/v1/bookfile": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book_file",
       "tracking_issue": "#9"
     },
     "GET /api/v1/bookfile/{id}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book_file",
       "tracking_issue": "#9"
     },
@@ -568,7 +568,7 @@
     },
     "GET /api/v1/edition": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_editions",
       "tracking_issue": "#9"
     },
@@ -929,13 +929,13 @@
     },
     "GET /api/v1/rename": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_rename_book_preview",
       "tracking_issue": "#9"
     },
     "GET /api/v1/retag": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_retag_book_preview",
       "tracking_issue": "#9"
     },
@@ -1209,7 +1209,7 @@
     },
     "POST /api/v1/book": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
@@ -1694,7 +1694,7 @@
     },
     "PUT /api/v1/book/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_book",
       "tracking_issue": "#9"
     },
