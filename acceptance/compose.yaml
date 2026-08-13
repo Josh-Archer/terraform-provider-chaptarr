@@ -1,0 +1,28 @@
+services:
+  chaptarr:
+    image: ${CHAPTARR_IMAGE:?set CHAPTARR_IMAGE to a tag-and-digest pinned image}
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      UMASK: "077"
+      TZ: UTC
+    ports:
+      - "127.0.0.1::8789"
+    volumes:
+      - config:/config
+      - audiobooks:/audiobooks
+      - ebooks:/ebooks
+      - downloads:/downloads
+    networks:
+      - acceptance
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  config:
+  audiobooks:
+  ebooks:
+  downloads:
+
+networks:
+  acceptance:

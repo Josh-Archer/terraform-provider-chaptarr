@@ -17,7 +17,10 @@ go mod verify
 go vet ./...
 go test ./...
 go run ./tools/openapi check
-tofu fmt -check -recursive examples
+go run ./tools/compatibility check
+tofu fmt -check -recursive examples acceptance
+CHAPTARR_IMAGE='chaptarr/chaptarr:0.9.925@sha256:8e29f4941acaf74c80bba4322237dfd2549816b3dd1b581f176b1be5d1ccb46b' \
+  docker compose -f acceptance/compose.yaml config --quiet
 bash ./scripts/test-plan-leak.sh
 bash ./scripts/test-release-assets.sh
 git diff --check
