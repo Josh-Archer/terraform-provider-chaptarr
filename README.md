@@ -73,6 +73,9 @@ safe media-operation controls are documented in the
 [library ownership guide](docs/resources/library.md).
 Book and monitored-edition lifecycle plus GET-only book-file, rename, and retag
 inspection are documented in the [book and edition guide](docs/resources/books.md).
+The [PostgreSQL composition boundary guide](docs/guides/azure-postgresql.md)
+distinguishes the provider's database resource from the infrastructure,
+secret-delivery, workload, and migration responsibilities it does not manage.
 
 ## Development
 
