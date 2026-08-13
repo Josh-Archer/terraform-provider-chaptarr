@@ -11,16 +11,21 @@ import (
 	"time"
 
 	"github.com/Josh-Archer/terraform-provider-chaptarr/internal/client"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	_ "github.com/lib/pq"
 )
 
 var (
-	_ resource.Resource = &postgresDatabaseResource{}
+	_ resource.Resource                 = &postgresDatabaseResource{}
+	_ resource.ResourceWithImportState  = &postgresDatabaseResource{}
+	_ resource.ResourceWithUpgradeState = &postgresDatabaseResource{}
 )
 
 type postgresDatabaseResource struct {
@@ -47,6 +52,17 @@ type bridgeSecretResponse struct {
 	Value string `json:"value"`
 }
 
+// postgresDatabaseCredentials is deliberately separate from the state model.
+// Write-only configuration is available to Create and Update only, and must
+// never be copied into a value passed to State.Set.
+type postgresDatabaseCredentials struct {
+	adminPassword   string
+	bridgeURL       string
+	bridgeToken     string
+	bridgeSecretKey string
+	rolePassword    string
+}
+
 func newPostgresDatabaseResource() resource.Resource {
 	return &postgresDatabaseResource{}
 }
@@ -56,7 +72,13 @@ func (r *postgresDatabaseResource) Metadata(_ context.Context, req resource.Meta
 }
 
 func (r *postgresDatabaseResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = schema.Schema{
+	resp.Schema = postgresDatabaseSchema(1)
+}
+
+func postgresDatabaseSchema(version int64) schema.Schema {
+	writeOnly := version > 0
+	return schema.Schema{
+		Version:             version,
 		MarkdownDescription: "Manage Azure PostgreSQL roles, databases, and Vaultwarden secret resolution directly within the provider.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -81,6 +103,7 @@ func (r *postgresDatabaseResource) Schema(_ context.Context, _ resource.SchemaRe
 			"admin_password": schema.StringAttribute{
 				Required:            true,
 				Sensitive:           true,
+				WriteOnly:           writeOnly,
 				MarkdownDescription: "PostgreSQL administrator password.",
 			},
 			"vaultwarden_bridge_url": schema.StringAttribute{
@@ -90,11 +113,13 @@ func (r *postgresDatabaseResource) Schema(_ context.Context, _ resource.SchemaRe
 			"vaultwarden_bridge_token": schema.StringAttribute{
 				Optional:            true,
 				Sensitive:           true,
+				WriteOnly:           writeOnly,
 				MarkdownDescription: "Optional Bearer token for authenticating with the Vaultwarden ESO bridge.",
 			},
 			"vaultwarden_secret_key": schema.StringAttribute{
 				Optional:            true,
 				Sensitive:           true,
+				WriteOnly:           writeOnly,
 				MarkdownDescription: "Vaultwarden secret item key (default 'media/chaptarr-postgres-credentials').",
 			},
 			"role_name": schema.StringAttribute{
@@ -104,6 +129,7 @@ func (r *postgresDatabaseResource) Schema(_ context.Context, _ resource.SchemaRe
 			"role_password": schema.StringAttribute{
 				Optional:            true,
 				Sensitive:           true,
+				WriteOnly:           writeOnly,
 				MarkdownDescription: "Explicit PostgreSQL role password (resolved automatically from Vaultwarden if bridge URL/token are provided).",
 			},
 			"databases": schema.ListAttribute{
@@ -138,11 +164,12 @@ func (r *postgresDatabaseResource) Configure(_ context.Context, req resource.Con
 func (r *postgresDatabaseResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan postgresDatabaseModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	credentials := loadPostgresDatabaseWriteOnlyConfig(ctx, req.Config, &plan, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	r.applyDatabaseSetup(ctx, &plan, resp)
+	r.applyDatabaseSetup(ctx, plan, credentials, resp)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -150,6 +177,7 @@ func (r *postgresDatabaseResource) Create(ctx context.Context, req resource.Crea
 	id := fmt.Sprintf("%s:%d:%s", plan.ServerHost.ValueString(), plan.ServerPort.ValueInt64(), plan.RoleName.ValueString())
 	plan.ID = types.StringValue(id)
 	plan.IsHealthy = types.BoolValue(true)
+	clearPostgresDatabaseCredentials(&plan)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
@@ -161,85 +189,28 @@ func (r *postgresDatabaseResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
-	rolePwd := r.resolveRolePassword(ctx, &state, resp)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	host := state.ServerHost.ValueString()
-	port := getPort(state.ServerPort)
-	adminUser := state.AdminUsername.ValueString()
-	adminPwd := state.AdminPassword.ValueString()
-	sslMode := getSSLMode(state.SSLMode)
-	roleName := getRoleName(state.RoleName)
-	dbs := getDatabases(ctx, state.Databases)
-
-	adminConnStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=%s", host, port, adminUser, adminPwd, sslMode)
-	db, err := sql.Open("postgres", adminConnStr)
-	if err != nil {
-		state.IsHealthy = types.BoolValue(false)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
-		return
-	}
-	defer db.Close()
-
-	// Check if role exists
-	var exists bool
-	err = db.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1);", roleName).Scan(&exists)
-	if err != nil || !exists {
-		state.IsHealthy = types.BoolValue(false)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
-		return
-	}
-
-	// Check if all databases exist
-	for _, dbName := range dbs {
-		var dbExists bool
-		err = db.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1);", dbName).Scan(&dbExists)
-		if err != nil || !dbExists {
-			state.IsHealthy = types.BoolValue(false)
-			resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
-			return
-		}
-	}
-
-	// Verify role authentication if role password is provided
-	if rolePwd != "" {
-		for _, dbName := range dbs {
-			roleConnStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", host, port, roleName, rolePwd, dbName, sslMode)
-			rDb, err := sql.Open("postgres", roleConnStr)
-			if err != nil {
-				state.IsHealthy = types.BoolValue(false)
-				resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
-				return
-			}
-			err = rDb.PingContext(ctx)
-			rDb.Close()
-			if err != nil {
-				state.IsHealthy = types.BoolValue(false)
-				resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
-				return
-			}
-		}
-	}
-
-	state.IsHealthy = types.BoolValue(true)
+	// Authentication material is write-only and unavailable during refresh.
+	// Refresh therefore cannot safely reconnect or re-read the Vaultwarden
+	// bridge; retain only the last apply result while scrubbing legacy state.
+	clearPostgresDatabaseCredentials(&state)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
 func (r *postgresDatabaseResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan postgresDatabaseModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	credentials := loadPostgresDatabaseWriteOnlyConfig(ctx, req.Config, &plan, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	r.applyDatabaseSetup(ctx, &plan, resp)
+	r.applyDatabaseSetup(ctx, plan, credentials, resp)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	plan.IsHealthy = types.BoolValue(true)
+	clearPostgresDatabaseCredentials(&plan)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
@@ -247,8 +218,8 @@ func (r *postgresDatabaseResource) Delete(ctx context.Context, _ resource.Delete
 	// Deleting the resource only relinquishes Terraform ownership to prevent accidental DROPs of production databases.
 }
 
-func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model *postgresDatabaseModel, resp interface{}) {
-	rolePwd := r.resolveRolePassword(ctx, model, resp)
+func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model postgresDatabaseModel, credentials postgresDatabaseCredentials, resp interface{}) {
+	rolePwd := r.resolveRolePassword(ctx, credentials, resp)
 	if rolePwd == "" {
 		return
 	}
@@ -256,7 +227,7 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 	host := model.ServerHost.ValueString()
 	port := getPort(model.ServerPort)
 	adminUser := model.AdminUsername.ValueString()
-	adminPwd := model.AdminPassword.ValueString()
+	adminPwd := credentials.adminPassword
 	sslMode := getSSLMode(model.SSLMode)
 	roleName := getRoleName(model.RoleName)
 	dbs := getDatabases(ctx, model.Databases)
@@ -264,7 +235,7 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 	adminConnStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=%s", host, port, adminUser, adminPwd, sslMode)
 	db, err := sql.Open("postgres", adminConnStr)
 	if err != nil {
-		r.addError(resp, "PostgreSQL Connection Error", fmt.Sprintf("Failed to connect to PostgreSQL at %s:%d as %s: %v", host, port, adminUser, err))
+		r.addError(resp, "PostgreSQL Connection Error", fmt.Sprintf("Failed to connect to PostgreSQL at %s:%d as %s.", host, port, adminUser))
 		return
 	}
 	defer db.Close()
@@ -273,14 +244,14 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 	var roleExists bool
 	err = db.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1);", roleName).Scan(&roleExists)
 	if err != nil {
-		r.addError(resp, "Role Check Failed", fmt.Sprintf("Failed to query pg_roles: %v", err))
+		r.addError(resp, "Role Check Failed", "Failed to query PostgreSQL roles.")
 		return
 	}
 
 	if !roleExists {
 		createRoleSQL := fmt.Sprintf("CREATE ROLE %s WITH LOGIN PASSWORD '%s';", sanitizeIdent(roleName), escapeLiteral(rolePwd))
 		if _, err := db.ExecContext(ctx, createRoleSQL); err != nil {
-			r.addError(resp, "Role Creation Failed", fmt.Sprintf("Failed to create role %s: %v", roleName, err))
+			r.addError(resp, "Role Creation Failed", fmt.Sprintf("Failed to create role %s.", roleName))
 			return
 		}
 	} else {
@@ -297,14 +268,14 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 		var dbExists bool
 		err = db.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1);", dbName).Scan(&dbExists)
 		if err != nil {
-			r.addError(resp, "Database Check Failed", fmt.Sprintf("Failed to query pg_database for %s: %v", dbName, err))
+			r.addError(resp, "Database Check Failed", fmt.Sprintf("Failed to query PostgreSQL database %s.", dbName))
 			return
 		}
 
 		if !dbExists {
 			createDBSQL := fmt.Sprintf("CREATE DATABASE %s OWNER %s;", sanitizeIdent(dbName), sanitizeIdent(roleName))
 			if _, err := db.ExecContext(ctx, createDBSQL); err != nil {
-				r.addError(resp, "Database Creation Failed", fmt.Sprintf("Failed to create database %s: %v", dbName, err))
+				r.addError(resp, "Database Creation Failed", fmt.Sprintf("Failed to create database %s.", dbName))
 				return
 			}
 		}
@@ -320,16 +291,16 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 	}
 }
 
-func (r *postgresDatabaseResource) resolveRolePassword(ctx context.Context, model *postgresDatabaseModel, resp interface{}) string {
-	if !model.RolePassword.IsNull() && model.RolePassword.ValueString() != "" {
-		return model.RolePassword.ValueString()
+func (r *postgresDatabaseResource) resolveRolePassword(ctx context.Context, credentials postgresDatabaseCredentials, resp interface{}) string {
+	if credentials.rolePassword != "" {
+		return credentials.rolePassword
 	}
 
-	bridgeURL := model.VaultwardenBridgeURL.ValueString()
-	bridgeToken := model.VaultwardenBridgeToken.ValueString()
+	bridgeURL := credentials.bridgeURL
+	bridgeToken := credentials.bridgeToken
 	secretKey := "media/chaptarr-postgres-credentials"
-	if !model.VaultwardenSecretKey.IsNull() && model.VaultwardenSecretKey.ValueString() != "" {
-		secretKey = model.VaultwardenSecretKey.ValueString()
+	if credentials.bridgeSecretKey != "" {
+		secretKey = credentials.bridgeSecretKey
 	}
 
 	if bridgeURL != "" && bridgeToken != "" {
@@ -339,12 +310,13 @@ func (r *postgresDatabaseResource) resolveRolePassword(ctx context.Context, mode
 			httpReq.Header.Set("Authorization", "Bearer "+bridgeToken)
 			httpClient := &http.Client{Timeout: 10 * time.Second}
 			httpResp, err := httpClient.Do(httpReq)
-			if err == nil && httpResp.StatusCode == http.StatusOK {
+			if err == nil && httpResp != nil {
+				defer httpResp.Body.Close()
+			}
+			if err == nil && httpResp != nil && httpResp.StatusCode == http.StatusOK {
 				body, _ := io.ReadAll(httpResp.Body)
-				httpResp.Body.Close()
 				var bResp bridgeSecretResponse
 				if err := json.Unmarshal(body, &bResp); err == nil && bResp.Value != "" {
-					model.RolePassword = types.StringValue(bResp.Value)
 					return bResp.Value
 				}
 			}
@@ -353,6 +325,51 @@ func (r *postgresDatabaseResource) resolveRolePassword(ctx context.Context, mode
 
 	r.addError(resp, "Missing Role Password", "Specify `role_password` or configure valid `vaultwarden_bridge_url` and `vaultwarden_bridge_token`.")
 	return ""
+}
+
+func loadPostgresDatabaseWriteOnlyConfig(ctx context.Context, config tfsdk.Config, model *postgresDatabaseModel, diagnostics *diag.Diagnostics) postgresDatabaseCredentials {
+	diagnostics.Append(config.GetAttribute(ctx, path.Root("admin_password"), &model.AdminPassword)...)
+	diagnostics.Append(config.GetAttribute(ctx, path.Root("vaultwarden_bridge_token"), &model.VaultwardenBridgeToken)...)
+	diagnostics.Append(config.GetAttribute(ctx, path.Root("vaultwarden_secret_key"), &model.VaultwardenSecretKey)...)
+	diagnostics.Append(config.GetAttribute(ctx, path.Root("role_password"), &model.RolePassword)...)
+	return postgresDatabaseCredentials{
+		adminPassword:   model.AdminPassword.ValueString(),
+		bridgeURL:       model.VaultwardenBridgeURL.ValueString(),
+		bridgeToken:     model.VaultwardenBridgeToken.ValueString(),
+		bridgeSecretKey: model.VaultwardenSecretKey.ValueString(),
+		rolePassword:    model.RolePassword.ValueString(),
+	}
+}
+
+func clearPostgresDatabaseCredentials(model *postgresDatabaseModel) {
+	model.AdminPassword = types.StringNull()
+	model.VaultwardenBridgeToken = types.StringNull()
+	model.VaultwardenSecretKey = types.StringNull()
+	model.RolePassword = types.StringNull()
+}
+
+func (r *postgresDatabaseResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// PostgreSQL connection and bridge credentials are intentionally absent
+	// from imported state. Configure them only for a later mutation.
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+}
+
+func (r *postgresDatabaseResource) UpgradeState(_ context.Context) map[int64]resource.StateUpgrader {
+	legacySchema := postgresDatabaseSchema(0)
+	return map[int64]resource.StateUpgrader{
+		0: {
+			PriorSchema: &legacySchema,
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var legacy postgresDatabaseModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &legacy)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+				clearPostgresDatabaseCredentials(&legacy)
+				resp.Diagnostics.Append(resp.State.Set(ctx, &legacy)...)
+			},
+		},
+	}
 }
 
 func (r *postgresDatabaseResource) addError(resp interface{}, title, detail string) {

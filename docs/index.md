@@ -93,7 +93,7 @@ integration gate.
 
 The [PostgreSQL composition boundary guide](guides/azure-postgresql.md)
 explains the scope and limits of `chaptarr_postgres_database`, including its
-read-only Vaultwarden bridge lookup.
+write-only database credentials and mutation-only Vaultwarden bridge lookup.
 
 The [operational API policy](operational-api-policy.md) records why queue,
 import, backup/restore, upgrade, process, log, and release-push operations are
