@@ -34,11 +34,20 @@ func newMetadataSchemaDataSource() datasource.DataSource {
 func newCustomFormatSchemaDataSource() datasource.DataSource {
 	return &customizationSchemaDataSource{kind: "custom_format"}
 }
+func newIndexerSchemaDataSource() datasource.DataSource {
+	return &customizationSchemaDataSource{kind: "indexer"}
+}
+func newDownloadClientSchemaDataSource() datasource.DataSource {
+	return &customizationSchemaDataSource{kind: "download_client"}
+}
+func newNotificationSchemaDataSource() datasource.DataSource {
+	return &customizationSchemaDataSource{kind: "notification"}
+}
 func (d *customizationSchemaDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + d.kind + "_schema"
 }
 func (d *customizationSchemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = schema.Schema{MarkdownDescription: "Fetch the current Chaptarr customization template contract as deterministic canonical JSON. Metadata password/API-key values are removed while field privacy/type metadata remains available.", Attributes: map[string]schema.Attribute{"id": schema.StringAttribute{Computed: true}, "templates_json": schema.StringAttribute{Computed: true}, "templates_sha256": schema.StringAttribute{Computed: true}}}
+	resp.Schema = schema.Schema{MarkdownDescription: "Fetch the current Chaptarr customization template contract as deterministic canonical JSON. Protected credential values are removed while field privacy/type metadata remains available.", Attributes: map[string]schema.Attribute{"id": schema.StringAttribute{Computed: true}, "templates_json": schema.StringAttribute{Computed: true}, "templates_sha256": schema.StringAttribute{Computed: true}}}
 }
 func (d *customizationSchemaDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
@@ -52,9 +61,11 @@ func (d *customizationSchemaDataSource) Configure(_ context.Context, req datasou
 	d.client = apiClient
 }
 func (d *customizationSchemaDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
-	endpoint := "/api/v1/customformat/schema"
-	if d.kind == "metadata" {
-		endpoint = "/api/v1/metadata/schema"
+	endpoints := map[string]string{"custom_format": "/api/v1/customformat/schema", "metadata": "/api/v1/metadata/schema", "indexer": "/api/v1/indexer/schema", "download_client": "/api/v1/downloadclient/schema", "notification": "/api/v1/notification/schema"}
+	endpoint, ok := endpoints[d.kind]
+	if !ok {
+		resp.Diagnostics.AddError("Invalid customization schema", "The provider requested an unknown customization schema kind.")
+		return
 	}
 	response, err := d.client.Do(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
@@ -66,7 +77,7 @@ func (d *customizationSchemaDataSource) Read(ctx context.Context, _ datasource.R
 		resp.Diagnostics.AddError("Invalid Chaptarr response", "Chaptarr returned an invalid customization schema.")
 		return
 	}
-	if d.kind == "metadata" {
+	if d.kind != "custom_format" {
 		decoded = sanitizeMetadataTemplates(decoded)
 	}
 	canonical, hash := canonicalValue(decoded)
