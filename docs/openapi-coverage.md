@@ -13,18 +13,18 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | Classification | Status | Operations |
 |---|---|---:|
 | action-only | excluded | 58 |
-| data-source | implemented | 44 |
-| data-source | planned | 40 |
+| data-source | implemented | 46 |
+| data-source | planned | 38 |
 | out-of-scope | excluded | 16 |
-| resource | implemented | 98 |
-| resource | planned | 61 |
+| resource | implemented | 106 |
+| resource | planned | 53 |
 
 ## Operation inventory
 
 | Operation | Tags | Decision | Status | Target / rationale | Issue | Contract |
 |---|---|---|---|---|---|---|
 | `DELETE /api/v1/author/editor` | AuthorEditor | resource | planned | chaptarr_author | #8 | `2c5a38ed6534` |
-| `DELETE /api/v1/author/{id}` | Author | resource | planned | chaptarr_author | #8 | `3a54040c9d65` |
+| `DELETE /api/v1/author/{id}` | Author | resource | implemented | chaptarr_author | #8 | `3a54040c9d65` |
 | `DELETE /api/v1/blocklist/bulk` | Blocklist | action-only | excluded | Blocklist removal is an imperative queue/history action, not declarative infrastructure. | #11 | `0cb87cd7f529` |
 | `DELETE /api/v1/blocklist/{id}` | Blocklist | action-only | excluded | Blocklist removal is an imperative queue/history action, not declarative infrastructure. | #11 | `05c9940da5f1` |
 | `DELETE /api/v1/book/editor` | BookEditor | resource | planned | chaptarr_book | #9 | `e75a4429aac1` |
@@ -64,9 +64,9 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /` | StaticResource | out-of-scope | excluded | Web UI static content is unrelated to infrastructure state. |  | `c3d13a469f71` |
 | `GET /api` | ApiInfo | data-source | implemented | chaptarr_api_info | #10 | `c409f455bc84` |
 | `GET /api/v1/author` | Author | resource | planned | chaptarr_author | #8 | `324cd3f0ab3f` |
-| `GET /api/v1/author/lookup` | AuthorLookup | data-source | planned | chaptarr_author_lookup | #8 | `4409a8f7af15` |
-| `GET /api/v1/author/{authorId}` | Author | resource | planned | chaptarr_author | #8 | `19d8bcc9929f` |
-| `GET /api/v1/author/{id}` | Author | resource | planned | chaptarr_author | #8 | `88ee8a38ddf2` |
+| `GET /api/v1/author/lookup` | AuthorLookup | data-source | implemented | chaptarr_author_lookup | #8 | `4409a8f7af15` |
+| `GET /api/v1/author/{authorId}` | Author | resource | implemented | chaptarr_author | #8 | `19d8bcc9929f` |
+| `GET /api/v1/author/{id}` | Author | resource | implemented | chaptarr_author | #8 | `88ee8a38ddf2` |
 | `GET /api/v1/author/{id}/size/{mediaType}` | Author | data-source | planned | chaptarr_author_statistics | #8 | `ec92be86e482` |
 | `GET /api/v1/blocklist` | Blocklist | data-source | planned | chaptarr_blocklist | #11 | `d67f92dee71c` |
 | `GET /api/v1/book` | Book | resource | planned | chaptarr_book | #9 | `df1ca665201f` |
@@ -181,9 +181,9 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/rootfolder` | RootFolder | data-source | implemented | chaptarr_root_folders | #3 | `5bb05f44666c` |
 | `GET /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `c50e18443ca7` |
 | `GET /api/v1/search` | Search | data-source | implemented | chaptarr_search | #10 | `505aa248d2a8` |
-| `GET /api/v1/series` | Series | resource | planned | chaptarr_series | #8 | `2cd3176e3d44` |
-| `GET /api/v1/series/lookup` | SeriesLookup | data-source | planned | chaptarr_series_lookup | #8 | `5659bf7bb9b1` |
-| `GET /api/v1/series/{seriesId}` | Series | resource | planned | chaptarr_series | #8 | `565b6861e16d` |
+| `GET /api/v1/series` | Series | resource | implemented | chaptarr_series | #8 | `2cd3176e3d44` |
+| `GET /api/v1/series/lookup` | SeriesLookup | data-source | implemented | chaptarr_series_lookup | #8 | `5659bf7bb9b1` |
+| `GET /api/v1/series/{seriesId}` | Series | resource | implemented | chaptarr_series | #8 | `565b6861e16d` |
 | `GET /api/v1/series/{seriesId}/narrators` | Series | resource | planned | chaptarr_series | #8 | `cc6a9f3cea1d` |
 | `GET /api/v1/series/{seriesId}/narrators/inheritance` | Series | resource | planned | chaptarr_series | #8 | `404e01627393` |
 | `GET /api/v1/series/{seriesId}/variants` | Series | resource | planned | chaptarr_series | #8 | `f9c0c47d8368` |
@@ -219,7 +219,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /ping` | Ping | data-source | planned | chaptarr_ping | #10 | `b16d6144ad53` |
 | `GET /{path}` | StaticResource | out-of-scope | excluded | Web UI static content is unrelated to infrastructure state. |  | `480eb1484926` |
 | `HEAD /ping` | Ping | data-source | planned | chaptarr_ping | #10 | `b16d6144ad53` |
-| `POST /api/v1/author` | Author | resource | planned | chaptarr_author | #8 | `0bb334f91332` |
+| `POST /api/v1/author` | Author | resource | implemented | chaptarr_author | #8 | `0bb334f91332` |
 | `POST /api/v1/author/import` | Author | resource | planned | chaptarr_author | #8 | `7fb1d3f333ba` |
 | `POST /api/v1/author/statistics/aggregate` | Author | data-source | planned | chaptarr_author_statistics | #8 | `e3466d8d8c25` |
 | `POST /api/v1/author/{id}/downloadmedia` | Author | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `f198d29054d0` |
@@ -283,7 +283,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/remotepathmapping/test` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `63836074a380` |
 | `POST /api/v1/rootfolder` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `907eafd4cbd8` |
 | `POST /api/v1/rootfolder/{id}/link-author` | RootFolder | action-only | excluded | Connectivity tests, provider actions, downloads, image loads, and explicit link operations must only run on direct user request. | #11 | `b7b34006fc31` |
-| `POST /api/v1/series/add` | AddSeries | resource | planned | chaptarr_series | #8 | `436bae9dd0fa` |
+| `POST /api/v1/series/add` | AddSeries | resource | implemented | chaptarr_series | #8 | `436bae9dd0fa` |
 | `POST /api/v1/series/{seriesId}/narrators/discover` | Series | data-source | planned | chaptarr_series_narrator_discovery | #8 | `247122ba34c9` |
 | `POST /api/v1/series/{seriesId}/narrators/search` | Series | data-source | planned | chaptarr_series_narrator_discovery | #8 | `bf37e1089d44` |
 | `POST /api/v1/settings/proxy` | Proxy | resource | implemented | chaptarr_proxy | #7 | `ecb2cc653144` |
@@ -298,7 +298,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `POST /api/v1/tag` | Tag | resource | implemented | chaptarr_tag | #7 | `02811d82ac87` |
 | `POST /login` | Authentication | out-of-scope | excluded | Browser login/session APIs are not provider authentication; the provider uses X-Api-Key only. |  | `32aea9e7c78f` |
 | `PUT /api/v1/author/editor` | AuthorEditor | resource | planned | chaptarr_author | #8 | `2c5a38ed6534` |
-| `PUT /api/v1/author/{id}` | Author | resource | planned | chaptarr_author | #8 | `6dd9f9972ef1` |
+| `PUT /api/v1/author/{id}` | Author | resource | implemented | chaptarr_author | #8 | `6dd9f9972ef1` |
 | `PUT /api/v1/author/{id}/monitor/{mediaType}` | Author | resource | planned | chaptarr_author | #8 | `b04804bd3ad2` |
 | `PUT /api/v1/author/{id}/primaryphoto` | Author | resource | planned | chaptarr_author | #8 | `d39e0fb05ff9` |
 | `PUT /api/v1/author/{id}/selectedmediatype/{mediaType}` | Author | resource | planned | chaptarr_author | #8 | `a0d8f65b4c05` |
