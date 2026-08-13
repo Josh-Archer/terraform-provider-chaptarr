@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Josh-Archer/terraform-provider-chaptarr/internal/client"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	providerschema "github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -28,11 +29,27 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 	if metadata.TypeName != "chaptarr" || metadata.Version != "test-version" {
 		t.Fatalf("unexpected metadata: %#v", metadata)
 	}
-	if resources := p.Resources(context.Background()); len(resources) != 18 {
-		t.Fatalf("registered %d resources, want 18", len(resources))
+	if resources := p.Resources(context.Background()); len(resources) != 23 {
+		t.Fatalf("registered %d resources, want 23", len(resources))
 	}
-	if dataSources := p.DataSources(context.Background()); len(dataSources) != 24 {
-		t.Fatalf("registered %d data sources, want 24", len(dataSources))
+	dataSources := p.DataSources(context.Background())
+	if len(dataSources) != 27 {
+		t.Fatalf("registered %d data sources, want 27", len(dataSources))
+	}
+	registeredDataSources := make(map[string]struct{}, len(dataSources))
+	for _, factory := range dataSources {
+		response := &datasource.MetadataResponse{}
+		factory().Metadata(context.Background(), datasource.MetadataRequest{ProviderTypeName: "chaptarr"}, response)
+		registeredDataSources[response.TypeName] = struct{}{}
+	}
+	for _, typeName := range []string{
+		"chaptarr_metadata_schema",
+		"chaptarr_custom_format_schema",
+		"chaptarr_tag_details",
+	} {
+		if _, ok := registeredDataSources[typeName]; !ok {
+			t.Fatalf("missing customization data source %q", typeName)
+		}
 	}
 }
 
