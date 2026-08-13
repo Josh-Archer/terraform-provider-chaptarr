@@ -12,7 +12,7 @@ if (-not $resolvedTestRoot.StartsWith($systemTemp, [StringComparison]::OrdinalIg
     throw 'Refusing to use a test directory outside the system temporary directory.'
 }
 
-$environmentNames = @('CHAPTARR_API_KEY', 'TF_VAR_oidc_client_secret', 'TF_VAR_calibre_password', 'TF_VAR_proxy_password', 'TF_VAR_metadata_api_key', 'TF_VAR_integration_token', 'TF_VAR_hardcover_token', 'TF_CLI_CONFIG_FILE', 'TF_LOG', 'TF_LOG_PATH', 'GOTOOLCHAIN')
+$environmentNames = @('CHAPTARR_API_KEY', 'TF_VAR_oidc_client_secret', 'TF_VAR_calibre_password', 'TF_VAR_proxy_password', 'TF_VAR_metadata_api_key', 'TF_VAR_integration_token', 'TF_VAR_hardcover_token', 'TF_VAR_postgres_admin_password', 'TF_VAR_postgres_bridge_token', 'TF_VAR_postgres_secret_key', 'TF_VAR_postgres_role_password', 'TF_CLI_CONFIG_FILE', 'TF_LOG', 'TF_LOG_PATH', 'GOTOOLCHAIN')
 $previousEnvironment = @{}
 foreach ($name in $environmentNames) {
     $item = Get-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
@@ -100,6 +100,30 @@ variable "hardcover_token" {
   ephemeral = true
 }
 
+variable "postgres_admin_password" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
+variable "postgres_bridge_token" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
+variable "postgres_secret_key" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
+variable "postgres_role_password" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
 resource "chaptarr_host_config" "leak_test" {
   instance_name      = "plan-leak-test"
   oidc_client_secret = var.oidc_client_secret
@@ -153,6 +177,16 @@ resource "chaptarr_hardcover_config" "fixture" {
   token                     = var.hardcover_token
   allow_external_validation = true
   observe_server            = false
+}
+
+resource "chaptarr_postgres_database" "fixture" {
+  server_host             = "postgres.example.test"
+  admin_username          = "fixture-admin"
+  admin_password          = var.postgres_admin_password
+  vaultwarden_bridge_url  = "https://bridge.example.test"
+  vaultwarden_bridge_token = var.postgres_bridge_token
+  vaultwarden_secret_key  = var.postgres_secret_key
+  role_password           = var.postgres_role_password
 }
 
 resource "chaptarr_author" "fixture" {
@@ -218,6 +252,10 @@ resource "chaptarr_edition" "fixture" {
 	$metadataSentinel = 'CHAPTARR_TEST_METADATA_API_KEY_SENTINEL_DO_NOT_USE_8d187ab2'
 	$integrationSentinel = 'CHAPTARR_TEST_INTEGRATION_TOKEN_SENTINEL_DO_NOT_USE_91dc63af'
 	$hardcoverSentinel = 'CHAPTARR_TEST_HARDCOVER_TOKEN_SENTINEL_DO_NOT_USE_14ce27ab'
+	$postgresAdminSentinel = 'CHAPTARR_TEST_POSTGRES_ADMIN_SENTINEL_DO_NOT_USE_552c9d1a'
+	$postgresBridgeSentinel = 'CHAPTARR_TEST_POSTGRES_BRIDGE_SENTINEL_DO_NOT_USE_42ec9b17'
+	$postgresSecretKeySentinel = 'CHAPTARR_TEST_POSTGRES_SECRET_KEY_SENTINEL_DO_NOT_USE_a7dc3128'
+	$postgresRoleSentinel = 'CHAPTARR_TEST_POSTGRES_ROLE_SENTINEL_DO_NOT_USE_5ec94d72'
     $env:CHAPTARR_API_KEY = $sentinel
 	$env:TF_VAR_oidc_client_secret = $hostSentinel
 	$env:TF_VAR_calibre_password = $calibreSentinel
@@ -225,6 +263,10 @@ resource "chaptarr_edition" "fixture" {
 	$env:TF_VAR_metadata_api_key = $metadataSentinel
 	$env:TF_VAR_integration_token = $integrationSentinel
 	$env:TF_VAR_hardcover_token = $hardcoverSentinel
+	$env:TF_VAR_postgres_admin_password = $postgresAdminSentinel
+	$env:TF_VAR_postgres_bridge_token = $postgresBridgeSentinel
+	$env:TF_VAR_postgres_secret_key = $postgresSecretKeySentinel
+	$env:TF_VAR_postgres_role_password = $postgresRoleSentinel
     $env:TF_CLI_CONFIG_FILE = Join-Path $resolvedTestRoot 'tofurc'
     Remove-Item Env:TF_LOG -ErrorAction SilentlyContinue
     Remove-Item Env:TF_LOG_PATH -ErrorAction SilentlyContinue
@@ -252,7 +294,7 @@ resource "chaptarr_edition" "fixture" {
 
     foreach ($path in @($planOutput, $showOutput)) {
 		$content = Get-Content -Raw $path
-		foreach ($secret in @($sentinel, $hostSentinel, $calibreSentinel, $proxySentinel, $metadataSentinel, $integrationSentinel, $hardcoverSentinel)) {
+		foreach ($secret in @($sentinel, $hostSentinel, $calibreSentinel, $proxySentinel, $metadataSentinel, $integrationSentinel, $hardcoverSentinel, $postgresAdminSentinel, $postgresBridgeSentinel, $postgresSecretKeySentinel, $postgresRoleSentinel)) {
 			if ($content.Contains($secret)) {
 				throw "Synthetic credential leaked into $(Split-Path -Leaf $path)."
 			}

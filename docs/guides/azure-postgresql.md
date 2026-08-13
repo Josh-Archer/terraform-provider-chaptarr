@@ -11,26 +11,30 @@ workload systems around it.
 On create and update, the resource connects with the configured PostgreSQL
 administrator. It creates a missing application role or updates that role's
 password, creates missing requested databases with that role as owner, and
-grants the role access to each database's `public` schema. Its refresh checks
-that the role and requested databases exist and, when a role password is
-available, checks that the role can connect to them.
+grants the role access to each database's `public` schema. Because database and
+bridge credentials are write-only, refresh does not reconnect; it preserves the
+last successful mutation result and removes any legacy credential fields from
+the current state.
 
 Destroy deliberately relinquishes OpenTofu ownership; it does not drop the
 role or databases. Database deletion, replacement, backups, restores, and
 disaster recovery therefore remain separate, explicitly approved operations.
 
 The resource accepts either an explicit role password or a password resolved
-through the Vaultwarden bridge. When bridge configuration is supplied, the
-provider makes an authenticated read request for an existing item property and
-uses the returned value as the role password. The bridge is a read path only:
-neither the bridge lookup nor this resource creates, updates, or rotates a
-Vaultwarden item.
+through the Vaultwarden bridge during create or update. When bridge
+configuration is supplied, the provider makes an authenticated read request
+for an existing item property and uses the returned value only for that
+database mutation. Refresh and import never contact the bridge; neither the
+bridge lookup nor this resource creates, updates, or rotates a Vaultwarden
+item.
 
-The resource's sensitive database and bridge credentials, including a resolved
-role password, can persist in OpenTofu state and require an encrypted,
-access-controlled state backend and normal plan, state, log, and diagnostic
-handling controls. Sensitivity redacts normal command output; it is not a
-substitute for those controls.
+Database and bridge credentials are Sensitive and WriteOnly, so OpenTofu does
+not retain them in plan or current state artifacts. Supply them from ephemeral
+variables for each create or update. Upgrading or refreshing also removes
+legacy credential values from the current state. Rotate any credentials that
+were configured before this security fix and use the state backend's retention
+and history-cleanup process: a provider cannot erase previously retained remote
+state versions.
 
 ## External responsibilities
 

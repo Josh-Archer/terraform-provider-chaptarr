@@ -86,6 +86,30 @@ variable "hardcover_token" {
   ephemeral = true
 }
 
+variable "postgres_admin_password" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
+variable "postgres_bridge_token" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
+variable "postgres_secret_key" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
+variable "postgres_role_password" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+
 resource "chaptarr_host_config" "leak_test" {
   instance_name      = "plan-leak-test"
   oidc_client_secret = var.oidc_client_secret
@@ -140,6 +164,16 @@ resource "chaptarr_hardcover_config" "fixture" {
   allow_external_validation = true
   observe_server            = false
 }
+
+resource "chaptarr_postgres_database" "fixture" {
+  server_host              = "postgres.example.test"
+  admin_username           = "fixture-admin"
+  admin_password           = var.postgres_admin_password
+  vaultwarden_bridge_url   = "https://bridge.example.test"
+  vaultwarden_bridge_token = var.postgres_bridge_token
+  vaultwarden_secret_key   = var.postgres_secret_key
+  role_password            = var.postgres_role_password
+}
 EOF
 
 sentinel='CHAPTARR_TEST_API_KEY_SENTINEL_DO_NOT_USE_79f6f1d2'
@@ -149,6 +183,10 @@ proxy_sentinel='CHAPTARR_TEST_PROXY_PASSWORD_SENTINEL_DO_NOT_USE_46b2c884'
 metadata_sentinel='CHAPTARR_TEST_METADATA_API_KEY_SENTINEL_DO_NOT_USE_8d187ab2'
 integration_sentinel='CHAPTARR_TEST_INTEGRATION_TOKEN_SENTINEL_DO_NOT_USE_91dc63af'
 hardcover_sentinel='CHAPTARR_TEST_HARDCOVER_TOKEN_SENTINEL_DO_NOT_USE_14ce27ab'
+postgres_admin_sentinel='CHAPTARR_TEST_POSTGRES_ADMIN_SENTINEL_DO_NOT_USE_552c9d1a'
+postgres_bridge_sentinel='CHAPTARR_TEST_POSTGRES_BRIDGE_SENTINEL_DO_NOT_USE_42ec9b17'
+postgres_secret_key_sentinel='CHAPTARR_TEST_POSTGRES_SECRET_KEY_SENTINEL_DO_NOT_USE_a7dc3128'
+postgres_role_sentinel='CHAPTARR_TEST_POSTGRES_ROLE_SENTINEL_DO_NOT_USE_5ec94d72'
 export CHAPTARR_API_KEY="${sentinel}"
 export TF_VAR_oidc_client_secret="${host_sentinel}"
 export TF_VAR_calibre_password="${calibre_sentinel}"
@@ -156,6 +194,10 @@ export TF_VAR_proxy_password="${proxy_sentinel}"
 export TF_VAR_metadata_api_key="${metadata_sentinel}"
 export TF_VAR_integration_token="${integration_sentinel}"
 export TF_VAR_hardcover_token="${hardcover_sentinel}"
+export TF_VAR_postgres_admin_password="${postgres_admin_sentinel}"
+export TF_VAR_postgres_bridge_token="${postgres_bridge_sentinel}"
+export TF_VAR_postgres_secret_key="${postgres_secret_key_sentinel}"
+export TF_VAR_postgres_role_password="${postgres_role_sentinel}"
 export TF_CLI_CONFIG_FILE="${tofu_test_root}/tofurc"
 unset TF_LOG TF_LOG_PATH
 
@@ -176,7 +218,9 @@ tofu -chdir="${tofu_test_root}/configuration" show -json "${tofu_test_root}/plan
 
 if grep -F -R -e "${sentinel}" -e "${host_sentinel}" -e "${calibre_sentinel}" \
   -e "${proxy_sentinel}" -e "${metadata_sentinel}" \
-  -e "${integration_sentinel}" -e "${hardcover_sentinel}" -- \
+  -e "${integration_sentinel}" -e "${hardcover_sentinel}" \
+  -e "${postgres_admin_sentinel}" -e "${postgres_bridge_sentinel}" \
+  -e "${postgres_secret_key_sentinel}" -e "${postgres_role_sentinel}" -- \
   "${test_root}/stdout.txt" "${test_root}/stderr.txt" \
   "${test_root}/plan.json" "${test_root}/show-stderr.txt" >/dev/null; then
   echo "Synthetic API key leaked into OpenTofu output." >&2
