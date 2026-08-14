@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.12+auto}"
+export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.13+auto}"
 
 if ! command -v tofu >/dev/null 2>&1; then
   echo "OpenTofu is required for the provider plan leak smoke test." >&2

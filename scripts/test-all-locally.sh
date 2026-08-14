@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.12+auto}"
+export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.13+auto}"
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${repo_root}"
