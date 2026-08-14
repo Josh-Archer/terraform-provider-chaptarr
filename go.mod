@@ -1,6 +1,6 @@
 module github.com/Josh-Archer/terraform-provider-chaptarr
 
-go 1.25.12
+go 1.25.13
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.19.0

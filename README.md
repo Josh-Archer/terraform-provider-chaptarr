@@ -79,7 +79,7 @@ secret-delivery, workload, and migration responsibilities it does not manage.
 
 ## Development
 
-Prerequisites are Go 1.25.12 and OpenTofu 1.11.2 or newer. OpenTofu 1.11 is
+Prerequisites are Go 1.25.13 and OpenTofu 1.11.2 or newer. OpenTofu 1.11 is
 required for write-only configuration and Calibre credential attributes. Run:
 
 ```shell

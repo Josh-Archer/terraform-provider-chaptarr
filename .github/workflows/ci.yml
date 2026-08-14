@@ -36,7 +36,7 @@ jobs:
       - name: Download modules
         run: go mod download
       - name: Verify pinned Go toolchain
-        run: test "$(go env GOVERSION)" = "go1.25.12"
+        run: test "$(go env GOVERSION)" = "go1.25.13"
       - name: Run unit tests with race detector
         run: go test -race ./...
 
@@ -65,7 +65,7 @@ jobs:
           tofu_wrapper: false
       - name: Verify contract and generated content
         run: |
-          test "$(go env GOVERSION)" = "go1.25.12"
+          test "$(go env GOVERSION)" = "go1.25.13"
           go mod verify
           go run ./tools/openapi check
           go run ./tools/compatibility check
@@ -97,7 +97,7 @@ jobs:
       - name: Run formatting and vet checks
         shell: bash
         run: |
-          test "$(go env GOVERSION)" = "go1.25.12"
+          test "$(go env GOVERSION)" = "go1.25.13"
           test -z "$(gofmt -l main.go internal tools)"
           go vet ./...
           tofu fmt -check -recursive examples acceptance
@@ -205,7 +205,7 @@ jobs:
           cache: true
       - name: Run govulncheck
         run: |
-          test "$(go env GOVERSION)" = "go1.25.12"
+          test "$(go env GOVERSION)" = "go1.25.13"
           go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
 
   release-snapshot:

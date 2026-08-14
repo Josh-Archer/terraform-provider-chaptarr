@@ -26,7 +26,7 @@ foreach ($name in $environmentNames) {
 
 try {
     if (-not $env:GOTOOLCHAIN) {
-        $env:GOTOOLCHAIN = 'go1.25.12+auto'
+        $env:GOTOOLCHAIN = 'go1.25.13+auto'
     }
     $binaryDirectory = Join-Path $resolvedTestRoot 'bin'
     $configurationDirectory = Join-Path $resolvedTestRoot 'configuration'

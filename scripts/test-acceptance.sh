@@ -3,9 +3,9 @@ set -euo pipefail
 
 # Purpose: exercise a representative provider lifecycle against disposable Chaptarr.
 # Usage: CHAPTARR_IMAGE=<tag@digest> CHAPTARR_VERSION=<version> ./scripts/test-acceptance.sh
-# Prerequisites: Docker Compose, Go 1.25.12, OpenTofu 1.11.2, and curl.
+# Prerequisites: Docker Compose, Go 1.25.13, OpenTofu 1.11.2, and curl.
 
-export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.12+auto}"
+export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.13+auto}"
 
 for command in docker go tofu curl; do
   if ! command -v "${command}" >/dev/null 2>&1; then
