@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -69,6 +70,121 @@ func TestQualityProfileValidationRejectsEbookAudiobookPreference(t *testing.T) {
 	payload := qualityProfileAPI{ProfileType: "ebook", PreferCustomFormatsOverQuality: true, Items: []qualityProfileItemAPI{{Quality: &qualityReference{ID: 14}}}}
 	if validateQualityProfile(payload, &diagnostics) || !diagnostics.HasError() {
 		t.Fatal("expected ebook custom-format preference validation error")
+	}
+}
+
+func TestQualityProfilePayloadAllowsUnknownTextAndEmptyFormatItems(t *testing.T) {
+	t.Parallel()
+	var diagnostics diag.Diagnostics
+	unknownText := qualityItemModel{QualityID: types.Int64Value(0), QualityName: types.StringNull(), QualityIsConversionTarget: types.BoolNull(), Allowed: types.BoolValue(true), Items: types.ListNull(qualityLeafType())}
+	azw3 := qualityItemModel{QualityID: types.Int64Value(4), QualityName: types.StringNull(), QualityIsConversionTarget: types.BoolNull(), Allowed: types.BoolValue(true), Items: types.ListNull(qualityLeafType())}
+	model := qualityProfileModel{Name: types.StringValue("E-Book"), ProfileType: types.StringValue("ebook"), UpgradeAllowed: types.BoolValue(true), PreferCustomFormatsOverQuality: types.BoolValue(false), Cutoff: types.Int64Value(4), MinimumFormatScore: types.Int64Value(0), CutoffFormatScore: types.Int64Value(0)}
+	model.Items = listObjectState(t.Context(), qualityItemType(), []qualityItemModel{unknownText, azw3}, &diagnostics)
+	model.FormatItems = listObjectState(t.Context(), formatItemType(), []formatItemModel{}, &diagnostics)
+	payload := qualityProfilePayload(t.Context(), model, 1, &diagnostics)
+	if diagnostics.HasError() || !validateQualityProfile(payload, &diagnostics) {
+		t.Fatalf("unknown-text ebook payload rejected: %v", diagnostics)
+	}
+	if payload.FormatItems == nil {
+		t.Fatal("empty format_items must serialize as an empty JSON array, not null")
+	}
+	if len(payload.FormatItems) != 0 || len(payload.Items) != 2 || payload.Items[0].Quality == nil || payload.Items[0].Quality.ID != 0 || payload.Items[0].Items == nil {
+		t.Fatalf("unexpected unknown-text payload: %#v", payload)
+	}
+	encoded, err := json.Marshal(payload)
+	if err != nil || !strings.Contains(string(encoded), `"formatItems":[]`) || !strings.Contains(string(encoded), `"id":0`) {
+		t.Fatalf("ebook payload JSON must include empty formatItems and quality 0: %s err=%v", encoded, err)
+	}
+}
+
+func TestQualityProfileValidationRejectsNegativeQualityID(t *testing.T) {
+	t.Parallel()
+	var diagnostics diag.Diagnostics
+	payload := qualityProfileAPI{ProfileType: "ebook", Items: []qualityProfileItemAPI{{Quality: &qualityReference{ID: -1}, Allowed: true, Items: []qualityProfileItemAPI{}}}}
+	if validateQualityProfile(payload, &diagnostics) || !diagnostics.HasError() {
+		t.Fatal("expected negative quality ID validation error")
+	}
+}
+
+func TestMergeQualityProfileServerOwnedFillsEmptyNames(t *testing.T) {
+	t.Parallel()
+	current := qualityProfileAPI{
+		ID: 2, Name: "Audiobook", ProfileType: "audiobook", UpgradeAllowed: true, Cutoff: 11,
+		Items: []qualityProfileItemAPI{
+			{Quality: &qualityReference{ID: 13, Name: "Unknown Audio"}, Allowed: true, Items: []qualityProfileItemAPI{}},
+			{Quality: &qualityReference{ID: 12, Name: "M4B", IsConversionTarget: true}, Allowed: true, Items: []qualityProfileItemAPI{}},
+		},
+		FormatItems: []formatItemAPI{
+			{Format: 2, BuiltInKey: "preferred-narrator", Name: "Selected Audiobook Narrators", Score: 50},
+			{Format: 1, BuiltInKey: "dramatized-full-cast-audio", Name: "Dramatized / Full-Cast Audio", Score: 0},
+		},
+	}
+	payload := qualityProfileAPI{
+		ID: 2, Name: "Audiobook", ProfileType: "audiobook", UpgradeAllowed: true, Cutoff: 11,
+		Items: []qualityProfileItemAPI{
+			{Quality: &qualityReference{ID: 13}, Allowed: true},
+			{Quality: &qualityReference{ID: 12}, Allowed: true},
+		},
+		FormatItems: []formatItemAPI{{Format: 2, Score: 50}, {Format: 1, Score: 0}},
+	}
+	mergeQualityProfileServerOwned(current, &payload)
+	if payload.Items[0].Quality.Name != "Unknown Audio" || payload.Items[1].Quality.Name != "M4B" || !payload.Items[1].Quality.IsConversionTarget {
+		t.Fatalf("quality names were not merged: %#v", payload.Items)
+	}
+	if payload.FormatItems[0].Name != "Selected Audiobook Narrators" || payload.FormatItems[0].BuiltInKey != "preferred-narrator" || payload.FormatItems[1].Name != "Dramatized / Full-Cast Audio" {
+		t.Fatalf("format names were not merged: %#v", payload.FormatItems)
+	}
+}
+
+func TestQualityProfileUpdateMergesServerOwnedNamesBeforePut(t *testing.T) {
+	t.Parallel()
+	currentJSON := `{"id":2,"name":"Audiobook","profileType":"audiobook","upgradeAllowed":true,"preferCustomFormatsOverQuality":false,"cutoff":11,"items":[{"quality":{"id":13,"name":"Unknown Audio","isConversionTarget":false},"items":[],"allowed":true},{"quality":{"id":11,"name":"FLAC","isConversionTarget":false},"items":[],"allowed":true}],"minFormatScore":0,"cutoffFormatScore":0,"formatItems":[{"format":2,"builtInKey":"preferred-narrator","name":"Selected Audiobook Narrators","score":50},{"format":1,"builtInKey":"dramatized-full-cast-audio","name":"Dramatized / Full-Cast Audio","score":0}]}`
+	var putBody qualityProfileAPI
+	gets := 0
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set("Content-Type", "application/json")
+		switch {
+		case request.Method == http.MethodGet && request.URL.Path == "/api/v1/qualityprofile/2":
+			gets++
+			_, _ = writer.Write([]byte(currentJSON))
+		case request.Method == http.MethodPut && request.URL.Path == "/api/v1/qualityprofile/2":
+			if err := json.NewDecoder(request.Body).Decode(&putBody); err != nil {
+				t.Fatalf("decode put: %v", err)
+			}
+			_, _ = writer.Write([]byte(currentJSON))
+		default:
+			t.Fatalf("unexpected request %s %s", request.Method, request.URL.Path)
+		}
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "quality-profile-update-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var diagnostics diag.Diagnostics
+	unknownAudio := qualityItemModel{QualityID: types.Int64Value(13), Allowed: types.BoolValue(true), Items: types.ListNull(qualityLeafType())}
+	flac := qualityItemModel{QualityID: types.Int64Value(11), Allowed: types.BoolValue(true), Items: types.ListNull(qualityLeafType())}
+	model := qualityProfileModel{ID: types.StringValue("2"), Name: types.StringValue("Audiobook"), ProfileType: types.StringValue("audiobook"), UpgradeAllowed: types.BoolValue(true), PreferCustomFormatsOverQuality: types.BoolValue(false), Cutoff: types.Int64Value(11), MinimumFormatScore: types.Int64Value(0), CutoffFormatScore: types.Int64Value(0)}
+	model.Items = listObjectState(t.Context(), qualityItemType(), []qualityItemModel{unknownAudio, flac}, &diagnostics)
+	model.FormatItems = listObjectState(t.Context(), formatItemType(), []formatItemModel{{FormatID: types.Int64Value(2), Score: types.Int64Value(50)}, {FormatID: types.Int64Value(1), Score: types.Int64Value(0)}}, &diagnostics)
+	if diagnostics.HasError() {
+		t.Fatalf("plan construction failed: %v", diagnostics)
+	}
+	instance := &qualityProfileResource{client: apiClient}
+	plan := stateForResource(t, instance, model)
+	response := &resource.UpdateResponse{State: emptyStateForResource(t, instance)}
+	instance.Update(t.Context(), resource.UpdateRequest{Plan: tfsdk.Plan(plan), State: plan}, response)
+	if response.Diagnostics.HasError() {
+		t.Fatalf("update failed: %v", response.Diagnostics)
+	}
+	if gets < 1 {
+		t.Fatal("update must GET the current profile before PUT")
+	}
+	if len(putBody.Items) != 2 || putBody.Items[0].Quality == nil || putBody.Items[0].Quality.Name != "Unknown Audio" || putBody.Items[1].Quality.Name != "FLAC" {
+		t.Fatalf("PUT omitted quality names: %#v", putBody.Items)
+	}
+	if len(putBody.FormatItems) != 2 || putBody.FormatItems[0].Name != "Selected Audiobook Narrators" || putBody.FormatItems[0].BuiltInKey != "preferred-narrator" || putBody.FormatItems[1].Name != "Dramatized / Full-Cast Audio" {
+		t.Fatalf("PUT omitted format names: %#v", putBody.FormatItems)
 	}
 }
 

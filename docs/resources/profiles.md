@@ -6,6 +6,8 @@ Issue #4 adds typed resources for Chaptarr quality, metadata, release, and delay
 
 Use `chaptarr_quality_profile_schema` with `media_type = "audiobook"` or `"ebook"` before creating a profile. It returns the server's ordered quality tree and complete applicable custom-format list. Copy each group's ID and name plus the ordered quality IDs, allowed flags, format IDs, and scores into `chaptarr_quality_profile`. Direct-quality IDs/names and format names/built-in keys remain server-owned.
 
+Unknown Text is a first-class leaf with `quality_id = 0`. Ebook profiles may send an empty `format_items` list; the provider serializes that as JSON `[]`, not `null`. On update the provider GETs the current profile and merges server-owned quality names, conversion-target flags, format names, and `built_in_key` values before PUT so imported profiles do not 500 when computed names are unknown in plan.
+
 The provider supports Chaptarr's current two-level tree (groups containing quality leaves). Refresh fails safely if a future Chaptarr version returns deeper nesting instead of silently flattening it. `convert_to_quality_id` is optional; omitting it disables conversion. `prefer_custom_formats_over_quality` is rejected for ebook profiles because upstream ignores it outside audiobook profiles.
 
 ## Metadata profiles

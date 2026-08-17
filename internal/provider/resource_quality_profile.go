@@ -14,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -106,20 +108,20 @@ func (r *qualityProfileResource) Metadata(_ context.Context, req resource.Metada
 
 func qualityLeafAttributes() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
-		"id":                           schema.Int64Attribute{Computed: true},
-		"name":                         schema.StringAttribute{Computed: true},
-		"quality_id":                   schema.Int64Attribute{Required: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
-		"quality_name":                 schema.StringAttribute{Computed: true},
-		"quality_is_conversion_target": schema.BoolAttribute{Computed: true},
+		"id":                           schema.Int64Attribute{Computed: true, PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()}},
+		"name":                         schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
+		"quality_id":                   schema.Int64Attribute{Required: true, Validators: []validator.Int64{int64validator.AtLeast(0)}, MarkdownDescription: "Quality identifier. `0` is Chaptarr's Unknown Text leaf."},
+		"quality_name":                 schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
+		"quality_is_conversion_target": schema.BoolAttribute{Computed: true, PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()}},
 		"allowed":                      schema.BoolAttribute{Required: true},
 	}
 }
 
 func qualityItemAttributes() map[string]schema.Attribute {
 	attributes := qualityLeafAttributes()
-	attributes["id"] = schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}, MarkdownDescription: "Required for a group; omit for a direct quality leaf."}
-	attributes["name"] = schema.StringAttribute{Optional: true, Computed: true, MarkdownDescription: "Required for a group; omit for a direct quality leaf."}
-	attributes["quality_id"] = schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}
+	attributes["id"] = schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}, PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()}, MarkdownDescription: "Required for a group; omit for a direct quality leaf."}
+	attributes["name"] = schema.StringAttribute{Optional: true, Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}, MarkdownDescription: "Required for a group; omit for a direct quality leaf."}
+	attributes["quality_id"] = schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(0)}, PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()}, MarkdownDescription: "Quality identifier for a direct leaf. `0` is Unknown Text. Omit for a group."}
 	attributes["items"] = schema.ListNestedAttribute{Optional: true, Computed: true, NestedObject: schema.NestedAttributeObject{Attributes: qualityLeafAttributes()}}
 	return attributes
 }
@@ -127,15 +129,15 @@ func qualityItemAttributes() map[string]schema.Attribute {
 func formatItemAttributes() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"format_id":    schema.Int64Attribute{Required: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
-		"built_in_key": schema.StringAttribute{Computed: true},
-		"name":         schema.StringAttribute{Computed: true},
+		"built_in_key": schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
+		"name":         schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 		"score":        schema.Int64Attribute{Required: true},
 	}
 }
 
 func (r *qualityProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Manage an audiobook or ebook quality profile. `items` and `format_items` are ordered lists. Copy each group's ID and name from the schema data source; direct-quality IDs/names and format names/built-in keys are server-owned, while allowed flags and scores are declarative.",
+		MarkdownDescription: "Manage an audiobook or ebook quality profile. `items` and `format_items` are ordered lists. Copy each group's ID and name from the schema data source; direct-quality IDs/names and format names/built-in keys are server-owned, while allowed flags and scores are declarative. Unknown Text uses `quality_id = 0`. Empty `format_items` is valid for ebook profiles and is sent as `[]`. Update GETs the current profile and merges those server-owned names before PUT.",
 		Attributes: map[string]schema.Attribute{
 			"id":                                 schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"name":                               schema.StringAttribute{Required: true},
@@ -190,9 +192,14 @@ func (r *qualityProfileResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 	payload := qualityProfilePayload(ctx, plan, id, &resp.Diagnostics)
-	if !validateQualityProfile(payload, &resp.Diagnostics) {
+	if resp.Diagnostics.HasError() || !validateQualityProfile(payload, &resp.Diagnostics) {
 		return
 	}
+	current, ok := r.currentQualityProfile(ctx, id, &resp.State, &resp.Diagnostics)
+	if !ok {
+		return
+	}
+	mergeQualityProfileServerOwned(current, &payload)
 	updateProfile(ctx, r.client, "/api/v1/qualityprofile/"+strconv.FormatInt(id, 10), payload, "quality profile", &resp.Diagnostics)
 	if !resp.Diagnostics.HasError() {
 		r.refresh(ctx, &plan, &resp.State, &resp.Diagnostics)
@@ -216,7 +223,7 @@ func qualityProfilePayload(ctx context.Context, model qualityProfileModel, id in
 	diagnostics.Append(model.Items.ElementsAs(ctx, &items, false)...)
 	var formats []formatItemModel
 	diagnostics.Append(model.FormatItems.ElementsAs(ctx, &formats, false)...)
-	payload := qualityProfileAPI{ID: id, Name: model.Name.ValueString(), ProfileType: model.ProfileType.ValueString(), UpgradeAllowed: valueBool(model.UpgradeAllowed), PreferCustomFormatsOverQuality: valueBool(model.PreferCustomFormatsOverQuality), ConvertToQualityID: intPointer(model.ConvertToQualityID), Cutoff: valueInt64(model.Cutoff), MinimumFormatScore: valueInt64(model.MinimumFormatScore), CutoffFormatScore: valueInt64(model.CutoffFormatScore)}
+	payload := qualityProfileAPI{ID: id, Name: model.Name.ValueString(), ProfileType: model.ProfileType.ValueString(), UpgradeAllowed: valueBool(model.UpgradeAllowed), PreferCustomFormatsOverQuality: valueBool(model.PreferCustomFormatsOverQuality), ConvertToQualityID: intPointer(model.ConvertToQualityID), Cutoff: valueInt64(model.Cutoff), Items: make([]qualityProfileItemAPI, 0, len(items)), MinimumFormatScore: valueInt64(model.MinimumFormatScore), CutoffFormatScore: valueInt64(model.CutoffFormatScore), FormatItems: make([]formatItemAPI, 0, len(formats))}
 	payload.ConvertMP3ToM4B = payload.ConvertToQualityID != nil && *payload.ConvertToQualityID == 12
 	for _, item := range items {
 		payload.Items = append(payload.Items, qualityItemPayload(ctx, item, diagnostics))
@@ -228,7 +235,7 @@ func qualityProfilePayload(ctx context.Context, model qualityProfileModel, id in
 }
 
 func qualityItemPayload(ctx context.Context, model qualityItemModel, diagnostics *diag.Diagnostics) qualityProfileItemAPI {
-	result := qualityProfileItemAPI{ID: valueInt64(model.ID), Name: model.Name.ValueString(), Allowed: valueBool(model.Allowed)}
+	result := qualityProfileItemAPI{ID: valueInt64(model.ID), Name: model.Name.ValueString(), Allowed: valueBool(model.Allowed), Items: []qualityProfileItemAPI{}}
 	if configured(model.QualityID) {
 		result.Quality = &qualityReference{ID: model.QualityID.ValueInt64(), Name: model.QualityName.ValueString(), IsConversionTarget: valueBool(model.QualityIsConversionTarget)}
 	}
@@ -281,8 +288,8 @@ func validateQualityProfile(payload qualityProfileAPI, diagnostics *diag.Diagnos
 }
 
 func validateUniqueQuality(quality *qualityReference, seen map[int64]struct{}, diagnostics *diag.Diagnostics) {
-	if quality == nil || quality.ID < 1 {
-		diagnostics.AddError("Invalid quality item", "Every quality leaf must have a positive quality ID.")
+	if quality == nil || quality.ID < 0 {
+		diagnostics.AddError("Invalid quality item", "Every quality leaf must have a non-negative quality ID.")
 		return
 	}
 	if _, exists := seen[quality.ID]; exists {
@@ -291,19 +298,92 @@ func validateUniqueQuality(quality *qualityReference, seen map[int64]struct{}, d
 	seen[quality.ID] = struct{}{}
 }
 
+func (r *qualityProfileResource) currentQualityProfile(ctx context.Context, id int64, target *tfsdk.State, diagnostics *diag.Diagnostics) (qualityProfileAPI, bool) {
+	body, found := readProfile(ctx, r.client, "/api/v1/qualityprofile/"+strconv.FormatInt(id, 10), "quality profile", target, diagnostics)
+	if !found || diagnostics.HasError() {
+		return qualityProfileAPI{}, false
+	}
+	var current qualityProfileAPI
+	if json.Unmarshal(body, &current) != nil || (current.ProfileType != "audiobook" && current.ProfileType != "ebook") {
+		diagnostics.AddError("Invalid Chaptarr response", "Chaptarr returned an invalid quality-profile document or profile type.")
+		return qualityProfileAPI{}, false
+	}
+	return current, true
+}
+
+func mergeQualityProfileServerOwned(current qualityProfileAPI, payload *qualityProfileAPI) {
+	byQuality := map[int64]qualityProfileItemAPI{}
+	byGroup := map[int64]qualityProfileItemAPI{}
+	indexQualityItems(current.Items, byQuality, byGroup)
+	for i := range payload.Items {
+		mergeQualityItemServerOwned(&payload.Items[i], byQuality, byGroup)
+	}
+	byFormat := map[int64]formatItemAPI{}
+	for _, item := range current.FormatItems {
+		byFormat[item.Format] = item
+	}
+	for i := range payload.FormatItems {
+		existing, ok := byFormat[payload.FormatItems[i].Format]
+		if !ok {
+			continue
+		}
+		if strings.TrimSpace(payload.FormatItems[i].Name) == "" {
+			payload.FormatItems[i].Name = existing.Name
+		}
+		if strings.TrimSpace(payload.FormatItems[i].BuiltInKey) == "" {
+			payload.FormatItems[i].BuiltInKey = existing.BuiltInKey
+		}
+	}
+}
+
+func indexQualityItems(items []qualityProfileItemAPI, byQuality, byGroup map[int64]qualityProfileItemAPI) {
+	for _, item := range items {
+		if item.Quality != nil {
+			byQuality[item.Quality.ID] = item
+			continue
+		}
+		byGroup[item.ID] = item
+		indexQualityItems(item.Items, byQuality, byGroup)
+	}
+}
+
+func mergeQualityItemServerOwned(item *qualityProfileItemAPI, byQuality, byGroup map[int64]qualityProfileItemAPI) {
+	if item.Items == nil {
+		item.Items = []qualityProfileItemAPI{}
+	}
+	if item.Quality != nil {
+		existing, ok := byQuality[item.Quality.ID]
+		if !ok || existing.Quality == nil {
+			return
+		}
+		if item.ID == 0 {
+			item.ID = existing.ID
+		}
+		if strings.TrimSpace(item.Name) == "" {
+			item.Name = existing.Name
+		}
+		if strings.TrimSpace(item.Quality.Name) == "" {
+			item.Quality.Name = existing.Quality.Name
+		}
+		item.Quality.IsConversionTarget = existing.Quality.IsConversionTarget
+		return
+	}
+	if existing, ok := byGroup[item.ID]; ok && strings.TrimSpace(item.Name) == "" {
+		item.Name = existing.Name
+	}
+	for i := range item.Items {
+		mergeQualityItemServerOwned(&item.Items[i], byQuality, byGroup)
+	}
+}
+
 func (r *qualityProfileResource) refresh(ctx context.Context, state *qualityProfileModel, target *tfsdk.State, diagnostics *diag.Diagnostics) {
 	id, ok := positiveModelID(state.ID)
 	if !ok {
 		diagnostics.AddError("Invalid quality-profile state", "The profile has no valid numeric identifier.")
 		return
 	}
-	body, found := readProfile(ctx, r.client, "/api/v1/qualityprofile/"+strconv.FormatInt(id, 10), "quality profile", target, diagnostics)
-	if !found || diagnostics.HasError() {
-		return
-	}
-	var current qualityProfileAPI
-	if json.Unmarshal(body, &current) != nil || (current.ProfileType != "audiobook" && current.ProfileType != "ebook") {
-		diagnostics.AddError("Invalid Chaptarr response", "Chaptarr returned an invalid quality-profile document or profile type.")
+	current, ok := r.currentQualityProfile(ctx, id, target, diagnostics)
+	if !ok {
 		return
 	}
 	currentState, ok := qualityProfileState(ctx, current, diagnostics)
