@@ -14,8 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -108,20 +106,20 @@ func (r *qualityProfileResource) Metadata(_ context.Context, req resource.Metada
 
 func qualityLeafAttributes() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
-		"id":                           schema.Int64Attribute{Computed: true, PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()}},
-		"name":                         schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
+		"id":                           schema.Int64Attribute{Computed: true},
+		"name":                         schema.StringAttribute{Computed: true},
 		"quality_id":                   schema.Int64Attribute{Required: true, Validators: []validator.Int64{int64validator.AtLeast(0)}, MarkdownDescription: "Quality identifier. `0` is Chaptarr's Unknown Text leaf."},
-		"quality_name":                 schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-		"quality_is_conversion_target": schema.BoolAttribute{Computed: true, PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()}},
+		"quality_name":                 schema.StringAttribute{Computed: true},
+		"quality_is_conversion_target": schema.BoolAttribute{Computed: true},
 		"allowed":                      schema.BoolAttribute{Required: true},
 	}
 }
 
 func qualityItemAttributes() map[string]schema.Attribute {
 	attributes := qualityLeafAttributes()
-	attributes["id"] = schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}, PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()}, MarkdownDescription: "Required for a group; omit for a direct quality leaf."}
-	attributes["name"] = schema.StringAttribute{Optional: true, Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}, MarkdownDescription: "Required for a group; omit for a direct quality leaf."}
-	attributes["quality_id"] = schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(0)}, PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()}, MarkdownDescription: "Quality identifier for a direct leaf. `0` is Unknown Text. Omit for a group."}
+	attributes["id"] = schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}, MarkdownDescription: "Required for a group; omit for a direct quality leaf."}
+	attributes["name"] = schema.StringAttribute{Optional: true, Computed: true, MarkdownDescription: "Required for a group; omit for a direct quality leaf."}
+	attributes["quality_id"] = schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(0)}, MarkdownDescription: "Quality identifier for a direct leaf. `0` is Unknown Text. Omit for a group."}
 	attributes["items"] = schema.ListNestedAttribute{Optional: true, Computed: true, NestedObject: schema.NestedAttributeObject{Attributes: qualityLeafAttributes()}}
 	return attributes
 }
@@ -129,15 +127,15 @@ func qualityItemAttributes() map[string]schema.Attribute {
 func formatItemAttributes() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"format_id":    schema.Int64Attribute{Required: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
-		"built_in_key": schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-		"name":         schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
+		"built_in_key": schema.StringAttribute{Computed: true},
+		"name":         schema.StringAttribute{Computed: true},
 		"score":        schema.Int64Attribute{Required: true},
 	}
 }
 
 func (r *qualityProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Manage an audiobook or ebook quality profile. `items` and `format_items` are ordered lists. Copy each group's ID and name from the schema data source; direct-quality IDs/names and format names/built-in keys are server-owned, while allowed flags and scores are declarative. Unknown Text uses `quality_id = 0`. Empty `format_items` is valid for ebook profiles and is sent as `[]`. Update GETs the current profile and merges those server-owned names before PUT.",
+		MarkdownDescription: "Manage an audiobook or ebook quality profile. `items` and `format_items` are ordered lists. Copy each group's ID and name from the schema data source; direct-quality IDs/names and format names/built-in keys are server-owned, while allowed flags and scores are declarative. Unknown Text uses `quality_id = 0`. Empty `format_items` is valid for ebook profiles and is sent as `[]`. Update GETs the current profile and merges those server-owned names before PUT. Nested computed names are not carried across list indexes, so reordering qualities or formats refreshes names from the server instead of failing apply.",
 		Attributes: map[string]schema.Attribute{
 			"id":                                 schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"name":                               schema.StringAttribute{Required: true},

@@ -288,6 +288,48 @@ func TestQualityDefinitionIdentityRequiresReplacement(t *testing.T) {
 	}
 }
 
+func TestQualityProfileComputedNamesAreNotStickyAcrossIndexes(t *testing.T) {
+	t.Parallel()
+	response := &resource.SchemaResponse{}
+	(&qualityProfileResource{}).Schema(t.Context(), resource.SchemaRequest{}, response)
+	items, ok := response.Schema.Attributes["items"].(resourceschema.ListNestedAttribute)
+	if !ok {
+		t.Fatal("items must be a list nested attribute")
+	}
+	for _, name := range []string{"quality_name", "name", "quality_is_conversion_target"} {
+		attribute, exists := items.NestedObject.Attributes[name]
+		if !exists {
+			t.Fatalf("missing items attribute %s", name)
+		}
+		switch typed := attribute.(type) {
+		case resourceschema.StringAttribute:
+			if len(typed.PlanModifiers) != 0 {
+				t.Fatalf("items.%s must not keep prior-state values across list indexes", name)
+			}
+		case resourceschema.BoolAttribute:
+			if len(typed.PlanModifiers) != 0 {
+				t.Fatalf("items.%s must not keep prior-state values across list indexes", name)
+			}
+		default:
+			t.Fatalf("unexpected type for items.%s: %T", name, attribute)
+		}
+	}
+	formats, ok := response.Schema.Attributes["format_items"].(resourceschema.ListNestedAttribute)
+	if !ok {
+		t.Fatal("format_items must be a list nested attribute")
+	}
+	for _, name := range []string{"name", "built_in_key"} {
+		attribute, exists := formats.NestedObject.Attributes[name]
+		if !exists {
+			t.Fatalf("missing format_items attribute %s", name)
+		}
+		typed, ok := attribute.(resourceschema.StringAttribute)
+		if !ok || len(typed.PlanModifiers) != 0 {
+			t.Fatalf("format_items.%s must not keep prior-state values across list indexes", name)
+		}
+	}
+}
+
 func TestProfileSchemasExposeNoSensitiveAttributes(t *testing.T) {
 	t.Parallel()
 	resources := []interface {
