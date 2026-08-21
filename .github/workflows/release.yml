@@ -1,23 +1,20 @@
 name: Release
-run-name: ${{ inputs.release_tag != '' && format('Release {0}', inputs.release_tag) || 'Automated SemVer Release' }}
+run-name: Release ${{ inputs.release_tag }}
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Explicit SemVer tag override (e.g. v0.2.0)
-        required: false
+        description: Exact version tag to build with the current hardened release workflow
+        required: true
         type: string
 
 concurrency:
-  group: release-main
+  group: release-${{ inputs.release_tag }}
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   GOTOOLCHAIN: local
@@ -27,77 +24,142 @@ jobs:
     name: Signed Release
     if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
-    timeout-minutes: 45
     environment: release
     permissions:
       contents: write
+    timeout-minutes: 45
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
     steps:
-      - name: Check out default branch source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: true
-
-      - name: Calculate next SemVer tag
-        id: semver
-        shell: bash
-        run: |
-          bash ./scripts/calculate-next-version.sh "${{ inputs.release_tag }}"
-
-      - name: Create and push git tag
-        if: steps.semver.outputs.should_release == 'true'
-        shell: bash
+      - name: Validate release tag
         env:
-          NEXT_TAG: ${{ steps.semver.outputs.next_tag }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
           set -euo pipefail
-          if git rev-parse "${NEXT_TAG}" >/dev/null 2>&1; then
-            echo "Tag ${NEXT_TAG} already exists locally."
-          else
-            echo "Tagging commit with ${NEXT_TAG}..."
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -a "${NEXT_TAG}" -m "Release ${NEXT_TAG}"
-            git push origin "${NEXT_TAG}"
+          semver_pattern='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'
+          if [[ ! "${RELEASE_TAG}" =~ ${semver_pattern} ]]; then
+            echo "Invalid release tag: ${RELEASE_TAG}" >&2
+            exit 1
           fi
-          echo "RELEASE_TAG=${NEXT_TAG}" >> "${GITHUB_ENV}"
+          gh api --silent "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}"
 
-      - name: Require release environment signing configuration
-        if: steps.semver.outputs.should_release == 'true'
-        shell: bash
+      - name: Check release state
+        id: release_state
         env:
-          GPG_PRIVATE_KEY_CONFIGURED: ${{ secrets.GPG_PRIVATE_KEY != '' }}
-          PASSPHRASE_CONFIGURED: ${{ secrets.PASSPHRASE != '' }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
           set -euo pipefail
-          if [[ "${GPG_PRIVATE_KEY_CONFIGURED}" != "true" || "${PASSPHRASE_CONFIGURED}" != "true" ]]; then
-            echo "Signed release prerequisites are not configured in the release environment." >&2
+          if response="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq '.draft' 2>&1)"; then
+            case "${response}" in
+              false)
+                echo "published=true" >> "$GITHUB_OUTPUT"
+                echo "Release ${RELEASE_TAG} is already published; nothing to do."
+                ;;
+              true)
+                echo "published=false" >> "$GITHUB_OUTPUT"
+                echo "Release ${RELEASE_TAG} has an incomplete draft; resuming it."
+                ;;
+              *)
+                echo "Unexpected GitHub Release response: ${response}" >&2
+                exit 1
+                ;;
+            esac
+          elif [[ "${response}" == *"(HTTP 404)"* ]]; then
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unable to inspect GitHub Release ${RELEASE_TAG}: ${response}" >&2
             exit 1
           fi
 
-      - name: Import release signing key
-        if: steps.semver.outputs.should_release == 'true'
-        id: import_gpg
+      - name: Checkout release controls
+        if: steps.release_state.outputs.published != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: release-control
+          persist-credentials: false
+
+      - name: Checkout tagged source
+        if: steps.release_state.outputs.published != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Go
+        if: steps.release_state.outputs.published != 'true'
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: source/go.mod
+          cache-dependency-path: source/go.sum
+          cache: true
+
+      - name: Detect signing availability
+        if: steps.release_state.outputs.published != 'true'
+        id: signing
+        run: |
+          if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ] && [ -n "${{ secrets.PASSPHRASE }}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Import GPG key
+        if: steps.release_state.outputs.published != 'true' && steps.signing.outputs.enabled == 'true'
         uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
+        id: import_gpg
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
 
-      - name: Set up Go
-        if: steps.semver.outputs.should_release == 'true'
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version-file: go.mod
-          cache-dependency-path: go.sum
-          cache: true
-
-      - name: Publish signed provider release
-        if: steps.semver.outputs.should_release == 'true'
+      - name: Run GoReleaser (signed)
+        if: steps.release_state.outputs.published != 'true' && steps.import_gpg.outputs.fingerprint != ''
         uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
         with:
-          distribution: goreleaser
-          version: v2.17.1
-          args: release --clean --parallelism=2 --config .goreleaser.yml
+          workdir: source
+          args: release --clean --config ../release-control/.goreleaser.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+
+      - name: Run GoReleaser (unsigned fallback)
+        if: steps.release_state.outputs.published != 'true' && steps.import_gpg.outputs.fingerprint == ''
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          workdir: source
+          args: release --clean --skip=sign --config ../release-control/.goreleaser.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify OpenTofu registry indexing
+        if: steps.release_state.outputs.published != 'true'
+        env:
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          echo "Checking OpenTofu registry indexing for version ${version}..."
+          registry_url="https://registry.opentofu.org/v1/providers/${GITHUB_REPOSITORY}/versions"
+          deadline=$((SECONDS + 600))
+          indexed="false"
+
+          while (( SECONDS < deadline )); do
+            if response="$(curl -fsSL "${registry_url}" 2>/dev/null)"; then
+              if echo "${response}" | grep -q "\"version\": \"${version}\""; then
+                echo "OpenTofu registry has successfully indexed ${RELEASE_TAG}."
+                indexed="true"
+                break
+              fi
+            fi
+            echo "Waiting for OpenTofu registry indexer to pick up ${RELEASE_TAG}... (${SECONDS}s elapsed)"
+            sleep 15
+          done
+
+          if [[ "${indexed}" != "true" ]]; then
+            echo "Note: OpenTofu registry indexing is still pending for ${RELEASE_TAG}. It usually finishes within 10-15 minutes."
+          fi
