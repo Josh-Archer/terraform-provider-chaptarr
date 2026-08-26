@@ -47,7 +47,7 @@ jobs:
     permissions:
       contents: read
     env:
-      CHAPTARR_IMAGE: chaptarr/chaptarr:0.9.925@sha256:8e29f4941acaf74c80bba4322237dfd2549816b3dd1b581f176b1be5d1ccb46b
+      CHAPTARR_IMAGE: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -117,6 +117,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - chaptarr-version: "0.9.929"
+            image: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
           - chaptarr-version: "0.9.925"
             image: chaptarr/chaptarr:0.9.925@sha256:8e29f4941acaf74c80bba4322237dfd2549816b3dd1b581f176b1be5d1ccb46b
           - chaptarr-version: "0.9.914"

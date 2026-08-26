@@ -1,17 +1,17 @@
 {
   "version": 1,
   "source": {
-    "blob_sha": "7ceb8445033c96eff1a757b2891fcd5f93a8369a",
-    "commit": "29853a2e4024b61857bfd64be200832beabf6938",
+    "blob_sha": "e8799c3f6b77eda38fd820b7d7f35802f933cbd1",
+    "commit": "537eb64f39ee1640f07ec0107aeeb8754402f0d8",
     "drift_url": "https://raw.githubusercontent.com/Chaptarr/chaptarr/develop/src/Chaptarr.Api.V1/openapi.json",
     "openapi_version": "3.0.4",
     "operation_count": 317,
     "path_count": 236,
     "repository": "Chaptarr/chaptarr",
     "schema_count": 230,
-    "global_contract_fingerprint": "4ec3783f44943490834aef8b4346e23519fd095802d6862212101573efef21d0",
-    "sha256": "00bb24c49621bcfc682720c2f4dcddde58a142e878935f21e112c410f9f9c6d4",
-    "tag": "v0.9.925",
+    "global_contract_fingerprint": "3d237cd6f9167e2761b98ec678bb33e940c75137c4c7077d4b3914f2bcd06d4a",
+    "sha256": "0c59f1d8079933d662fc3fbe26104e99ccff53044aedb87e58b567d47c44efdf",
+    "tag": "v0.9.929",
     "tag_count": 87
   },
   "operations": {
