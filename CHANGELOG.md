@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.9](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.8...v0.11.9) (2026-08-24)
+
+
+### Bug Fixes
+
+* **ci:** remove environment gate from release.yml for zero-click publishing ([#55](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/55)) ([bde2a63](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/bde2a6360d4f5c8588445531e09a12454fb0df31))
+
+
+### Build System
+
+* **deps:** bump googleapis/release-please-action from 4.1.3 to 5.0.0 ([#60](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/60)) ([2c32033](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/2c3203367edb6afcc60c096c1d3f690214696601))
+
 ## [0.11.8](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.7...v0.11.8) (2026-08-21)
 
 
