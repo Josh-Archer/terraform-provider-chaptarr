@@ -53,7 +53,7 @@ jobs:
           if release_json="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" 2>&1)"; then
             is_draft="$(echo "${release_json}" | jq -r '.draft')"
             asset_count="$(echo "${release_json}" | jq -r '.assets | length')"
-            if [[ "${is_draft}" == "false" && "${asset_count}" -ge 16 ]]; then
+            if [[ "${is_draft}" == "false" && "${asset_count}" -ge 15 ]]; then
               echo "published=true" >> "$GITHUB_OUTPUT"
               echo "Release ${RELEASE_TAG} is already published with ${asset_count} assets; nothing to do."
             else
@@ -134,11 +134,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          SIGNING_ENABLED: ${{ steps.signing.outputs.enabled }}
         shell: bash
         run: |
           set -euo pipefail
+          flags=()
+          if [[ "${SIGNING_ENABLED}" != "true" ]]; then
+            flags+=("--allow-unsigned")
+          fi
           gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq '.assets[].name' \
-            | bash release-control/scripts/validate-release-assets.sh "${RELEASE_TAG}"
+            | bash release-control/scripts/validate-release-assets.sh "${flags[@]}" "${RELEASE_TAG}"
 
       - name: Verify OpenTofu registry indexing
         if: steps.release_state.outputs.published != 'true'
@@ -149,7 +154,8 @@ jobs:
           set -euo pipefail
           version="${RELEASE_TAG#v}"
           echo "Checking OpenTofu registry indexing for version ${version}..."
-          registry_url="https://registry.opentofu.org/v1/providers/${GITHUB_REPOSITORY}/versions"
+          provider_namespace="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]' | sed 's/terraform-provider-//')"
+          registry_url="https://registry.opentofu.org/v1/providers/${provider_namespace}/versions"
           deadline=$((SECONDS + 600))
           indexed="false"
 
