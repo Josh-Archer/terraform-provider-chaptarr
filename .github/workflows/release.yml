@@ -50,25 +50,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if response="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq '.draft' 2>&1)"; then
-            case "${response}" in
-              false)
-                echo "published=true" >> "$GITHUB_OUTPUT"
-                echo "Release ${RELEASE_TAG} is already published; nothing to do."
-                ;;
-              true)
-                echo "published=false" >> "$GITHUB_OUTPUT"
-                echo "Release ${RELEASE_TAG} has an incomplete draft; resuming it."
-                ;;
-              *)
-                echo "Unexpected GitHub Release response: ${response}" >&2
-                exit 1
-                ;;
-            esac
-          elif [[ "${response}" == *"(HTTP 404)"* ]]; then
+          if release_json="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" 2>&1)"; then
+            is_draft="$(echo "${release_json}" | jq -r '.draft')"
+            asset_count="$(echo "${release_json}" | jq -r '.assets | length')"
+            if [[ "${is_draft}" == "false" && "${asset_count}" -ge 16 ]]; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              echo "Release ${RELEASE_TAG} is already published with ${asset_count} assets; nothing to do."
+            else
+              echo "published=false" >> "$GITHUB_OUTPUT"
+              echo "Release ${RELEASE_TAG} needs assets (draft=${is_draft}, assets=${asset_count}); proceeding with build."
+            fi
+          elif [[ "${release_json}" == *"(HTTP 404)"* ]]; then
             echo "published=false" >> "$GITHUB_OUTPUT"
           else
-            echo "Unable to inspect GitHub Release ${RELEASE_TAG}: ${response}" >&2
+            echo "Unable to inspect GitHub Release ${RELEASE_TAG}: ${release_json}" >&2
             exit 1
           fi
 
@@ -133,6 +128,17 @@ jobs:
           args: release --clean --skip=sign --config ../release-control/.goreleaser.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate published release assets
+        if: steps.release_state.outputs.published != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq '.assets[].name' \
+            | bash release-control/scripts/validate-release-assets.sh "${RELEASE_TAG}"
 
       - name: Verify OpenTofu registry indexing
         if: steps.release_state.outputs.published != 'true'
