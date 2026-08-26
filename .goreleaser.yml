@@ -55,7 +55,7 @@ signs:
       - '${artifact}'
 
 release:
-  use_existing_draft: true
+  mode: append
   replace_existing_artifacts: true
   extra_files:
     - glob: terraform-registry-manifest.json
