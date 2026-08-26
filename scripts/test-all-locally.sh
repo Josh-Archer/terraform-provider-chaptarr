@@ -19,7 +19,7 @@ go test ./...
 go run ./tools/openapi check
 go run ./tools/compatibility check
 tofu fmt -check -recursive examples acceptance
-CHAPTARR_IMAGE='chaptarr/chaptarr:0.9.925@sha256:8e29f4941acaf74c80bba4322237dfd2549816b3dd1b581f176b1be5d1ccb46b' \
+CHAPTARR_IMAGE='chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb' \
   docker compose -f acceptance/compose.yaml config --quiet
 bash ./scripts/test-plan-leak.sh
 bash ./scripts/test-release-assets.sh

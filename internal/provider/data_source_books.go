@@ -26,8 +26,38 @@ func bookReadOnlyDefinitions() []readOnlyDefinition {
 			return queryPath("/api/v1/edition", url.Values{"bookId": []string{strconv.FormatInt(id, 10)}})
 		}, decode: jsonDecode},
 		{name: "book_file", description: "Inspect bounded book-file metadata. This data source never edits tags, moves paths, or deletes media.", attributes: map[string]schema.Attribute{"book_file_id": schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}, "author_id": schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}, "book_id": schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}, "media_type": schema.StringAttribute{Optional: true, Validators: []validator.String{stringvalidator.OneOf("audiobook", "ebook")}}, "unmapped": schema.BoolAttribute{Optional: true}, "result_json": resultJSONAttribute()}, request: bookFilesRequest, decode: jsonDecode},
-		previewDefinition("rename_book_preview", "/api/v1/rename", "Preview proposed book-file renames without moving files."),
+		renamePreviewDefinition(),
 		previewDefinition("retag_book_preview", "/api/v1/retag", "Preview proposed book-file retags without writing tags."),
+	}
+}
+
+func renamePreviewDefinition() readOnlyDefinition {
+	return readOnlyDefinition{
+		name:        "rename_book_preview",
+		description: "Preview proposed book-file renames without moving files.",
+		attributes: map[string]schema.Attribute{
+			"author_id":                       schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
+			"book_id":                         schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
+			"media_type":                      schema.StringAttribute{Optional: true, Validators: []validator.String{stringvalidator.OneOf("audiobook", "ebook")}},
+			"move_to_canonical_author_folder": schema.BoolAttribute{Optional: true},
+			"result_json":                     resultJSONAttribute(),
+		},
+		request: func(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) (string, string) {
+			values := url.Values{}
+			for attribute, queryName := range map[string]string{"author_id": "authorId", "book_id": "bookId"} {
+				if value, ok := intInput(ctx, req, resp, attribute); ok {
+					values.Set(queryName, strconv.FormatInt(value, 10))
+				}
+			}
+			if value := stringInput(ctx, req, resp, "media_type", false); value != "" {
+				values.Set("mediaType", value)
+			}
+			if value, ok := boolInput(ctx, req, resp, "move_to_canonical_author_folder"); ok {
+				values.Set("moveToCanonicalAuthorFolder", strconv.FormatBool(value))
+			}
+			return queryPath("/api/v1/rename", values)
+		},
+		decode: jsonDecode,
 	}
 }
 

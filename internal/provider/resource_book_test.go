@@ -155,7 +155,7 @@ func TestBookReadOnlyDefinitionsUseOnlyGETAndHashQueries(t *testing.T) {
 	cases := []struct {
 		name      string
 		overrides map[string]tftypes.Value
-	}{{"book_lookup", map[string]tftypes.Value{"term": tftypes.NewValue(tftypes.String, "private-looking title"), "media_type": tftypes.NewValue(tftypes.String, "ebook")}}, {"editions", map[string]tftypes.Value{"book_id": tftypes.NewValue(tftypes.Number, 9)}}, {"book_file", map[string]tftypes.Value{"book_id": tftypes.NewValue(tftypes.Number, 9)}}, {"rename_book_preview", map[string]tftypes.Value{"book_id": tftypes.NewValue(tftypes.Number, 9)}}, {"retag_book_preview", map[string]tftypes.Value{"book_id": tftypes.NewValue(tftypes.Number, 9)}}}
+	}{{"book_lookup", map[string]tftypes.Value{"term": tftypes.NewValue(tftypes.String, "private-looking title"), "media_type": tftypes.NewValue(tftypes.String, "ebook")}}, {"editions", map[string]tftypes.Value{"book_id": tftypes.NewValue(tftypes.Number, 9)}}, {"book_file", map[string]tftypes.Value{"book_id": tftypes.NewValue(tftypes.Number, 9)}}, {"rename_book_preview", map[string]tftypes.Value{"book_id": tftypes.NewValue(tftypes.Number, 9), "move_to_canonical_author_folder": tftypes.NewValue(tftypes.Bool, true)}}, {"retag_book_preview", map[string]tftypes.Value{"book_id": tftypes.NewValue(tftypes.Number, 9)}}}
 	definitions := map[string]readOnlyDefinition{}
 	for _, definition := range bookReadOnlyDefinitions() {
 		definitions[definition.name] = definition
