@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.10](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.9...v0.11.10) (2026-08-26)
+
+
+### Features
+
+* sync OpenAPI contract to Chaptarr v0.9.929 and update CodeQL to v4.37.8 ([#61](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/61)) ([078a2a2](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/078a2a2759faa878a441ab9f1b9992d9f8656878))
+
+
+### Bug Fixes
+
+* **ci:** check release asset completeness and validate assets in release.yml ([#63](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/63)) ([ffb84ea](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/ffb84ea9b693368dcf36b77a3f4fe7288155f380))
+
 ## [0.11.9](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.8...v0.11.9) (2026-08-24)
 
 
