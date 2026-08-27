@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.11](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.10...v0.11.11) (2026-08-27)
+
+
+### Bug Fixes
+
+* **ci:** configure goreleaser mode: append for existing releases ([#64](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/64)) ([295eaf6](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/295eaf658b1ec2d761daceaeb6e255f1efdde86d))
+* **ci:** support unsigned asset validation and fix registry query url ([#66](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/66)) ([077b613](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/077b613a460b9fceecc70ea67e02fcd64ac71470))
+
 ## [0.11.10](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.9...v0.11.10) (2026-08-26)
 
 
