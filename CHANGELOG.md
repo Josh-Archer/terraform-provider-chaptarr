@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.12](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.11...v0.11.12) (2026-08-27)
+
+
+### Features
+
+* **provider:** implement remaining planned read-only data sources ([#67](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/67)) ([6d9b3a6](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/6d9b3a6d70da081384fead8991d3a7f8ec6bd5b7))
+
 ## [0.11.11](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.10...v0.11.11) (2026-08-27)
 
 
