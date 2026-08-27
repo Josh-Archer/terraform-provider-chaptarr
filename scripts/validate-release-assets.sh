@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+allow_unsigned=false
+if [[ "${1:-}" == "--allow-unsigned" ]]; then
+  allow_unsigned=true
+  shift
+fi
+
 if [[ $# -ne 1 ]]; then
-  echo "usage: validate-release-assets.sh <vSemVer>" >&2
+  echo "usage: validate-release-assets.sh [--allow-unsigned] <vSemVer>" >&2
   exit 2
 fi
 
@@ -20,9 +26,11 @@ mapfile -t assets
 
 required=(
   "${prefix}_SHA256SUMS"
-  "${prefix}_SHA256SUMS.sig"
   "${prefix}_manifest.json"
 )
+if [[ "${allow_unsigned}" != "true" ]]; then
+  required+=("${prefix}_SHA256SUMS.sig")
+fi
 for target in \
   darwin_amd64 darwin_arm64 \
   freebsd_386 freebsd_amd64 freebsd_arm freebsd_arm64 \

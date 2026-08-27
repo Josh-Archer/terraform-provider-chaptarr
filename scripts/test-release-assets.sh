@@ -28,9 +28,10 @@ for asset in "${assets[@]}"; do
   fi
 done
 if printf '%s\n' "${unsigned[@]}" | bash "${validator}" "v${version}" >/dev/null 2>&1; then
-  echo "release validator accepted an unsigned asset set" >&2
+  echo "release validator accepted an unsigned asset set without --allow-unsigned" >&2
   exit 1
 fi
+printf '%s\n' "${unsigned[@]}" | bash "${validator}" --allow-unsigned "v${version}" >/dev/null
 
 for invalid_tag in 'not-a-tag' 'v1.2.3-01' 'v1.2.3-alpha.01'; do
   if printf '%s\n' "${assets[@]}" | bash "${validator}" "${invalid_tag}" >/dev/null 2>&1; then
