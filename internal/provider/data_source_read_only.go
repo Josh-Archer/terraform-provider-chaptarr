@@ -172,6 +172,32 @@ func readOnlyDefinitions() []readOnlyDefinition {
 			}, request: noQuery("/api", "api-info"), decode: decodeAPIInfo,
 		},
 		{
+			name: "author_statistics", description: "Read author disk size statistics for a specified author and media type.",
+			attributes: map[string]schema.Attribute{
+				"author_id":    schema.Int64Attribute{Required: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
+				"media_type":   schema.StringAttribute{Required: true, Validators: []validator.String{stringvalidator.OneOf("all", "audiobook", "ebook")}},
+				"size_on_disk": schema.Int64Attribute{Computed: true, MarkdownDescription: "Total disk size in bytes for the specified author and media type."},
+				"result_json":  resultJSONAttribute(),
+			}, request: authorStatisticsRequest, decode: decodeAuthorStatistics,
+		},
+		{
+			name: "blocklist", description: "Read blocklisted releases and history without modifying blocklist entries.",
+			attributes: map[string]schema.Attribute{
+				"page":           schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
+				"page_size":      schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.Between(1, 1000)}},
+				"sort_key":       schema.StringAttribute{Optional: true},
+				"sort_direction": schema.StringAttribute{Optional: true, Validators: []validator.String{stringvalidator.OneOf("default", "ascending", "descending")}},
+				"result_json":    resultJSONAttribute(),
+			}, request: blocklistRequest, decode: jsonDecode,
+		},
+		{
+			name: "commands", description: "Read background command execution state without enqueueing or cancelling commands.",
+			attributes: map[string]schema.Attribute{
+				"command_id":  schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
+				"result_json": resultJSONAttribute(),
+			}, request: optionalIDRequest("/api/v1/command", "command_id"), decode: jsonDecode,
+		},
+		{
 			name: "languages", description: "Read the configured language catalog or one language by numeric identifier.",
 			attributes: map[string]schema.Attribute{"language_id": schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}, "result_json": resultJSONAttribute()},
 			request:    optionalIDRequest("/api/v1/language", "language_id"), decode: jsonDecode,
@@ -521,4 +547,46 @@ func decodeDatabaseStatus(response *client.Response) (map[string]any, error) {
 		"is_healthy":        isHealthy,
 		"migration_version": value.Version,
 	}, nil
+}
+
+func authorStatisticsRequest(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) (string, string) {
+	authorID, ok := intInput(ctx, req, resp, "author_id")
+	if !ok || authorID < 1 {
+		resp.Diagnostics.AddAttributeError(path.Root("author_id"), "Required author ID", "`author_id` must be known and at least 1.")
+		return "", ""
+	}
+	mediaType := stringInput(ctx, req, resp, "media_type", true)
+	if resp.Diagnostics.HasError() {
+		return "", ""
+	}
+	requestPath := fmt.Sprintf("/api/v1/author/%d/size/%s", authorID, url.PathEscape(mediaType))
+	return requestPath, requestPath
+}
+
+func decodeAuthorStatistics(response *client.Response) (map[string]any, error) {
+	var size int64
+	if err := json.Unmarshal(response.Body, &size); err != nil {
+		return nil, fmt.Errorf("chaptarr returned invalid author statistics")
+	}
+	return map[string]any{
+		"size_on_disk": size,
+		"result_json":  strconv.FormatInt(size, 10),
+	}, nil
+}
+
+func blocklistRequest(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) (string, string) {
+	values := url.Values{}
+	if page, ok := intInput(ctx, req, resp, "page"); ok {
+		values.Set("page", strconv.FormatInt(page, 10))
+	}
+	if pageSize, ok := intInput(ctx, req, resp, "page_size"); ok {
+		values.Set("pageSize", strconv.FormatInt(pageSize, 10))
+	}
+	if sortKey := stringInput(ctx, req, resp, "sort_key", false); sortKey != "" {
+		values.Set("sortKey", sortKey)
+	}
+	if sortDirection := stringInput(ctx, req, resp, "sort_direction", false); sortDirection != "" {
+		values.Set("sortDirection", sortDirection)
+	}
+	return queryPath("/api/v1/blocklist", values)
 }
