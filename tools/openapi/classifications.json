@@ -280,13 +280,13 @@
     },
     "GET /api/v1/author/{id}/size/{mediaType}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_author_statistics",
       "tracking_issue": "#8"
     },
     "GET /api/v1/blocklist": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_blocklist",
       "tracking_issue": "#11"
     },
@@ -370,13 +370,13 @@
     },
     "GET /api/v1/command": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_commands",
       "tracking_issue": "#11"
     },
     "GET /api/v1/command/{id}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_commands",
       "tracking_issue": "#11"
     },
@@ -917,7 +917,7 @@
     },
     "GET /api/v1/remotepathmapping/suggestions": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_remote_path_mapping_suggestions",
       "tracking_issue": "#3"
     },

@@ -595,7 +595,7 @@
       ],
       "contract_fingerprint": "ec92be86e482634df4081746091ff2fea707da2e39bc9a6e2558819ab3fffda3",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_author_statistics",
       "tracking_issue": "#8"
     },
@@ -608,7 +608,7 @@
       ],
       "contract_fingerprint": "d67f92dee71c4e39adeef80a204d6c61695cca961d16a02701de1a62a8d74f21",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_blocklist",
       "tracking_issue": "#11"
     },
@@ -790,7 +790,7 @@
       ],
       "contract_fingerprint": "efefa80f8fb97c19012618ae5f09a683c7284fbd3e6bd9fb76b02e3e70c0ffc3",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_commands",
       "tracking_issue": "#11"
     },
@@ -803,7 +803,7 @@
       ],
       "contract_fingerprint": "396939337e09d26ad302a0c42d1257fa81d36e70c05249c00d81e9ed0a280263",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_commands",
       "tracking_issue": "#11"
     },
@@ -1981,7 +1981,7 @@
       ],
       "contract_fingerprint": "ff0adb132bd5449eee18bd4fcba10496d1932c112049712d2d1a43d7b82cac73",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_remote_path_mapping_suggestions",
       "tracking_issue": "#3"
     },

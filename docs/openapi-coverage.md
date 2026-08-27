@@ -13,8 +13,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | Classification | Status | Operations |
 |---|---|---:|
 | action-only | excluded | 58 |
-| data-source | implemented | 52 |
-| data-source | planned | 32 |
+| data-source | implemented | 57 |
+| data-source | planned | 27 |
 | out-of-scope | excluded | 16 |
 | resource | implemented | 111 |
 | resource | planned | 48 |
@@ -67,8 +67,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/author/lookup` | AuthorLookup | data-source | implemented | chaptarr_author_lookup | #8 | `4409a8f7af15` |
 | `GET /api/v1/author/{authorId}` | Author | resource | implemented | chaptarr_author | #8 | `19d8bcc9929f` |
 | `GET /api/v1/author/{id}` | Author | resource | implemented | chaptarr_author | #8 | `88ee8a38ddf2` |
-| `GET /api/v1/author/{id}/size/{mediaType}` | Author | data-source | planned | chaptarr_author_statistics | #8 | `ec92be86e482` |
-| `GET /api/v1/blocklist` | Blocklist | data-source | planned | chaptarr_blocklist | #11 | `d67f92dee71c` |
+| `GET /api/v1/author/{id}/size/{mediaType}` | Author | data-source | implemented | chaptarr_author_statistics | #8 | `ec92be86e482` |
+| `GET /api/v1/blocklist` | Blocklist | data-source | implemented | chaptarr_blocklist | #11 | `d67f92dee71c` |
 | `GET /api/v1/book` | Book | resource | planned | chaptarr_book | #9 | `df1ca665201f` |
 | `GET /api/v1/book/buckets` | Book | resource | planned | chaptarr_book | #9 | `e61f46a83461` |
 | `GET /api/v1/book/ids` | Book | resource | planned | chaptarr_book | #9 | `a10ae089f148` |
@@ -82,8 +82,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/bookfile/{id}` | BookFile | data-source | implemented | chaptarr_book_file | #9 | `12894d975b1b` |
 | `GET /api/v1/calendar` | Calendar | data-source | implemented | chaptarr_calendar | #10 | `eba179c41717` |
 | `GET /api/v1/calendar/{id}` | Calendar | data-source | implemented | chaptarr_calendar | #10 | `7852aa78ae48` |
-| `GET /api/v1/command` | Command | data-source | planned | chaptarr_commands | #11 | `efefa80f8fb9` |
-| `GET /api/v1/command/{id}` | Command | data-source | planned | chaptarr_commands | #11 | `396939337e09` |
+| `GET /api/v1/command` | Command | data-source | implemented | chaptarr_commands | #11 | `efefa80f8fb9` |
+| `GET /api/v1/command/{id}` | Command | data-source | implemented | chaptarr_commands | #11 | `396939337e09` |
 | `GET /api/v1/config/conversion` | ConversionConfig | resource | implemented | chaptarr_conversion_config | #2 | `1e68ff850f6b` |
 | `GET /api/v1/config/conversion/{id}` | ConversionConfig | resource | implemented | chaptarr_conversion_config | #2 | `833e31fac204` |
 | `GET /api/v1/config/development` | DevelopmentConfig | resource | implemented | chaptarr_development_config | #2 | `e7739e0bc9e4` |
@@ -174,7 +174,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/releaseprofile` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `c8476e69a698` |
 | `GET /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | implemented | chaptarr_release_profile | #4 | `f5559fd58837` |
 | `GET /api/v1/remotepathmapping` | RemotePathMapping | data-source | implemented | chaptarr_remote_path_mappings | #3 | `ca1f912a5f93` |
-| `GET /api/v1/remotepathmapping/suggestions` | RemotePathMapping | data-source | planned | chaptarr_remote_path_mapping_suggestions | #3 | `ff0adb132bd5` |
+| `GET /api/v1/remotepathmapping/suggestions` | RemotePathMapping | data-source | implemented | chaptarr_remote_path_mapping_suggestions | #3 | `ff0adb132bd5` |
 | `GET /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `f0cdb4a80f1e` |
 | `GET /api/v1/rename` | RenameBook | data-source | implemented | chaptarr_rename_book_preview | #9 | `507b2d37dbdc` |
 | `GET /api/v1/retag` | RetagBook | data-source | implemented | chaptarr_retag_book_preview | #9 | `681a9f868238` |
