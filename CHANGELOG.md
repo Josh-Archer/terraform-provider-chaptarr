@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.14](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.13...v0.11.14) (2026-09-03)
+
+
+### Build System
+
+* **deps:** bump google.golang.org/grpc from 1.82.1 to 1.83.1 ([#71](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/71)) ([f33e390](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/f33e3909eb873acc81a945d01b585fc3b8f30e82))
+
 ## [0.11.13](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.12...v0.11.13) (2026-08-31)
 
 
