@@ -42,6 +42,29 @@ func TestPostgresDatabaseHelperGetters(t *testing.T) {
 	if got := escapeLiteral("pwd'with'quotes"); got != "pwd''with''quotes" {
 		t.Errorf("expected pwd''with''quotes, got %s", got)
 	}
+
+	if got := grantRoleMembershipSQL("chaptarr", "admin"); got != `GRANT "chaptarr" TO "admin";` {
+		t.Errorf("expected %s, got %s", `GRANT "chaptarr" TO "admin";`, got)
+	}
+}
+
+func TestPostgresDatabaseGrantRoleMembershipSQL(t *testing.T) {
+	t.Parallel()
+
+	// Verify that the application role is granted to the admin user
+	// (so the admin user becomes a member of the application role to assign ownership),
+	// rather than granting the admin role to the application role.
+	got := grantRoleMembershipSQL("chaptarr", "homelabdbadmin")
+	expected := `GRANT "chaptarr" TO "homelabdbadmin";`
+	if got != expected {
+		t.Fatalf("expected %q, got %q", expected, got)
+	}
+
+	got = grantRoleMembershipSQL(`app"role`, `admin"user`)
+	expected = `GRANT "app""role" TO "admin""user";`
+	if got != expected {
+		t.Fatalf("expected %q, got %q", expected, got)
+	}
 }
 
 func TestPostgresDatabaseCredentialsAreSensitiveWriteOnly(t *testing.T) {
