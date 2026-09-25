@@ -2,11 +2,18 @@ package provider
 
 import (
 	"context"
+	"database/sql"
+	"database/sql/driver"
+	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -45,6 +52,26 @@ func TestPostgresDatabaseHelperGetters(t *testing.T) {
 
 	if got := grantRoleMembershipSQL("chaptarr", "admin"); got != `GRANT "chaptarr" TO "admin";` {
 		t.Errorf("expected %s, got %s", `GRANT "chaptarr" TO "admin";`, got)
+	}
+
+	if got := grantSchemaPermissionsSQL("chaptarr"); got != `GRANT ALL ON SCHEMA public TO "chaptarr";` {
+		t.Errorf("expected %s, got %s", `GRANT ALL ON SCHEMA public TO "chaptarr";`, got)
+	}
+}
+
+func TestPostgresDatabaseGrantSchemaPermissionsSQL(t *testing.T) {
+	t.Parallel()
+
+	got := grantSchemaPermissionsSQL("chaptarr")
+	expected := `GRANT ALL ON SCHEMA public TO "chaptarr";`
+	if got != expected {
+		t.Fatalf("expected %q, got %q", expected, got)
+	}
+
+	got = grantSchemaPermissionsSQL(`app"role`)
+	expected = `GRANT ALL ON SCHEMA public TO "app""role";`
+	if got != expected {
+		t.Fatalf("expected %q, got %q", expected, got)
 	}
 }
 
@@ -209,5 +236,365 @@ func assertPostgresCredentialsCleared(t *testing.T, model postgresDatabaseModel)
 		if !value.IsNull() {
 			t.Fatalf("%s remained in state", name)
 		}
+	}
+}
+
+var mockDriverCounter atomic.Int64
+
+func registerMockDriver(t *testing.T, d driver.Driver) string {
+	t.Helper()
+	name := fmt.Sprintf("mock_pg_%d", mockDriverCounter.Add(1))
+	sql.Register(name, d)
+	return name
+}
+
+type mockPostgresDriver struct {
+	openFunc func(name string) (driver.Conn, error)
+}
+
+func (d *mockPostgresDriver) Open(name string) (driver.Conn, error) {
+	if d.openFunc != nil {
+		return d.openFunc(name)
+	}
+	return nil, errors.New("openFunc not set")
+}
+
+type mockPostgresConn struct {
+	execFunc  func(ctx context.Context, query string) error
+	queryFunc func(ctx context.Context, query string) (driver.Rows, error)
+}
+
+func (c *mockPostgresConn) Prepare(query string) (driver.Stmt, error) {
+	return nil, errors.New("prepare not implemented")
+}
+
+func (c *mockPostgresConn) Close() error {
+	return nil
+}
+
+func (c *mockPostgresConn) Begin() (driver.Tx, error) {
+	return nil, errors.New("begin not implemented")
+}
+
+func (c *mockPostgresConn) ExecContext(ctx context.Context, query string, _ []driver.NamedValue) (driver.Result, error) {
+	if c.execFunc != nil {
+		if err := c.execFunc(ctx, query); err != nil {
+			return nil, err
+		}
+	}
+	return driver.RowsAffected(1), nil
+}
+
+func (c *mockPostgresConn) QueryContext(ctx context.Context, query string, _ []driver.NamedValue) (driver.Rows, error) {
+	if c.queryFunc != nil {
+		return c.queryFunc(ctx, query)
+	}
+	return nil, errors.New("queryFunc not set")
+}
+
+type singleBoolRows struct {
+	val  bool
+	read bool
+}
+
+func (r *singleBoolRows) Columns() []string {
+	return []string{"exists"}
+}
+
+func (r *singleBoolRows) Close() error {
+	return nil
+}
+
+func (r *singleBoolRows) Next(dest []driver.Value) error {
+	if r.read {
+		return io.EOF
+	}
+	dest[0] = r.val
+	r.read = true
+	return nil
+}
+
+func postgresCreateRequest(t *testing.T, model postgresDatabaseModel) resource.CreateRequest {
+	t.Helper()
+	state := tfsdk.State{Schema: postgresDatabaseSchema(1)}
+	if diags := state.Set(t.Context(), &model); diags.HasError() {
+		t.Fatalf("state.Set: %v", diags)
+	}
+	return resource.CreateRequest{Plan: tfsdk.Plan(state), Config: tfsdk.Config(state)}
+}
+
+func assertDiagnosticMatch(t *testing.T, diagnostics diag.Diagnostics, expectedSummary, expectedDetailSubstring string) {
+	t.Helper()
+	for _, diagnostic := range diagnostics {
+		if diagnostic.Summary() == expectedSummary && strings.Contains(diagnostic.Detail(), expectedDetailSubstring) {
+			return
+		}
+	}
+	t.Fatalf("expected diagnostic with summary %q and detail containing %q, got: %v", expectedSummary, expectedDetailSubstring, diagnostics)
+}
+
+func TestPostgresDatabaseCreateFailsWhenAlterRoleErrors(t *testing.T) {
+	t.Parallel()
+
+	driverName := registerMockDriver(t, &mockPostgresDriver{
+		openFunc: func(name string) (driver.Conn, error) {
+			return &mockPostgresConn{
+				queryFunc: func(ctx context.Context, query string) (driver.Rows, error) {
+					if strings.Contains(query, "pg_roles") {
+						return &singleBoolRows{val: true}, nil
+					}
+					return nil, fmt.Errorf("unexpected query: %s", query)
+				},
+				execFunc: func(ctx context.Context, query string) error {
+					if strings.HasPrefix(query, "ALTER ROLE") {
+						return errors.New("simulated alter role error")
+					}
+					return nil
+				},
+			}, nil
+		},
+	})
+
+	instance := &postgresDatabaseResource{driverName: driverName}
+	model := postgresTestModel("")
+	req := postgresCreateRequest(t, model)
+	resp := &resource.CreateResponse{State: tfsdk.State{Schema: postgresDatabaseSchema(1)}}
+
+	instance.Create(t.Context(), req, resp)
+
+	if !resp.Diagnostics.HasError() {
+		t.Fatal("expected error diagnostic when ALTER ROLE fails, got none")
+	}
+	assertDiagnosticMatch(t, resp.Diagnostics, "Role Update Failed", "Failed to update role chaptarr.")
+
+	var state postgresDatabaseModel
+	_ = resp.State.Get(t.Context(), &state)
+	if state.IsHealthy.ValueBool() {
+		t.Fatal("expected is_healthy not to be set to true in state on error")
+	}
+}
+
+func TestPostgresDatabaseCreateFailsWhenGrantRoleMembershipErrors(t *testing.T) {
+	t.Parallel()
+
+	driverName := registerMockDriver(t, &mockPostgresDriver{
+		openFunc: func(name string) (driver.Conn, error) {
+			return &mockPostgresConn{
+				queryFunc: func(ctx context.Context, query string) (driver.Rows, error) {
+					if strings.Contains(query, "pg_roles") {
+						return &singleBoolRows{val: false}, nil
+					}
+					return nil, fmt.Errorf("unexpected query: %s", query)
+				},
+				execFunc: func(ctx context.Context, query string) error {
+					if strings.HasPrefix(query, "GRANT") {
+						return errors.New("simulated grant admin error")
+					}
+					return nil
+				},
+			}, nil
+		},
+	})
+
+	instance := &postgresDatabaseResource{driverName: driverName}
+	model := postgresTestModel("")
+	req := postgresCreateRequest(t, model)
+	resp := &resource.CreateResponse{State: tfsdk.State{Schema: postgresDatabaseSchema(1)}}
+
+	instance.Create(t.Context(), req, resp)
+
+	if !resp.Diagnostics.HasError() {
+		t.Fatal("expected error diagnostic when role grant fails, got none")
+	}
+	assertDiagnosticMatch(t, resp.Diagnostics, "Role Grant Failed", "Failed to grant role chaptarr to admin.")
+
+	var state postgresDatabaseModel
+	_ = resp.State.Get(t.Context(), &state)
+	if state.IsHealthy.ValueBool() {
+		t.Fatal("expected is_healthy not to be set to true in state on error")
+	}
+}
+
+func TestPostgresDatabaseCreateFailsWhenTargetDatabaseOpenErrors(t *testing.T) {
+	t.Parallel()
+
+	driverName := registerMockDriver(t, &mockPostgresDriver{
+		openFunc: func(name string) (driver.Conn, error) {
+			return &mockPostgresConn{
+				queryFunc: func(ctx context.Context, query string) (driver.Rows, error) {
+					if strings.Contains(query, "pg_roles") {
+						return &singleBoolRows{val: false}, nil
+					}
+					if strings.Contains(query, "pg_database") {
+						return &singleBoolRows{val: true}, nil
+					}
+					return nil, fmt.Errorf("unexpected query: %s", query)
+				},
+				execFunc: func(ctx context.Context, query string) error {
+					return nil
+				},
+			}, nil
+		},
+	})
+
+	instance := &postgresDatabaseResource{
+		driverName: driverName,
+		sqlOpener: func(drv, dsn string) (*sql.DB, error) {
+			if strings.Contains(dsn, "dbname=chaptarr-main") {
+				return nil, errors.New("simulated connection failure")
+			}
+			return sql.Open(drv, dsn)
+		},
+	}
+	model := postgresTestModel("")
+	req := postgresCreateRequest(t, model)
+	resp := &resource.CreateResponse{State: tfsdk.State{Schema: postgresDatabaseSchema(1)}}
+
+	instance.Create(t.Context(), req, resp)
+
+	if !resp.Diagnostics.HasError() {
+		t.Fatal("expected error diagnostic when target db connection fails, got none")
+	}
+	assertDiagnosticMatch(t, resp.Diagnostics, "PostgreSQL Connection Error", "Failed to connect to PostgreSQL database chaptarr-main.")
+
+	var state postgresDatabaseModel
+	_ = resp.State.Get(t.Context(), &state)
+	if state.IsHealthy.ValueBool() {
+		t.Fatal("expected is_healthy not to be set to true in state on error")
+	}
+}
+
+func TestPostgresDatabaseCreateFailsWhenGrantPublicSchemaErrors(t *testing.T) {
+	t.Parallel()
+
+	driverName := registerMockDriver(t, &mockPostgresDriver{
+		openFunc: func(name string) (driver.Conn, error) {
+			return &mockPostgresConn{
+				queryFunc: func(ctx context.Context, query string) (driver.Rows, error) {
+					if strings.Contains(query, "pg_roles") {
+						return &singleBoolRows{val: false}, nil
+					}
+					if strings.Contains(query, "pg_database") {
+						return &singleBoolRows{val: true}, nil
+					}
+					return nil, fmt.Errorf("unexpected query: %s", query)
+				},
+				execFunc: func(ctx context.Context, query string) error {
+					if strings.HasPrefix(query, "GRANT ALL ON SCHEMA public") {
+						return errors.New("simulated schema grant failure")
+					}
+					return nil
+				},
+			}, nil
+		},
+	})
+
+	instance := &postgresDatabaseResource{driverName: driverName}
+	model := postgresTestModel("")
+	req := postgresCreateRequest(t, model)
+	resp := &resource.CreateResponse{State: tfsdk.State{Schema: postgresDatabaseSchema(1)}}
+
+	instance.Create(t.Context(), req, resp)
+
+	if !resp.Diagnostics.HasError() {
+		t.Fatal("expected error diagnostic when schema grant fails, got none")
+	}
+	assertDiagnosticMatch(t, resp.Diagnostics, "Schema Grant Failed", "Failed to grant schema permissions on database chaptarr-main to role chaptarr.")
+
+	var state postgresDatabaseModel
+	_ = resp.State.Get(t.Context(), &state)
+	if state.IsHealthy.ValueBool() {
+		t.Fatal("expected is_healthy not to be set to true in state on error")
+	}
+}
+
+func TestPostgresDatabaseCreateHappyPathSetsHealthy(t *testing.T) {
+	t.Parallel()
+
+	driverName := registerMockDriver(t, &mockPostgresDriver{
+		openFunc: func(name string) (driver.Conn, error) {
+			return &mockPostgresConn{
+				queryFunc: func(ctx context.Context, query string) (driver.Rows, error) {
+					if strings.Contains(query, "pg_roles") {
+						return &singleBoolRows{val: true}, nil
+					}
+					if strings.Contains(query, "pg_database") {
+						return &singleBoolRows{val: false}, nil
+					}
+					return nil, fmt.Errorf("unexpected query: %s", query)
+				},
+				execFunc: func(ctx context.Context, query string) error {
+					return nil
+				},
+			}, nil
+		},
+	})
+
+	instance := &postgresDatabaseResource{driverName: driverName}
+	model := postgresTestModel("")
+	req := postgresCreateRequest(t, model)
+	resp := &resource.CreateResponse{State: tfsdk.State{Schema: postgresDatabaseSchema(1)}}
+
+	instance.Create(t.Context(), req, resp)
+
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("unexpected create failure: %v", resp.Diagnostics)
+	}
+
+	var state postgresDatabaseModel
+	if diags := resp.State.Get(t.Context(), &state); diags.HasError() {
+		t.Fatalf("get state failed: %v", diags)
+	}
+	if !state.IsHealthy.ValueBool() {
+		t.Fatal("expected is_healthy to be true on successful create")
+	}
+	if state.ID.ValueString() != "postgres.example.test:5432:chaptarr" {
+		t.Fatalf("unexpected id: %s", state.ID.ValueString())
+	}
+	assertPostgresCredentialsCleared(t, state)
+}
+
+func TestPostgresDatabaseUpdateFailsWhenGrantRoleMembershipErrors(t *testing.T) {
+	t.Parallel()
+
+	driverName := registerMockDriver(t, &mockPostgresDriver{
+		openFunc: func(name string) (driver.Conn, error) {
+			return &mockPostgresConn{
+				queryFunc: func(ctx context.Context, query string) (driver.Rows, error) {
+					if strings.Contains(query, "pg_roles") {
+						return &singleBoolRows{val: true}, nil
+					}
+					return nil, fmt.Errorf("unexpected query: %s", query)
+				},
+				execFunc: func(ctx context.Context, query string) error {
+					if strings.HasPrefix(query, "GRANT") {
+						return errors.New("simulated grant admin error")
+					}
+					return nil
+				},
+			}, nil
+		},
+	})
+
+	instance := &postgresDatabaseResource{driverName: driverName}
+	model := postgresTestModel("")
+	state := tfsdk.State{Schema: postgresDatabaseSchema(1)}
+	if diags := state.Set(t.Context(), &model); diags.HasError() {
+		t.Fatalf("state.Set: %v", diags)
+	}
+	req := resource.UpdateRequest{Plan: tfsdk.Plan(state), Config: tfsdk.Config(state)}
+	resp := &resource.UpdateResponse{State: tfsdk.State{Schema: postgresDatabaseSchema(1)}}
+
+	instance.Update(t.Context(), req, resp)
+
+	if !resp.Diagnostics.HasError() {
+		t.Fatal("expected error diagnostic when role grant fails during update, got none")
+	}
+	assertDiagnosticMatch(t, resp.Diagnostics, "Role Grant Failed", "Failed to grant role chaptarr to admin.")
+
+	var result postgresDatabaseModel
+	_ = resp.State.Get(t.Context(), &result)
+	if result.IsHealthy.ValueBool() {
+		t.Fatal("expected is_healthy not to be set to true in state on update error")
 	}
 }

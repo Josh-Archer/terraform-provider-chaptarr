@@ -29,7 +29,9 @@ var (
 )
 
 type postgresDatabaseResource struct {
-	client *client.Client
+	client     *client.Client
+	driverName string
+	sqlOpener  func(driverName, dataSourceName string) (*sql.DB, error)
 }
 
 type postgresDatabaseModel struct {
@@ -233,7 +235,7 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 	dbs := getDatabases(ctx, model.Databases)
 
 	adminConnStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=%s", host, port, adminUser, adminPwd, sslMode)
-	db, err := sql.Open("postgres", adminConnStr)
+	db, err := r.openSQL(adminConnStr)
 	if err != nil {
 		r.addError(resp, "PostgreSQL Connection Error", fmt.Sprintf("Failed to connect to PostgreSQL at %s:%d as %s.", host, port, adminUser))
 		return
@@ -256,12 +258,18 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 		}
 	} else {
 		alterRoleSQL := fmt.Sprintf("ALTER ROLE %s WITH LOGIN PASSWORD '%s';", sanitizeIdent(roleName), escapeLiteral(rolePwd))
-		_, _ = db.ExecContext(ctx, alterRoleSQL)
+		if _, err := db.ExecContext(ctx, alterRoleSQL); err != nil {
+			r.addError(resp, "Role Update Failed", fmt.Sprintf("Failed to update role %s.", roleName))
+			return
+		}
 	}
 
 	// Grant admin user membership so admin can assign database ownership
 	grantAdminSQL := grantRoleMembershipSQL(roleName, adminUser)
-	_, _ = db.ExecContext(ctx, grantAdminSQL)
+	if _, err := db.ExecContext(ctx, grantAdminSQL); err != nil {
+		r.addError(resp, "Role Grant Failed", fmt.Sprintf("Failed to grant role %s to %s.", roleName, adminUser))
+		return
+	}
 
 	// 2. Create databases
 	for _, dbName := range dbs {
@@ -282,11 +290,17 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 
 		// Grant schema permissions on each database
 		targetConnStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", host, port, adminUser, adminPwd, dbName, sslMode)
-		targetDb, err := sql.Open("postgres", targetConnStr)
-		if err == nil {
-			grantSchemaSQL := fmt.Sprintf("GRANT ALL ON SCHEMA public TO %s;", sanitizeIdent(roleName))
-			_, _ = targetDb.ExecContext(ctx, grantSchemaSQL)
-			targetDb.Close()
+		targetDb, err := r.openSQL(targetConnStr)
+		if err != nil {
+			r.addError(resp, "PostgreSQL Connection Error", fmt.Sprintf("Failed to connect to PostgreSQL database %s.", dbName))
+			return
+		}
+		grantSchemaSQL := grantSchemaPermissionsSQL(roleName)
+		_, err = targetDb.ExecContext(ctx, grantSchemaSQL)
+		_ = targetDb.Close()
+		if err != nil {
+			r.addError(resp, "Schema Grant Failed", fmt.Sprintf("Failed to grant schema permissions on database %s to role %s.", dbName, roleName))
+			return
 		}
 	}
 }
@@ -425,4 +439,19 @@ func escapeLiteral(lit string) string {
 
 func grantRoleMembershipSQL(roleName, memberUser string) string {
 	return fmt.Sprintf("GRANT %s TO %s;", sanitizeIdent(roleName), sanitizeIdent(memberUser))
+}
+
+func grantSchemaPermissionsSQL(roleName string) string {
+	return fmt.Sprintf("GRANT ALL ON SCHEMA public TO %s;", sanitizeIdent(roleName))
+}
+
+func (r *postgresDatabaseResource) openSQL(dataSourceName string) (*sql.DB, error) {
+	driver := "postgres"
+	if r.driverName != "" {
+		driver = r.driverName
+	}
+	if r.sqlOpener != nil {
+		return r.sqlOpener(driver, dataSourceName)
+	}
+	return sql.Open(driver, dataSourceName)
 }
