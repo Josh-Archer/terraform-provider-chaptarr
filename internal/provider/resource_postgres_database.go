@@ -260,7 +260,7 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 	}
 
 	// Grant admin user membership so admin can assign database ownership
-	grantAdminSQL := fmt.Sprintf("GRANT %s TO %s;", sanitizeIdent(adminUser), sanitizeIdent(roleName))
+	grantAdminSQL := grantRoleMembershipSQL(roleName, adminUser)
 	_, _ = db.ExecContext(ctx, grantAdminSQL)
 
 	// 2. Create databases
@@ -421,4 +421,8 @@ func sanitizeIdent(ident string) string {
 
 func escapeLiteral(lit string) string {
 	return strings.ReplaceAll(lit, `'`, `''`)
+}
+
+func grantRoleMembershipSQL(roleName, memberUser string) string {
+	return fmt.Sprintf("GRANT %s TO %s;", sanitizeIdent(roleName), sanitizeIdent(memberUser))
 }
