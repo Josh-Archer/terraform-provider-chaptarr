@@ -18,6 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/lib/pq"
 )
 
 func TestPostgresDatabaseHelperGetters(t *testing.T) {
@@ -57,6 +58,14 @@ func TestPostgresDatabaseHelperGetters(t *testing.T) {
 	if got := grantSchemaPermissionsSQL("chaptarr"); got != `GRANT ALL ON SCHEMA public TO "chaptarr";` {
 		t.Errorf("expected %s, got %s", `GRANT ALL ON SCHEMA public TO "chaptarr";`, got)
 	}
+
+	if got := escapeDSNLiteral("token with spaces"); got != `'token with spaces'` {
+		t.Errorf("expected 'token with spaces', got %s", got)
+	}
+
+	if got := escapeDSNLiteral(`token'with\'quotes`); got != `'token\'with\\\'quotes'` {
+		t.Errorf(`expected 'token\'with\\\'quotes', got %s`, got)
+	}
 }
 
 func TestPostgresDatabaseGrantSchemaPermissionsSQL(t *testing.T) {
@@ -72,6 +81,162 @@ func TestPostgresDatabaseGrantSchemaPermissionsSQL(t *testing.T) {
 	expected = `GRANT ALL ON SCHEMA public TO "app""role";`
 	if got != expected {
 		t.Fatalf("expected %q, got %q", expected, got)
+	}
+}
+
+func TestPostgresDatabaseGetSSLMode(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input types.String
+		want  string
+	}{
+		{types.StringNull(), "require"},
+		{types.StringUnknown(), "require"},
+		{types.StringValue(""), "require"},
+		{types.StringValue("require"), "require"},
+		{types.StringValue("prefer"), "prefer"},
+		{types.StringValue("disable"), "disable"},
+		{types.StringValue("verify-ca"), "verify-ca"},
+		{types.StringValue("verify-full"), "verify-full"},
+		{types.StringValue("allow"), "allow"},
+		{types.StringValue(" REQUIRE "), "require"},
+		{types.StringValue(" Prefer "), "prefer"},
+		{types.StringValue("require extra_keyword=value"), "require"},
+		{types.StringValue("disable sslmode=require"), "require"},
+		{types.StringValue("require host=evil.com"), "require"},
+		{types.StringValue("invalid_mode"), "require"},
+	}
+
+	for _, tt := range tests {
+		got := getSSLMode(tt.input)
+		if got != tt.want {
+			t.Errorf("getSSLMode(%v) = %q, want %q", tt.input, got, tt.want)
+		}
+	}
+}
+
+func TestPostgresDatabaseBuildDSN(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name          string
+		targetHost    string
+		targetPort    int
+		targetUser    string
+		targetDB      string
+		secretToken   string
+		targetSSLMode string
+		wantHost      string
+		wantPort      int
+		wantUser      string
+		wantSecret    string
+		wantDB        string
+		wantSSLMode   pq.SSLMode
+	}{
+		{
+			name:          "standard values",
+			targetHost:    "postgres.example.test",
+			targetPort:    5432,
+			targetUser:    "homelabdbadmin",
+			targetDB:      "postgres",
+			secretToken:   "REDACTED_TEST_VALUE",
+			targetSSLMode: "require",
+			wantHost:      "postgres.example.test",
+			wantPort:      5432,
+			wantUser:      "homelabdbadmin",
+			wantSecret:    "REDACTED_TEST_VALUE",
+			wantDB:        "postgres",
+			wantSSLMode:   pq.SSLModeRequire,
+		},
+		{
+			name:          "secret with spaces",
+			targetHost:    "postgres.example.test",
+			targetPort:    5432,
+			targetUser:    "homelabdbadmin",
+			targetDB:      "chaptarr-main",
+			secretToken:   "REDACTED_TEST_VALUE with multiple spaces",
+			targetSSLMode: "require",
+			wantHost:      "postgres.example.test",
+			wantPort:      5432,
+			wantUser:      "homelabdbadmin",
+			wantSecret:    "REDACTED_TEST_VALUE with multiple spaces",
+			wantDB:        "chaptarr-main",
+			wantSSLMode:   pq.SSLModeRequire,
+		},
+		{
+			name:          "secret with quotes and backslashes",
+			targetHost:    "postgres.example.test",
+			targetPort:    5432,
+			targetUser:    "homelabdbadmin",
+			targetDB:      "chaptarr-log",
+			secretToken:   `REDACTED_TEST_VALUE'with\'quotes\\and\backslashes`,
+			targetSSLMode: "prefer",
+			wantHost:      "postgres.example.test",
+			wantPort:      5432,
+			wantUser:      "homelabdbadmin",
+			wantSecret:    `REDACTED_TEST_VALUE'with\'quotes\\and\backslashes`,
+			wantDB:        "chaptarr-log",
+			wantSSLMode:   pq.SSLModePrefer,
+		},
+		{
+			name:          "secret with equals and special characters",
+			targetHost:    "postgres.example.test",
+			targetPort:    5432,
+			targetUser:    "admin@server",
+			targetDB:      "chaptarr-cache",
+			secretToken:   "param=value;REDACTED_TEST_VALUE",
+			targetSSLMode: "disable",
+			wantHost:      "postgres.example.test",
+			wantPort:      5432,
+			wantUser:      "admin@server",
+			wantSecret:    "param=value;REDACTED_TEST_VALUE",
+			wantDB:        "chaptarr-cache",
+			wantSSLMode:   pq.SSLModeDisable,
+		},
+		{
+			name:          "empty secret",
+			targetHost:    "localhost",
+			targetPort:    5433,
+			targetUser:    "app user",
+			targetDB:      "my database",
+			secretToken:   "",
+			targetSSLMode: "require",
+			wantHost:      "localhost",
+			wantPort:      5433,
+			wantUser:      "app user",
+			wantSecret:    "",
+			wantDB:        "my database",
+			wantSSLMode:   pq.SSLModeRequire,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dsn := buildPostgresDSN(tt.targetHost, tt.targetPort, tt.targetUser, tt.targetDB, tt.secretToken, tt.targetSSLMode)
+			cfg, err := pq.NewConfig(dsn)
+			if err != nil {
+				t.Fatalf("pq.NewConfig(%q) failed: %v", dsn, err)
+			}
+			if cfg.Host != tt.wantHost {
+				t.Errorf("host mismatch: got %q, want %q", cfg.Host, tt.wantHost)
+			}
+			if cfg.Port != uint16(tt.wantPort) {
+				t.Errorf("port mismatch: got %d, want %d", cfg.Port, tt.wantPort)
+			}
+			if cfg.User != tt.wantUser {
+				t.Errorf("user mismatch: got %q, want %q", cfg.User, tt.wantUser)
+			}
+			if cfg.Password != tt.wantSecret {
+				t.Errorf("password mismatch: got %q, want %q", cfg.Password, tt.wantSecret)
+			}
+			if cfg.Database != tt.wantDB {
+				t.Errorf("database mismatch: got %q, want %q", cfg.Database, tt.wantDB)
+			}
+			if cfg.SSLMode != tt.wantSSLMode {
+				t.Errorf("sslmode mismatch: got %q, want %q", cfg.SSLMode, tt.wantSSLMode)
+			}
+		})
 	}
 }
 
@@ -440,7 +605,7 @@ func TestPostgresDatabaseCreateFailsWhenTargetDatabaseOpenErrors(t *testing.T) {
 	instance := &postgresDatabaseResource{
 		driverName: driverName,
 		sqlOpener: func(drv, dsn string) (*sql.DB, error) {
-			if strings.Contains(dsn, "dbname=chaptarr-main") {
+			if strings.Contains(dsn, "dbname='chaptarr-main'") || strings.Contains(dsn, "dbname=chaptarr-main") {
 				return nil, errors.New("simulated connection failure")
 			}
 			return sql.Open(drv, dsn)
