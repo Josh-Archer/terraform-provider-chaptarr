@@ -22,6 +22,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const postgresMaintenanceDB = "postgres"
+
 var (
 	_ resource.Resource                 = &postgresDatabaseResource{}
 	_ resource.ResourceWithImportState  = &postgresDatabaseResource{}
@@ -234,7 +236,7 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 	roleName := getRoleName(model.RoleName)
 	dbs := getDatabases(ctx, model.Databases)
 
-	adminConnStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=%s", host, port, adminUser, adminPwd, sslMode)
+	adminConnStr := buildPostgresDSN(host, port, adminUser, postgresMaintenanceDB, adminPwd, sslMode)
 	db, err := r.openSQL(adminConnStr)
 	if err != nil {
 		r.addError(resp, "PostgreSQL Connection Error", fmt.Sprintf("Failed to connect to PostgreSQL at %s:%d as %s.", host, port, adminUser))
@@ -289,7 +291,7 @@ func (r *postgresDatabaseResource) applyDatabaseSetup(ctx context.Context, model
 		}
 
 		// Grant schema permissions on each database
-		targetConnStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s", host, port, adminUser, adminPwd, dbName, sslMode)
+		targetConnStr := buildPostgresDSN(host, port, adminUser, dbName, adminPwd, sslMode)
 		targetDb, err := r.openSQL(targetConnStr)
 		if err != nil {
 			r.addError(resp, "PostgreSQL Connection Error", fmt.Sprintf("Failed to connect to PostgreSQL database %s.", dbName))
@@ -405,8 +407,11 @@ func getPort(v types.Int64) int {
 }
 
 func getSSLMode(v types.String) string {
-	if !v.IsNull() && v.ValueString() != "" {
-		return v.ValueString()
+	if !v.IsNull() && !v.IsUnknown() {
+		switch mode := strings.ToLower(strings.TrimSpace(v.ValueString())); mode {
+		case "disable", "allow", "prefer", "require", "verify-ca", "verify-full":
+			return mode
+		}
 	}
 	return "require"
 }
@@ -454,4 +459,21 @@ func (r *postgresDatabaseResource) openSQL(dataSourceName string) (*sql.DB, erro
 		return r.sqlOpener(driver, dataSourceName)
 	}
 	return sql.Open(driver, dataSourceName)
+}
+
+func escapeDSNLiteral(lit string) string {
+	escaped := strings.ReplaceAll(lit, `\`, `\\`)
+	escaped = strings.ReplaceAll(escaped, `'`, `\'`)
+	return "'" + escaped + "'"
+}
+
+func buildPostgresDSN(host string, port int, user, dbname, secret, sslMode string) string {
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		escapeDSNLiteral(host),
+		port,
+		escapeDSNLiteral(user),
+		escapeDSNLiteral(secret),
+		escapeDSNLiteral(dbname),
+		escapeDSNLiteral(sslMode),
+	)
 }
