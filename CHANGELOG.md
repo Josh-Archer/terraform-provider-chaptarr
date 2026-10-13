@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.16](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.15...v0.11.16) (2026-10-13)
+
+
+### Bug Fixes
+
+* **deps:** bump Go to 1.26.9 and x/net to v0.60.0 to clear govulncheck findings ([#88](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/88)) ([8db1859](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/8db18596e39a27364f35c06b91af46ca4658da54))
+* **provider:** escape database DSN parameters and validate ssl mode ([#86](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/86)) ([469d568](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/469d568f4687e9b38a364f3720b8cd67e85cf71c))
+* **provider:** grant app role to admin user in database setup ([#84](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/84)) ([49854bd](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/49854bdcea73b9b376f84ad28442560f2bd08482))
+* **provider:** handle database setup password and grant errors ([#85](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/85)) ([5554d54](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/5554d545323aba0cf86c240fbc7d12196e5109a8))
+
+
+### Build System
+
+* **deps:** bump the codeql-action group with 3 updates ([#76](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/76)) ([767231c](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/767231c8f6f6e0db4059269c88b42114f8c3a4ce))
+* **deps:** bump the codeql-action group with 3 updates ([#87](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/87)) ([4a06002](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/4a06002f771e7271627a52e2ff7bc7c0fde16bf6))
+
 ## [0.11.15](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.14...v0.11.15) (2026-09-17)
 
 
