@@ -1890,7 +1890,7 @@
       ],
       "contract_fingerprint": "3f6e25d27786388a948e467b9a1cd8e81abf5512fc5bdf1d04fadee138eeaf26",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_queue",
       "tracking_issue": "#11"
     },
@@ -1903,7 +1903,7 @@
       ],
       "contract_fingerprint": "a60dced36271fd363161827fbbf4a257b4783ab1092e52e23cd0b9e8d973ba14",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_queue_details",
       "tracking_issue": "#11"
     },
@@ -1916,7 +1916,7 @@
       ],
       "contract_fingerprint": "c4fc28051a6290ab7115f285d34d90b01280035c129cc3b1a83be521976e5f5f",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_queue_status",
       "tracking_issue": "#11"
     },

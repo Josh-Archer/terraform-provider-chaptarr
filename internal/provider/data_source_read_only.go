@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -145,6 +146,31 @@ func boolInput(ctx context.Context, req datasource.ReadRequest, resp *datasource
 	return value.ValueBool(), true
 }
 
+func int64SetInput(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse, name string) ([]int64, bool) {
+	var value types.Set
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root(name), &value)...)
+	if resp.Diagnostics.HasError() || value.IsNull() || value.IsUnknown() {
+		return nil, false
+	}
+	var raw []int64
+	resp.Diagnostics.Append(value.ElementsAs(ctx, &raw, false)...)
+	if resp.Diagnostics.HasError() {
+		return nil, false
+	}
+	for _, id := range raw {
+		if id < 1 {
+			resp.Diagnostics.AddAttributeError(path.Root(name), "Invalid ID", fmt.Sprintf("`%s` entries must be at least 1.", name))
+			return nil, false
+		}
+	}
+	sort.Slice(raw, func(i, j int) bool { return raw[i] < raw[j] })
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(name), value)...)
+	if len(raw) == 0 {
+		return nil, false
+	}
+	return raw, true
+}
+
 func queryPath(base string, values url.Values) (string, string) {
 	encoded := values.Encode()
 	if encoded == "" {
@@ -226,6 +252,38 @@ func readOnlyDefinitions() []readOnlyDefinition {
 				title := stringInput(ctx, req, resp, "title", true)
 				return queryPath("/api/v1/parse", url.Values{"title": []string{title}})
 			}, decode: jsonDecode,
+		},
+		{
+			name: "queue", description: "Read queued items and queue paging state without modifying the queue.",
+			attributes: map[string]schema.Attribute{
+				"page":                         schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
+				"page_size":                    schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.Between(1, 1000)}},
+				"sort_key":                     schema.StringAttribute{Optional: true},
+				"sort_direction":               schema.StringAttribute{Optional: true, Validators: []validator.String{stringvalidator.OneOf("default", "ascending", "descending")}},
+				"include_unknown_author_items": schema.BoolAttribute{Optional: true},
+				"include_author":               schema.BoolAttribute{Optional: true},
+				"include_book":                 schema.BoolAttribute{Optional: true},
+				"media_type":                   schema.StringAttribute{Optional: true, Validators: []validator.String{stringvalidator.OneOf("all", "audiobook", "ebook")}},
+				"result_json":                  resultJSONAttribute(),
+			}, request: queueRequest, decode: jsonDecode,
+		},
+		{
+			name: "queue_details", description: "Read detailed queue items without modifying download progress or queue state.",
+			attributes: map[string]schema.Attribute{
+				"author_id":      schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
+				"book_ids":       schema.SetAttribute{Optional: true, ElementType: types.Int64Type},
+				"include_author": schema.BoolAttribute{Optional: true},
+				"include_book":   schema.BoolAttribute{Optional: true},
+				"media_type":     schema.StringAttribute{Optional: true, Validators: []validator.String{stringvalidator.OneOf("all", "audiobook", "ebook")}},
+				"result_json":    resultJSONAttribute(),
+			}, request: queueDetailsRequest, decode: jsonDecode,
+		},
+		{
+			name: "queue_status", description: "Read queue status and queue health counts without modifying queue state.",
+			attributes: map[string]schema.Attribute{
+				"media_type":  schema.StringAttribute{Optional: true, Validators: []validator.String{stringvalidator.OneOf("all", "audiobook", "ebook")}},
+				"result_json": resultJSONAttribute(),
+			}, request: queueStatusRequest, decode: jsonDecode,
 		},
 		{
 			name: "calendar", description: "Read calendar entries. Results are refreshed on every Terraform read.",
@@ -589,4 +647,67 @@ func blocklistRequest(ctx context.Context, req datasource.ReadRequest, resp *dat
 		values.Set("sortDirection", sortDirection)
 	}
 	return queryPath("/api/v1/blocklist", values)
+}
+
+func queueRequest(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) (string, string) {
+	values := url.Values{}
+	if page, ok := intInput(ctx, req, resp, "page"); ok {
+		values.Set("page", strconv.FormatInt(page, 10))
+	}
+	if pageSize, ok := intInput(ctx, req, resp, "page_size"); ok {
+		values.Set("pageSize", strconv.FormatInt(pageSize, 10))
+	}
+	if sortKey := stringInput(ctx, req, resp, "sort_key", false); sortKey != "" {
+		values.Set("sortKey", sortKey)
+	}
+	if sortDirection := stringInput(ctx, req, resp, "sort_direction", false); sortDirection != "" {
+		values.Set("sortDirection", sortDirection)
+	}
+	if value, ok := boolInput(ctx, req, resp, "include_unknown_author_items"); ok {
+		values.Set("includeUnknownAuthorItems", strconv.FormatBool(value))
+	}
+	if value, ok := boolInput(ctx, req, resp, "include_author"); ok {
+		values.Set("includeAuthor", strconv.FormatBool(value))
+	}
+	if value, ok := boolInput(ctx, req, resp, "include_book"); ok {
+		values.Set("includeBook", strconv.FormatBool(value))
+	}
+	if mediaType := stringInput(ctx, req, resp, "media_type", false); mediaType != "" {
+		values.Set("mediaType", mediaType)
+	}
+	return queryPath("/api/v1/queue", values)
+}
+
+func queueDetailsRequest(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) (string, string) {
+	values := url.Values{}
+	if authorID, ok := intInput(ctx, req, resp, "author_id"); ok {
+		if authorID < 1 {
+			resp.Diagnostics.AddAttributeError(path.Root("author_id"), "Invalid author ID", "`author_id` must be at least 1.")
+			return "", ""
+		}
+		values.Set("authorId", strconv.FormatInt(authorID, 10))
+	}
+	if bookIDs, ok := int64SetInput(ctx, req, resp, "book_ids"); ok {
+		for _, id := range bookIDs {
+			values.Add("bookIds", strconv.FormatInt(id, 10))
+		}
+	}
+	if value, ok := boolInput(ctx, req, resp, "include_author"); ok {
+		values.Set("includeAuthor", strconv.FormatBool(value))
+	}
+	if value, ok := boolInput(ctx, req, resp, "include_book"); ok {
+		values.Set("includeBook", strconv.FormatBool(value))
+	}
+	if mediaType := stringInput(ctx, req, resp, "media_type", false); mediaType != "" {
+		values.Set("mediaType", mediaType)
+	}
+	return queryPath("/api/v1/queue/details", values)
+}
+
+func queueStatusRequest(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) (string, string) {
+	values := url.Values{}
+	if mediaType := stringInput(ctx, req, resp, "media_type", false); mediaType != "" {
+		values.Set("mediaType", mediaType)
+	}
+	return queryPath("/api/v1/queue/status", values)
 }

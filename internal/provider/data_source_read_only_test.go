@@ -27,6 +27,7 @@ func TestReadOnlyDefinitionsAreUniqueAndNonMutating(t *testing.T) {
 	want := []string{
 		"api_info", "author_statistics", "blocklist", "calendar", "calendar_feed", "commands", "database_status", "disk_space", "file_system", "health",
 		"languages", "library_search", "localization", "media_cover", "parse",
+		"queue", "queue_details", "queue_status",
 		"remote_path_mapping_suggestions", "remote_path_mappings", "root_folders", "search", "system_routes",
 		"system_statistics", "system_status", "tasks", "updates",
 	}
@@ -530,6 +531,315 @@ func TestAuthorStatisticsDataSourceEndToEnd(t *testing.T) {
 	readResponse.Diagnostics.Append(readResponse.State.GetAttribute(t.Context(), path.Root("size_on_disk"), &sizeOnDisk)...)
 	if readResponse.Diagnostics.HasError() || sizeOnDisk.ValueInt64() != 52428800 {
 		t.Fatalf("size_on_disk was not stored: %v", sizeOnDisk.ValueInt64())
+	}
+}
+
+func TestQueueRequest(t *testing.T) {
+	t.Parallel()
+
+	definition := definitionByName(t, "queue")
+
+	// Empty parameters
+	requestPath, identifier, diagnostics := buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":                           unknownString(),
+		"page":                         tftypes.NewValue(tftypes.Number, nil),
+		"page_size":                    tftypes.NewValue(tftypes.Number, nil),
+		"sort_key":                     tftypes.NewValue(tftypes.String, nil),
+		"sort_direction":               tftypes.NewValue(tftypes.String, nil),
+		"include_unknown_author_items": tftypes.NewValue(tftypes.Bool, nil),
+		"include_author":               tftypes.NewValue(tftypes.Bool, nil),
+		"include_book":                 tftypes.NewValue(tftypes.Bool, nil),
+		"media_type":                   tftypes.NewValue(tftypes.String, nil),
+		"result_json":                  unknownString(),
+	})
+	if diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", diagnostics)
+	}
+	if requestPath != "/api/v1/queue" || identifier != "/api/v1/queue" {
+		t.Fatalf("queue requestPath = %q, identifier = %q", requestPath, identifier)
+	}
+
+	// With query parameters
+	requestPath, identifier, diagnostics = buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":                           unknownString(),
+		"page":                         tftypes.NewValue(tftypes.Number, int64(3)),
+		"page_size":                    tftypes.NewValue(tftypes.Number, int64(50)),
+		"sort_key":                     tftypes.NewValue(tftypes.String, "title"),
+		"sort_direction":               tftypes.NewValue(tftypes.String, "descending"),
+		"include_unknown_author_items": tftypes.NewValue(tftypes.Bool, true),
+		"include_author":               tftypes.NewValue(tftypes.Bool, true),
+		"include_book":                 tftypes.NewValue(tftypes.Bool, true),
+		"media_type":                   tftypes.NewValue(tftypes.String, "audiobook"),
+		"result_json":                  unknownString(),
+	})
+	if diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", diagnostics)
+	}
+	for _, expected := range []string{
+		"page=3",
+		"pageSize=50",
+		"sortKey=title",
+		"sortDirection=descending",
+		"includeUnknownAuthorItems=true",
+		"includeAuthor=true",
+		"includeBook=true",
+		"mediaType=audiobook",
+	} {
+		if !strings.Contains(requestPath, expected) {
+			t.Fatalf("queue requestPath = %q missing %q", requestPath, expected)
+		}
+	}
+	if strings.Contains(identifier, "title") || strings.Contains(identifier, "audiobook") {
+		t.Fatalf("queue identifier leaked query values: %q", identifier)
+	}
+}
+
+func TestQueueDetailsRequest(t *testing.T) {
+	t.Parallel()
+
+	definition := definitionByName(t, "queue_details")
+
+	// Empty parameters
+	requestPath, identifier, diagnostics := buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":             unknownString(),
+		"author_id":      tftypes.NewValue(tftypes.Number, nil),
+		"book_ids":       tftypes.NewValue(tftypes.Set{ElementType: tftypes.Number}, nil),
+		"include_author": tftypes.NewValue(tftypes.Bool, nil),
+		"include_book":   tftypes.NewValue(tftypes.Bool, nil),
+		"media_type":     tftypes.NewValue(tftypes.String, nil),
+		"result_json":    unknownString(),
+	})
+	if diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", diagnostics)
+	}
+	if requestPath != "/api/v1/queue/details" || identifier != "/api/v1/queue/details" {
+		t.Fatalf("queue_details requestPath = %q, identifier = %q", requestPath, identifier)
+	}
+
+	// With query parameters
+	requestPath, identifier, diagnostics = buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":             unknownString(),
+		"author_id":      tftypes.NewValue(tftypes.Number, int64(7)),
+		"book_ids":       tftypes.NewValue(tftypes.Set{ElementType: tftypes.Number}, []tftypes.Value{tftypes.NewValue(tftypes.Number, int64(15)), tftypes.NewValue(tftypes.Number, int64(25))}),
+		"include_author": tftypes.NewValue(tftypes.Bool, true),
+		"include_book":   tftypes.NewValue(tftypes.Bool, false),
+		"media_type":     tftypes.NewValue(tftypes.String, "ebook"),
+		"result_json":    unknownString(),
+	})
+	if diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", diagnostics)
+	}
+	for _, expected := range []string{
+		"authorId=7",
+		"bookIds=15",
+		"bookIds=25",
+		"includeAuthor=true",
+		"includeBook=false",
+		"mediaType=ebook",
+	} {
+		if !strings.Contains(requestPath, expected) {
+			t.Fatalf("queue_details requestPath = %q missing %q", requestPath, expected)
+		}
+	}
+	if strings.Contains(identifier, "ebook") || strings.Contains(identifier, "authorId") {
+		t.Fatalf("queue_details identifier leaked query values: %q", identifier)
+	}
+
+	// Invalid author_id error
+	_, _, diagnostics = buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":             unknownString(),
+		"author_id":      tftypes.NewValue(tftypes.Number, int64(0)),
+		"book_ids":       tftypes.NewValue(tftypes.Set{ElementType: tftypes.Number}, nil),
+		"include_author": tftypes.NewValue(tftypes.Bool, nil),
+		"include_book":   tftypes.NewValue(tftypes.Bool, nil),
+		"media_type":     tftypes.NewValue(tftypes.String, nil),
+		"result_json":    unknownString(),
+	})
+	if !diagnostics.HasError() {
+		t.Fatal("expected diagnostics error when author_id is 0")
+	}
+
+	// Invalid book_ids entry error
+	_, _, diagnostics = buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":             unknownString(),
+		"author_id":      tftypes.NewValue(tftypes.Number, nil),
+		"book_ids":       tftypes.NewValue(tftypes.Set{ElementType: tftypes.Number}, []tftypes.Value{tftypes.NewValue(tftypes.Number, int64(-1))}),
+		"include_author": tftypes.NewValue(tftypes.Bool, nil),
+		"include_book":   tftypes.NewValue(tftypes.Bool, nil),
+		"media_type":     tftypes.NewValue(tftypes.String, nil),
+		"result_json":    unknownString(),
+	})
+	if !diagnostics.HasError() {
+		t.Fatal("expected diagnostics error when book_ids has non-positive entry")
+	}
+}
+
+func TestQueueStatusRequest(t *testing.T) {
+	t.Parallel()
+
+	definition := definitionByName(t, "queue_status")
+
+	// Empty parameters
+	requestPath, identifier, diagnostics := buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":          unknownString(),
+		"media_type":  tftypes.NewValue(tftypes.String, nil),
+		"result_json": unknownString(),
+	})
+	if diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", diagnostics)
+	}
+	if requestPath != "/api/v1/queue/status" || identifier != "/api/v1/queue/status" {
+		t.Fatalf("queue_status requestPath = %q, identifier = %q", requestPath, identifier)
+	}
+
+	// With media_type
+	requestPath, identifier, diagnostics = buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":          unknownString(),
+		"media_type":  tftypes.NewValue(tftypes.String, "audiobook"),
+		"result_json": unknownString(),
+	})
+	if diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", diagnostics)
+	}
+	if !strings.Contains(requestPath, "mediaType=audiobook") {
+		t.Fatalf("queue_status requestPath = %q missing mediaType", requestPath)
+	}
+	if strings.Contains(identifier, "audiobook") {
+		t.Fatalf("queue_status identifier leaked query value: %q", identifier)
+	}
+}
+
+func TestQueueDataSourceEndToEnd(t *testing.T) {
+	t.Parallel()
+
+	var gotMethod, gotPath, gotKey string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotMethod, gotPath, gotKey = r.Method, r.URL.Path, r.Header.Get("X-Api-Key")
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"page":1,"pageSize":10,"totalRecords":1,"records":[{"id":1,"title":"The Way of Kings"}]}`))
+	}))
+	defer server.Close()
+
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: readOnlySyntheticKey, UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	definition := definitionByName(t, "queue")
+	instance := &readOnlyDataSource{definition: definition, client: apiClient}
+	schemaResponse := &datasource.SchemaResponse{}
+	instance.Schema(t.Context(), datasource.SchemaRequest{}, schemaResponse)
+	typeValue := schemaResponse.Schema.Type().TerraformType(context.Background())
+	raw := tftypes.NewValue(typeValue, map[string]tftypes.Value{
+		"id":                           unknownString(),
+		"page":                         tftypes.NewValue(tftypes.Number, nil),
+		"page_size":                    tftypes.NewValue(tftypes.Number, nil),
+		"sort_key":                     tftypes.NewValue(tftypes.String, nil),
+		"sort_direction":               tftypes.NewValue(tftypes.String, nil),
+		"include_unknown_author_items": tftypes.NewValue(tftypes.Bool, nil),
+		"include_author":               tftypes.NewValue(tftypes.Bool, nil),
+		"include_book":                 tftypes.NewValue(tftypes.Bool, nil),
+		"media_type":                   tftypes.NewValue(tftypes.String, nil),
+		"result_json":                  unknownString(),
+	})
+	readResponse := &datasource.ReadResponse{State: tfsdk.State{Raw: raw, Schema: schemaResponse.Schema}}
+	instance.Read(t.Context(), datasource.ReadRequest{Config: tfsdk.Config{Raw: raw, Schema: schemaResponse.Schema}}, readResponse)
+	if readResponse.Diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", readResponse.Diagnostics)
+	}
+	if gotMethod != http.MethodGet || gotPath != "/api/v1/queue" || gotKey != readOnlySyntheticKey {
+		t.Fatalf("request = %s %s key=%q", gotMethod, gotPath, gotKey)
+	}
+	var resultJSON types.String
+	readResponse.Diagnostics.Append(readResponse.State.GetAttribute(t.Context(), path.Root("result_json"), &resultJSON)...)
+	if readResponse.Diagnostics.HasError() || !strings.Contains(resultJSON.ValueString(), "The Way of Kings") {
+		t.Fatalf("result_json was not stored properly: %s", resultJSON.ValueString())
+	}
+}
+
+func TestQueueDetailsDataSourceEndToEnd(t *testing.T) {
+	t.Parallel()
+
+	var gotMethod, gotPath, gotKey string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotMethod, gotPath, gotKey = r.Method, r.URL.Path, r.Header.Get("X-Api-Key")
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`[{"id":1,"title":"The Way of Kings"}]`))
+	}))
+	defer server.Close()
+
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: readOnlySyntheticKey, UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	definition := definitionByName(t, "queue_details")
+	instance := &readOnlyDataSource{definition: definition, client: apiClient}
+	schemaResponse := &datasource.SchemaResponse{}
+	instance.Schema(t.Context(), datasource.SchemaRequest{}, schemaResponse)
+	typeValue := schemaResponse.Schema.Type().TerraformType(context.Background())
+	raw := tftypes.NewValue(typeValue, map[string]tftypes.Value{
+		"id":             unknownString(),
+		"author_id":      tftypes.NewValue(tftypes.Number, nil),
+		"book_ids":       tftypes.NewValue(tftypes.Set{ElementType: tftypes.Number}, nil),
+		"include_author": tftypes.NewValue(tftypes.Bool, nil),
+		"include_book":   tftypes.NewValue(tftypes.Bool, nil),
+		"media_type":     tftypes.NewValue(tftypes.String, nil),
+		"result_json":    unknownString(),
+	})
+	readResponse := &datasource.ReadResponse{State: tfsdk.State{Raw: raw, Schema: schemaResponse.Schema}}
+	instance.Read(t.Context(), datasource.ReadRequest{Config: tfsdk.Config{Raw: raw, Schema: schemaResponse.Schema}}, readResponse)
+	if readResponse.Diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", readResponse.Diagnostics)
+	}
+	if gotMethod != http.MethodGet || gotPath != "/api/v1/queue/details" || gotKey != readOnlySyntheticKey {
+		t.Fatalf("request = %s %s key=%q", gotMethod, gotPath, gotKey)
+	}
+	var resultJSON types.String
+	readResponse.Diagnostics.Append(readResponse.State.GetAttribute(t.Context(), path.Root("result_json"), &resultJSON)...)
+	if readResponse.Diagnostics.HasError() || !strings.Contains(resultJSON.ValueString(), "The Way of Kings") {
+		t.Fatalf("result_json was not stored properly: %s", resultJSON.ValueString())
+	}
+}
+
+func TestQueueStatusDataSourceEndToEnd(t *testing.T) {
+	t.Parallel()
+
+	var gotMethod, gotPath, gotKey string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotMethod, gotPath, gotKey = r.Method, r.URL.Path, r.Header.Get("X-Api-Key")
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"totalCount":3,"count":2,"unknownCount":0,"errors":false,"warnings":true,"unknownErrors":false,"unknownWarnings":false}`))
+	}))
+	defer server.Close()
+
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: readOnlySyntheticKey, UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	definition := definitionByName(t, "queue_status")
+	instance := &readOnlyDataSource{definition: definition, client: apiClient}
+	schemaResponse := &datasource.SchemaResponse{}
+	instance.Schema(t.Context(), datasource.SchemaRequest{}, schemaResponse)
+	typeValue := schemaResponse.Schema.Type().TerraformType(context.Background())
+	raw := tftypes.NewValue(typeValue, map[string]tftypes.Value{
+		"id":          unknownString(),
+		"media_type":  tftypes.NewValue(tftypes.String, nil),
+		"result_json": unknownString(),
+	})
+	readResponse := &datasource.ReadResponse{State: tfsdk.State{Raw: raw, Schema: schemaResponse.Schema}}
+	instance.Read(t.Context(), datasource.ReadRequest{Config: tfsdk.Config{Raw: raw, Schema: schemaResponse.Schema}}, readResponse)
+	if readResponse.Diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %v", readResponse.Diagnostics)
+	}
+	if gotMethod != http.MethodGet || gotPath != "/api/v1/queue/status" || gotKey != readOnlySyntheticKey {
+		t.Fatalf("request = %s %s key=%q", gotMethod, gotPath, gotKey)
+	}
+	var resultJSON types.String
+	readResponse.Diagnostics.Append(readResponse.State.GetAttribute(t.Context(), path.Root("result_json"), &resultJSON)...)
+	if readResponse.Diagnostics.HasError() {
+		t.Fatalf("failed to get attributes from state: %v", readResponse.Diagnostics)
+	}
+	if !strings.Contains(resultJSON.ValueString(), `"totalCount":3`) {
+		t.Fatalf("result_json was not stored properly: %s", resultJSON.ValueString())
 	}
 }
 

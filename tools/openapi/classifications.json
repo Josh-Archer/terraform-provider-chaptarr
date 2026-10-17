@@ -875,19 +875,19 @@
     },
     "GET /api/v1/queue": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_queue",
       "tracking_issue": "#11"
     },
     "GET /api/v1/queue/details": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_queue_details",
       "tracking_issue": "#11"
     },
     "GET /api/v1/queue/status": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_queue_status",
       "tracking_issue": "#11"
     },
