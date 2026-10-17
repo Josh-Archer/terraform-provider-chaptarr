@@ -1778,9 +1778,9 @@
     },
     "PUT /api/v1/delayprofile/reorder/{id}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_delay_profile",
-      "tracking_issue": "#4"
+      "tracking_issue": "#80"
     },
     "PUT /api/v1/delayprofile/{id}": {
       "classification": "resource",
