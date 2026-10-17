@@ -742,17 +742,17 @@ func (r *seriesResource) removeSeriesVariants(ctx context.Context, seriesID int6
 }
 func (r *seriesResource) loadSeriesNarratorState(ctx context.Context, seriesID int64, state *seriesModel, d *diag.Diagnostics) bool {
 	base := seriesPath(seriesID)
-	analysisBody, analysisFound := readSeriesSubresource(ctx, r.client, base+"/narrators", "series narrators", d)
+	analysisBody, analysisFound := readSeriesLookupSubresource(ctx, r.client, base+"/narrators", "series narrators", d)
 	if d.HasError() {
 		return false
 	}
 	analysisFound = analysisFound && !isJSONNull(analysisBody)
-	inheritanceBody, inheritanceFound := readSeriesSubresource(ctx, r.client, base+"/narrators/inheritance", "series narrator inheritance", d)
+	inheritanceBody, inheritanceFound := readSeriesLookupSubresource(ctx, r.client, base+"/narrators/inheritance", "series narrator inheritance", d)
 	if d.HasError() {
 		return false
 	}
 	inheritanceFound = inheritanceFound && !isJSONNull(inheritanceBody)
-	variantsBody, variantsFound := readSeriesSubresource(ctx, r.client, base+"/variants", "series variants", d)
+	variantsBody, variantsFound := readSeriesLookupSubresource(ctx, r.client, base+"/variants", "series variants", d)
 	if d.HasError() {
 		return false
 	}
@@ -903,6 +903,14 @@ func seriesPath(seriesID int64) string {
 	return "/api/v1/series/" + strconv.FormatInt(seriesID, 10)
 }
 func readSeriesSubresource(ctx context.Context, apiClient *client.Client, endpoint, label string, d *diag.Diagnostics) ([]byte, bool) {
+	response, err := apiClient.Do(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		d.AddError("Unable to read "+label, err.Error())
+		return nil, false
+	}
+	return response.Body, true
+}
+func readSeriesLookupSubresource(ctx context.Context, apiClient *client.Client, endpoint, label string, d *diag.Diagnostics) ([]byte, bool) {
 	response, err := apiClient.Do(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		if seriesLookupNotFound(err) {
