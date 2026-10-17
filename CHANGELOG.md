@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.18](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.17...v0.11.18) (2026-10-17)
+
+
+### Features
+
+* add queue data sources ([#91](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/91)) ([98cc713](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/98cc713e71d9cd682358a80f6c8f35a2376c6ea4))
+
 ## [0.11.17](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.16...v0.11.17) (2026-10-15)
 
 
