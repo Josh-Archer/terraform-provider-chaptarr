@@ -25,6 +25,7 @@ import (
 var (
 	_ resource.Resource                = &delayProfileResource{}
 	_ resource.ResourceWithImportState = &delayProfileResource{}
+	_ resource.ResourceWithModifyPlan  = &delayProfileResource{}
 )
 
 type delayProfileResource struct{ client *client.Client }
@@ -88,11 +89,29 @@ func (r *delayProfileResource) Configure(_ context.Context, req resource.Configu
 	r.client = configuredResourceClient(req.ProviderData, &resp.Diagnostics)
 }
 
+func (r *delayProfileResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	if req.Plan.Raw.IsNull() {
+		return
+	}
+	var plan delayProfileModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() || plan.AfterID.IsNull() || plan.AfterID.IsUnknown() {
+		return
+	}
+	id := int64(0)
+	var state delayProfileModel
+	if !req.State.Raw.IsNull() {
+		resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+		id, _ = positiveModelID(state.ID)
+	}
+	validateDelayProfilePosition(id, plan.AfterID, &resp.Diagnostics)
+}
+
 func (r *delayProfileResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan delayProfileModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	payload := delayProfilePayload(ctx, plan, 0, &resp.Diagnostics)
-	if !validateDelayProfile(payload, false, &resp.Diagnostics) {
+	if !validateDelayProfile(payload, false, &resp.Diagnostics) || !validateDelayProfileTarget(ctx, r.client, 0, plan.AfterID, &resp.Diagnostics) {
 		return
 	}
 	id := createProfile(ctx, r.client, "/api/v1/delayprofile", payload, "delay profile", &resp.Diagnostics)
@@ -101,6 +120,7 @@ func (r *delayProfileResource) Create(ctx context.Context, req resource.CreateRe
 	}
 	plan.ID = types.StringValue(strconv.FormatInt(id, 10))
 	if !reorderDelayProfile(ctx, r.client, id, plan.AfterID, &resp.Diagnostics) {
+		plan.AfterID = types.Int64Null()
 		var refreshDiagnostics diag.Diagnostics
 		r.refresh(ctx, &plan, &resp.State, &refreshDiagnostics)
 		resp.Diagnostics.Append(refreshDiagnostics...)
@@ -134,9 +154,20 @@ func (r *delayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 	if !validateDelayProfilePosition(id, plan.AfterID, &resp.Diagnostics) {
 		return
 	}
+	if !validateDelayProfileTarget(ctx, r.client, id, plan.AfterID, &resp.Diagnostics) {
+		return
+	}
 	updateProfile(ctx, r.client, "/api/v1/delayprofile/"+strconv.FormatInt(id, 10), payload, "delay profile", &resp.Diagnostics)
 	if !resp.Diagnostics.HasError() {
 		if !reorderDelayProfile(ctx, r.client, id, plan.AfterID, &resp.Diagnostics) {
+			var prior delayProfileModel
+			var stateDiagnostics diag.Diagnostics
+			stateDiagnostics.Append(req.State.Get(ctx, &prior)...)
+			resp.Diagnostics.Append(stateDiagnostics...)
+			plan.AfterID = types.Int64Null()
+			if !stateDiagnostics.HasError() {
+				plan.AfterID = prior.AfterID
+			}
 			var refreshDiagnostics diag.Diagnostics
 			r.refresh(ctx, &plan, &resp.State, &refreshDiagnostics)
 			resp.Diagnostics.Append(refreshDiagnostics...)
@@ -187,10 +218,38 @@ func validateDelayProfilePosition(id int64, afterID types.Int64, diagnostics *di
 	}
 	if afterID.ValueInt64() < 0 {
 		diagnostics.AddAttributeError(path.Root("after_id"), "Invalid delay-profile position", "after_id must be zero or a positive delay-profile ID.")
-	} else if afterID.ValueInt64() == id {
+	} else if afterID.ValueInt64() == 1 {
+		diagnostics.AddAttributeError(path.Root("after_id"), "Invalid delay-profile position", "The global delay profile (ID 1) cannot be used as an after_id target.")
+	} else if id > 0 && afterID.ValueInt64() == id {
 		diagnostics.AddAttributeError(path.Root("after_id"), "Invalid delay-profile position", "A delay profile cannot be placed after itself.")
 	}
 	return !diagnostics.HasError()
+}
+
+func validateDelayProfileTarget(ctx context.Context, apiClient *client.Client, id int64, afterID types.Int64, diagnostics *diag.Diagnostics) bool {
+	if afterID.IsNull() || afterID.IsUnknown() || afterID.ValueInt64() == 0 || diagnostics.HasError() {
+		return !diagnostics.HasError()
+	}
+	if !validateDelayProfilePosition(id, afterID, diagnostics) {
+		return false
+	}
+	response, err := apiClient.Do(ctx, http.MethodGet, "/api/v1/delayprofile", nil)
+	if err != nil {
+		diagnostics.AddAttributeError(path.Root("after_id"), "Unable to verify delay-profile position", fmt.Sprintf("Could not verify that delay profile %d exists: %s", afterID.ValueInt64(), err))
+		return false
+	}
+	var profiles []delayProfileAPI
+	if err := json.Unmarshal(response.Body, &profiles); err != nil {
+		diagnostics.AddAttributeError(path.Root("after_id"), "Unable to verify delay-profile position", "Chaptarr returned an invalid delay-profile list while checking after_id.")
+		return false
+	}
+	for _, profile := range profiles {
+		if profile.ID == afterID.ValueInt64() {
+			return true
+		}
+	}
+	diagnostics.AddAttributeError(path.Root("after_id"), "Invalid delay-profile position", fmt.Sprintf("Delay profile %d does not exist.", afterID.ValueInt64()))
+	return false
 }
 
 func reorderDelayProfile(ctx context.Context, apiClient *client.Client, id int64, afterID types.Int64, diagnostics *diag.Diagnostics) bool {

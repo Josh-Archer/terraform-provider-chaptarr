@@ -267,6 +267,8 @@ func TestDelayProfileUpdateReordersAfterConfiguredProfile(t *testing.T) {
 		requestOrder = append(requestOrder, request.Method+" "+request.URL.RequestURI())
 		writer.Header().Set("Content-Type", "application/json")
 		switch {
+		case request.Method == http.MethodGet && request.URL.Path == "/api/v1/delayprofile":
+			_, _ = writer.Write([]byte(`[{"id":1},{"id":7}]`))
 		case request.Method == http.MethodPut && request.URL.Path == "/api/v1/delayprofile/2":
 			writer.WriteHeader(http.StatusOK)
 		case request.Method == http.MethodPut && request.URL.Path == "/api/v1/delayprofile/reorder/2":
@@ -305,7 +307,7 @@ func TestDelayProfileUpdateReordersAfterConfiguredProfile(t *testing.T) {
 	if response.Diagnostics.HasError() {
 		t.Fatalf("update failed: %v", response.Diagnostics)
 	}
-	if strings.Join(requestOrder, ",") != "PUT /api/v1/delayprofile/2,PUT /api/v1/delayprofile/reorder/2?afterId=7,GET /api/v1/delayprofile/2" {
+	if strings.Join(requestOrder, ",") != "GET /api/v1/delayprofile,PUT /api/v1/delayprofile/2,PUT /api/v1/delayprofile/reorder/2?afterId=7,GET /api/v1/delayprofile/2" {
 		t.Fatalf("unexpected update request sequence: %v", requestOrder)
 	}
 	var afterID, order types.Int64
@@ -313,6 +315,53 @@ func TestDelayProfileUpdateReordersAfterConfiguredProfile(t *testing.T) {
 	response.Diagnostics.Append(response.State.GetAttribute(t.Context(), path.Root("order"), &order)...)
 	if response.Diagnostics.HasError() || afterID.ValueInt64() != 7 || order.ValueInt64() != 3 {
 		t.Fatalf("refresh did not preserve desired position and observe server order: after_id=%d order=%d diagnostics=%v", afterID.ValueInt64(), order.ValueInt64(), response.Diagnostics)
+	}
+}
+
+func TestDelayProfileUpdateReorderFailureKeepsPriorAfterID(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set("Content-Type", "application/json")
+		switch {
+		case request.Method == http.MethodGet && request.URL.Path == "/api/v1/delayprofile":
+			_, _ = writer.Write([]byte(`[{"id":1},{"id":4},{"id":7}]`))
+		case request.Method == http.MethodPut && request.URL.Path == "/api/v1/delayprofile/2":
+			writer.WriteHeader(http.StatusOK)
+		case request.Method == http.MethodPut && request.URL.Path == "/api/v1/delayprofile/reorder/2":
+			writer.WriteHeader(http.StatusInternalServerError)
+		case request.Method == http.MethodGet && request.URL.Path == "/api/v1/delayprofile/2":
+			_, _ = writer.Write([]byte(`{"id":2,"enableUsenet":true,"enableTorrent":true,"preferredProtocol":"usenet","usenetDelay":0,"torrentDelay":30,"bypassIfHighestQuality":true,"bypassIfAboveCustomFormatScore":false,"minimumCustomFormatScore":0,"order":3,"tags":[1]}`))
+		default:
+			t.Errorf("unexpected request %s %s", request.Method, request.URL.RequestURI())
+			writer.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "delay-profile-test-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var diagnostics diag.Diagnostics
+	prior := delayProfileModel{
+		ID: types.StringValue("2"), EnableUsenet: types.BoolValue(true), EnableTorrent: types.BoolValue(true),
+		PreferredProtocol: types.StringValue("usenet"), UsenetDelay: types.Int64Value(0), TorrentDelay: types.Int64Value(30),
+		BypassIfHighestQuality: types.BoolValue(true), BypassIfAboveCustomFormatScore: types.BoolValue(false),
+		MinimumCustomFormatScore: types.Int64Value(0), AfterID: types.Int64Value(4), Tags: setInt64State(t.Context(), []int64{1}, &diagnostics),
+	}
+	plan := prior
+	plan.AfterID = types.Int64Value(7)
+	instance := &delayProfileResource{client: apiClient}
+	priorState := stateForResource(t, instance, prior)
+	response := &resource.UpdateResponse{State: emptyStateForResource(t, instance)}
+	instance.Update(t.Context(), resource.UpdateRequest{Plan: tfsdk.Plan(stateForResource(t, instance, plan)), State: priorState}, response)
+	if !response.Diagnostics.HasError() {
+		t.Fatal("expected reorder failure")
+	}
+	var afterID types.Int64
+	var stateDiagnostics diag.Diagnostics
+	stateDiagnostics.Append(response.State.GetAttribute(t.Context(), path.Root("after_id"), &afterID)...)
+	if stateDiagnostics.HasError() || afterID.IsNull() || afterID.ValueInt64() != 4 {
+		t.Fatalf("failed reorder must retain prior after_id for retry: after_id=%v diagnostics=%v", afterID, response.Diagnostics)
 	}
 }
 
@@ -324,6 +373,8 @@ func TestDelayProfileCreateCanMoveProfileToFirstPosition(t *testing.T) {
 		requestOrder = append(requestOrder, request.Method+" "+request.URL.RequestURI())
 		writer.Header().Set("Content-Type", "application/json")
 		switch {
+		case request.Method == http.MethodGet && request.URL.Path == "/api/v1/delayprofile":
+			_, _ = writer.Write([]byte(`[{"id":1}]`))
 		case request.Method == http.MethodPost && request.URL.Path == "/api/v1/delayprofile":
 			_, _ = writer.Write([]byte(`{"id":2}`))
 		case request.Method == http.MethodPut && request.URL.Path == "/api/v1/delayprofile/reorder/2":
@@ -365,11 +416,128 @@ func TestDelayProfileCreateCanMoveProfileToFirstPosition(t *testing.T) {
 	}
 }
 
+func TestDelayProfileCreateReorderFailureDoesNotSaveAfterID(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set("Content-Type", "application/json")
+		switch {
+		case request.Method == http.MethodGet && request.URL.Path == "/api/v1/delayprofile":
+			_, _ = writer.Write([]byte(`[{"id":1},{"id":7}]`))
+		case request.Method == http.MethodPost && request.URL.Path == "/api/v1/delayprofile":
+			_, _ = writer.Write([]byte(`{"id":2}`))
+		case request.Method == http.MethodPut && request.URL.Path == "/api/v1/delayprofile/reorder/2":
+			writer.WriteHeader(http.StatusInternalServerError)
+		case request.Method == http.MethodGet && request.URL.Path == "/api/v1/delayprofile/2":
+			_, _ = writer.Write([]byte(`{"id":2,"enableUsenet":true,"enableTorrent":false,"preferredProtocol":"usenet","usenetDelay":0,"torrentDelay":0,"bypassIfHighestQuality":false,"bypassIfAboveCustomFormatScore":false,"minimumCustomFormatScore":0,"order":2,"tags":[1]}`))
+		default:
+			t.Errorf("unexpected request %s %s", request.Method, request.URL.RequestURI())
+			writer.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "delay-profile-test-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var diagnostics diag.Diagnostics
+	model := delayProfileModel{
+		EnableUsenet: types.BoolValue(true), EnableTorrent: types.BoolValue(false), PreferredProtocol: types.StringValue("usenet"),
+		UsenetDelay: types.Int64Value(0), TorrentDelay: types.Int64Value(0), BypassIfHighestQuality: types.BoolValue(false),
+		BypassIfAboveCustomFormatScore: types.BoolValue(false), MinimumCustomFormatScore: types.Int64Value(0),
+		AfterID: types.Int64Value(7), Tags: setInt64State(t.Context(), []int64{1}, &diagnostics),
+	}
+	instance := &delayProfileResource{client: apiClient}
+	response := &resource.CreateResponse{State: emptyStateForResource(t, instance)}
+	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan(stateForResource(t, instance, model))}, response)
+	if !response.Diagnostics.HasError() {
+		t.Fatal("expected reorder failure")
+	}
+	var afterID types.Int64
+	var stateDiagnostics diag.Diagnostics
+	stateDiagnostics.Append(response.State.GetAttribute(t.Context(), path.Root("after_id"), &afterID)...)
+	if stateDiagnostics.HasError() || !afterID.IsNull() {
+		t.Fatalf("failed create reorder must not save after_id: after_id=%v diagnostics=%v", afterID, stateDiagnostics)
+	}
+}
+
 func TestDelayProfilePositionRejectsSelfReference(t *testing.T) {
 	t.Parallel()
 	var diagnostics diag.Diagnostics
 	if validateDelayProfilePosition(5, types.Int64Value(5), &diagnostics) || !diagnostics.HasError() {
 		t.Fatal("expected a delay profile to reject positioning after itself")
+	}
+}
+
+func TestDelayProfilePositionRejectsGlobalTarget(t *testing.T) {
+	t.Parallel()
+	var diagnostics diag.Diagnostics
+	if validateDelayProfilePosition(5, types.Int64Value(1), &diagnostics) || !diagnostics.HasError() {
+		t.Fatal("expected the reserved global profile to be rejected as a target")
+	}
+}
+
+func TestDelayProfileRejectsMissingAfterIDTarget(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method != http.MethodGet || request.URL.Path != "/api/v1/delayprofile" {
+			t.Errorf("unexpected request %s %s", request.Method, request.URL.RequestURI())
+		}
+		_, _ = writer.Write([]byte(`[{"id":1},{"id":2}]`))
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "delay-profile-test-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var diagnostics diag.Diagnostics
+	if validateDelayProfileTarget(t.Context(), apiClient, 3, types.Int64Value(999), &diagnostics) || !diagnostics.HasError() {
+		t.Fatal("expected a missing target to be rejected")
+	}
+	if !strings.Contains(diagnostics.Errors()[0].Detail(), "does not exist") {
+		t.Fatalf("missing-target error was unclear: %v", diagnostics)
+	}
+}
+
+func TestDelayProfileNullAfterIDDoesNotReorder(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		t.Errorf("null after_id must not make an API call, got %s %s", request.Method, request.URL.RequestURI())
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "delay-profile-test-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var diagnostics diag.Diagnostics
+	if !reorderDelayProfile(t.Context(), apiClient, 2, types.Int64Null(), &diagnostics) || diagnostics.HasError() {
+		t.Fatalf("null after_id should skip reorder without errors: %v", diagnostics)
+	}
+}
+
+func TestDelayProfileCycleUsesApplyOrder(t *testing.T) {
+	t.Parallel()
+	var reorders []string
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method == http.MethodPut && strings.HasPrefix(request.URL.Path, "/api/v1/delayprofile/reorder/") {
+			reorders = append(reorders, request.URL.Path+"?"+request.URL.RawQuery)
+			writer.WriteHeader(http.StatusOK)
+			return
+		}
+		t.Errorf("unexpected request %s %s", request.Method, request.URL.RequestURI())
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "delay-profile-test-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var diagnostics diag.Diagnostics
+	for _, pair := range [][2]int64{{2, 3}, {3, 2}} {
+		if !reorderDelayProfile(t.Context(), apiClient, pair[0], types.Int64Value(pair[1]), &diagnostics) {
+			t.Fatalf("cycle reorder failed: %v", diagnostics)
+		}
+	}
+	if strings.Join(reorders, ",") != "/api/v1/delayprofile/reorder/2?afterId=3,/api/v1/delayprofile/reorder/3?afterId=2" {
+		t.Fatalf("cyclic constraints were not applied in call order: %v", reorders)
 	}
 }
 

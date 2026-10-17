@@ -18,7 +18,9 @@ The provider supports Chaptarr's current two-level tree (groups containing quali
 
 Release-profile required and ignored terms remain ordered lists. At least one list must be non-empty. An enabled profile with a nonzero `indexer_id` is also validated by Chaptarr against its configured indexers.
 
-Delay profiles require Usenet or Torrent, non-negative delays, and tags for non-global profiles. Chaptarr reserves delay-profile ID `1`: it must have no tags and cannot be destroyed through the provider. Set optional `after_id` to move a profile after another profile; use `0` to place it first. The provider calls Chaptarr's reorder endpoint during create or update when `after_id` is configured. The server owns the resulting position, which is observed through computed `order`.
+Delay profiles require Usenet or Torrent, non-negative delays, and tags for non-global profiles. Chaptarr reserves delay-profile ID `1`: it must have no tags, cannot be destroyed through the provider, and cannot be used as an `after_id` target. Set optional `after_id` to move a profile after another existing profile; use `0` to place it first. The provider checks that a nonzero target exists before create or update, and reports reorder failures without recording the new `after_id`, so Terraform can retry. Omitting `after_id` does not issue a reorder request.
+
+`after_id` records ordering intent; `order` is read from Chaptarr. A manual reorder in Chaptarr's UI can therefore change `order` without producing Terraform drift. If configured ordering constraints form a cycle, the provider cannot detect the cycle across separate resources: each successful reorder is applied in Terraform apply order, and later calls may override earlier placement. Avoid cyclic `after_id` references. Self-reference is rejected during planning when the profile ID is known.
 
 ## Quality definitions
 
