@@ -100,6 +100,8 @@ resource "chaptarr_delay_profile" "tagged" {
   bypass_if_above_custom_format_score = false
   minimum_custom_format_score         = 0
   tags                                = [1]
+  # Optional: place this profile after another delay profile; use 0 for first.
+  after_id = 0
 }
 
 # quality_id adopts an existing built-in definition rather than creating one.

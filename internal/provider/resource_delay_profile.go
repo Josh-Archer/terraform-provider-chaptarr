@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/Josh-Archer/terraform-provider-chaptarr/internal/client"
@@ -38,6 +40,7 @@ type delayProfileModel struct {
 	BypassIfAboveCustomFormatScore types.Bool   `tfsdk:"bypass_if_above_custom_format_score"`
 	MinimumCustomFormatScore       types.Int64  `tfsdk:"minimum_custom_format_score"`
 	Order                          types.Int64  `tfsdk:"order"`
+	AfterID                        types.Int64  `tfsdk:"after_id"`
 	Tags                           types.Set    `tfsdk:"tags"`
 }
 
@@ -63,7 +66,7 @@ func (r *delayProfileResource) Metadata(_ context.Context, req resource.Metadata
 
 func (r *delayProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Manage a Chaptarr delay profile. The server owns profile ordering; `order` is observed and the global profile (ID 1) cannot be destroyed.",
+		MarkdownDescription: "Manage a Chaptarr delay profile. Set `after_id` to place the profile after another profile (`0` places it first); `order` is observed from the server. The global profile (ID 1) cannot be destroyed.",
 		Attributes: map[string]schema.Attribute{
 			"id":                                  schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"enable_usenet":                       schema.BoolAttribute{Required: true},
@@ -75,6 +78,7 @@ func (r *delayProfileResource) Schema(_ context.Context, _ resource.SchemaReques
 			"bypass_if_above_custom_format_score": schema.BoolAttribute{Required: true},
 			"minimum_custom_format_score":         schema.Int64Attribute{Required: true},
 			"order":                               schema.Int64Attribute{Computed: true},
+			"after_id":                            schema.Int64Attribute{Optional: true, Validators: []validator.Int64{int64validator.AtLeast(0)}, MarkdownDescription: "Place this profile after the given delay-profile ID. Use `0` to move it to the first position. Omit to leave ordering unchanged."},
 			"tags":                                schema.SetAttribute{Optional: true, Computed: true, ElementType: types.Int64Type},
 		},
 	}
@@ -96,6 +100,12 @@ func (r *delayProfileResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 	plan.ID = types.StringValue(strconv.FormatInt(id, 10))
+	if !reorderDelayProfile(ctx, r.client, id, plan.AfterID, &resp.Diagnostics) {
+		var refreshDiagnostics diag.Diagnostics
+		r.refresh(ctx, &plan, &resp.State, &refreshDiagnostics)
+		resp.Diagnostics.Append(refreshDiagnostics...)
+		return
+	}
 	r.refresh(ctx, &plan, &resp.State, &resp.Diagnostics)
 }
 
@@ -121,8 +131,17 @@ func (r *delayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 	if !validateDelayProfile(payload, id == 1, &resp.Diagnostics) {
 		return
 	}
+	if !validateDelayProfilePosition(id, plan.AfterID, &resp.Diagnostics) {
+		return
+	}
 	updateProfile(ctx, r.client, "/api/v1/delayprofile/"+strconv.FormatInt(id, 10), payload, "delay profile", &resp.Diagnostics)
 	if !resp.Diagnostics.HasError() {
+		if !reorderDelayProfile(ctx, r.client, id, plan.AfterID, &resp.Diagnostics) {
+			var refreshDiagnostics diag.Diagnostics
+			r.refresh(ctx, &plan, &resp.State, &refreshDiagnostics)
+			resp.Diagnostics.Append(refreshDiagnostics...)
+			return
+		}
 		r.refresh(ctx, &plan, &resp.State, &resp.Diagnostics)
 	}
 }
@@ -160,6 +179,40 @@ func validateDelayProfile(payload delayProfileAPI, global bool, diagnostics *dia
 		diagnostics.AddError("Delay-profile tags required", "Non-global delay profiles must have at least one tag.")
 	}
 	return !diagnostics.HasError()
+}
+
+func validateDelayProfilePosition(id int64, afterID types.Int64, diagnostics *diag.Diagnostics) bool {
+	if afterID.IsNull() || afterID.IsUnknown() {
+		return !diagnostics.HasError()
+	}
+	if afterID.ValueInt64() < 0 {
+		diagnostics.AddAttributeError(path.Root("after_id"), "Invalid delay-profile position", "after_id must be zero or a positive delay-profile ID.")
+	} else if afterID.ValueInt64() == id {
+		diagnostics.AddAttributeError(path.Root("after_id"), "Invalid delay-profile position", "A delay profile cannot be placed after itself.")
+	}
+	return !diagnostics.HasError()
+}
+
+func reorderDelayProfile(ctx context.Context, apiClient *client.Client, id int64, afterID types.Int64, diagnostics *diag.Diagnostics) bool {
+	if afterID.IsNull() || afterID.IsUnknown() {
+		return !diagnostics.HasError()
+	}
+	if !validateDelayProfilePosition(id, afterID, diagnostics) {
+		return false
+	}
+	values := url.Values{}
+	if afterID.ValueInt64() != 0 {
+		values.Set("afterId", strconv.FormatInt(afterID.ValueInt64(), 10))
+	}
+	endpoint := "/api/v1/delayprofile/reorder/" + strconv.FormatInt(id, 10)
+	if query := values.Encode(); query != "" {
+		endpoint += "?" + query
+	}
+	if _, err := apiClient.Do(ctx, http.MethodPut, endpoint, nil); err != nil {
+		diagnostics.AddError("Unable to reorder delay profile", err.Error())
+		return false
+	}
+	return true
 }
 
 func (r *delayProfileResource) refresh(ctx context.Context, state *delayProfileModel, target *tfsdk.State, diagnostics *diag.Diagnostics) {

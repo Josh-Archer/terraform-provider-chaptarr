@@ -18,7 +18,7 @@ The provider supports Chaptarr's current two-level tree (groups containing quali
 
 Release-profile required and ignored terms remain ordered lists. At least one list must be non-empty. An enabled profile with a nonzero `indexer_id` is also validated by Chaptarr against its configured indexers.
 
-Delay profiles require Usenet or Torrent, non-negative delays, and tags for non-global profiles. Chaptarr reserves delay-profile ID `1`: it must have no tags and cannot be destroyed through the provider. Profile ordering remains server-owned and observed through computed `order`; the imperative reorder endpoint is intentionally not called during plan or refresh.
+Delay profiles require Usenet or Torrent, non-negative delays, and tags for non-global profiles. Chaptarr reserves delay-profile ID `1`: it must have no tags and cannot be destroyed through the provider. Set optional `after_id` to move a profile after another profile; use `0` to place it first. The provider calls Chaptarr's reorder endpoint during create or update when `after_id` is configured. The server owns the resulting position, which is observed through computed `order`.
 
 ## Quality definitions
 
