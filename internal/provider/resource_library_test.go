@@ -360,7 +360,7 @@ func TestSeriesSubresourceNotFoundIsNoData(t *testing.T) {
 		if request.Method != http.MethodGet {
 			t.Fatalf("unexpected request: %s %s", request.Method, request.URL.Path)
 		}
-		http.Error(writer, "endpoint not found", http.StatusNotFound)
+		http.Error(writer, `{"message":"Not Found"}`, http.StatusNotFound)
 	}))
 	defer server.Close()
 	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "series-key", UserAgent: "test/1.0"})
@@ -402,8 +402,43 @@ func TestSeriesSubresourceNullResponsesAreNoData(t *testing.T) {
 
 func TestSeriesSubresourceOtherErrorsStillFail(t *testing.T) {
 	t.Parallel()
+	for _, testCase := range []struct {
+		name       string
+		statusCode int
+		body       string
+	}{
+		{name: "500 endpoint not found", statusCode: http.StatusInternalServerError, body: `{"message":"Endpoint not found"}`},
+		{name: "401 auth endpoint not found", statusCode: http.StatusUnauthorized, body: `{"message":"auth endpoint not found"}`},
+		{name: "500 temporary server failure", statusCode: http.StatusInternalServerError, body: "temporary server failure"},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			t.Parallel()
+			server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+				http.Error(writer, testCase.body, testCase.statusCode)
+			}))
+			defer server.Close()
+			apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "series-key", UserAgent: "test/1.0"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			state := seriesTestModel(t)
+			var diagnostics diag.Diagnostics
+			if ok := (&seriesResource{client: apiClient}).loadSeriesNarratorState(t.Context(), 12, &state, &diagnostics); ok || !diagnostics.HasError() {
+				t.Fatalf("non-404 subresource errors must fail refresh: ok=%v diagnostics=%v", ok, diagnostics)
+			}
+		})
+	}
+}
+
+func TestSeriesSubresourceDroppedConnectionFails(t *testing.T) {
+	t.Parallel()
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		http.Error(writer, "temporary server failure", http.StatusInternalServerError)
+		connection, _, err := writer.(http.Hijacker).Hijack()
+		if err != nil {
+			t.Errorf("hijack connection: %v", err)
+			return
+		}
+		_ = connection.Close()
 	}))
 	defer server.Close()
 	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "series-key", UserAgent: "test/1.0"})
@@ -413,7 +448,7 @@ func TestSeriesSubresourceOtherErrorsStillFail(t *testing.T) {
 	state := seriesTestModel(t)
 	var diagnostics diag.Diagnostics
 	if ok := (&seriesResource{client: apiClient}).loadSeriesNarratorState(t.Context(), 12, &state, &diagnostics); ok || !diagnostics.HasError() {
-		t.Fatalf("non-404 subresource errors must fail refresh: ok=%v diagnostics=%v", ok, diagnostics)
+		t.Fatalf("dropped connection must fail refresh: ok=%v diagnostics=%v", ok, diagnostics)
 	}
 }
 

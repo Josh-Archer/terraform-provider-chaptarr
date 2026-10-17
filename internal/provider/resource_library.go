@@ -923,14 +923,7 @@ func readSeriesLookupSubresource(ctx context.Context, apiClient *client.Client, 
 }
 func seriesLookupNotFound(err error) bool {
 	var apiErr *client.APIError
-	if !errors.As(err, &apiErr) {
-		return false
-	}
-	if apiErr.StatusCode == http.StatusNotFound {
-		return true
-	}
-	message := strings.ToLower(apiErr.Message)
-	return strings.Contains(message, "endpoint") && (strings.Contains(message, "not found") || strings.Contains(message, "not-found"))
+	return errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound
 }
 func isJSONNull(body []byte) bool {
 	return bytes.Equal(bytes.TrimSpace(body), []byte("null"))

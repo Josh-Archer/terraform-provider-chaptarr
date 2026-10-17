@@ -33,7 +33,7 @@ func testAccSeriesRefresh(t *testing.T, verify func(*testing.T, seriesModel)) {
 	}
 	seriesID := os.Getenv("CHAPTARR_TEST_SERIES_ID")
 	if seriesID == "" {
-		t.Fatal("CHAPTARR_TEST_SERIES_ID must identify an existing series")
+		t.Skip("acceptance tests require CHAPTARR_TEST_SERIES_ID to identify an existing series")
 	}
 	apiClient, err := client.New(client.Config{BaseURL: os.Getenv("CHAPTARR_URL"), APIKey: os.Getenv("CHAPTARR_API_KEY"), UserAgent: "terraform-provider-chaptarr-acceptance/1.0"})
 	if err != nil {
