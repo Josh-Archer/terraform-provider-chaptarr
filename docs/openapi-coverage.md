@@ -13,8 +13,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | Classification | Status | Operations |
 |---|---|---:|
 | action-only | excluded | 58 |
-| data-source | implemented | 57 |
-| data-source | planned | 27 |
+| data-source | implemented | 60 |
+| data-source | planned | 24 |
 | out-of-scope | excluded | 16 |
 | resource | implemented | 111 |
 | resource | planned | 48 |
@@ -167,9 +167,9 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/qualityprofile` | QualityProfile | resource | planned | chaptarr_quality_profile | #4 | `a71a0ea426a5` |
 | `GET /api/v1/qualityprofile/schema` | QualityProfileSchema | data-source | implemented | chaptarr_quality_profile_schema | #4 | `06d14457231a` |
 | `GET /api/v1/qualityprofile/{id}` | QualityProfile | resource | implemented | chaptarr_quality_profile | #4 | `eb50c19bfe2b` |
-| `GET /api/v1/queue` | Queue | data-source | planned | chaptarr_queue | #11 | `3f6e25d27786` |
-| `GET /api/v1/queue/details` | QueueDetails | data-source | planned | chaptarr_queue_details | #11 | `a60dced36271` |
-| `GET /api/v1/queue/status` | QueueStatus | data-source | planned | chaptarr_queue_status | #11 | `c4fc28051a62` |
+| `GET /api/v1/queue` | Queue | data-source | implemented | chaptarr_queue | #11 | `3f6e25d27786` |
+| `GET /api/v1/queue/details` | QueueDetails | data-source | implemented | chaptarr_queue_details | #11 | `a60dced36271` |
+| `GET /api/v1/queue/status` | QueueStatus | data-source | implemented | chaptarr_queue_status | #11 | `c4fc28051a62` |
 | `GET /api/v1/release` | Release | data-source | planned | chaptarr_release_search | #5 | `a45ef8624d3e` |
 | `GET /api/v1/releaseprofile` | ReleaseProfile | resource | planned | chaptarr_release_profile | #4 | `c8476e69a698` |
 | `GET /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | implemented | chaptarr_release_profile | #4 | `f5559fd58837` |

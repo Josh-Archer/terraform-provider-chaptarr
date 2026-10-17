@@ -22,6 +22,18 @@ data "chaptarr_calendar" "next_month" {
   include_author = true
 }
 
+data "chaptarr_queue" "current" {
+  page      = 1
+  page_size = 20
+}
+
+data "chaptarr_queue_details" "current" {
+  include_author = true
+  include_book   = true
+}
+
+data "chaptarr_queue_status" "current" {}
+
 check "chaptarr_ready" {
   assert {
     condition     = data.chaptarr_api_info.current.current == "v1"

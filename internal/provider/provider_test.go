@@ -33,8 +33,8 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 		t.Fatalf("registered %d resources, want 32", len(resources))
 	}
 	dataSources := p.DataSources(context.Background())
-	if len(dataSources) != 43 {
-		t.Fatalf("registered %d data sources, want 43", len(dataSources))
+	if len(dataSources) != 46 {
+		t.Fatalf("registered %d data sources, want 46", len(dataSources))
 	}
 	registeredDataSources := make(map[string]struct{}, len(dataSources))
 	for _, factory := range dataSources {
@@ -62,6 +62,9 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 		"chaptarr_blocklist",
 		"chaptarr_remote_path_mapping_suggestions",
 		"chaptarr_author_statistics",
+		"chaptarr_queue",
+		"chaptarr_queue_details",
+		"chaptarr_queue_status",
 	} {
 		if _, ok := registeredDataSources[typeName]; !ok {
 			t.Fatalf("missing registered data source %q", typeName)

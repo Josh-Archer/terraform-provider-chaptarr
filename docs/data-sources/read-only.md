@@ -51,6 +51,9 @@ check "supported_chaptarr" {
 - `chaptarr_tasks` reads all tasks or one `task_id` without running it.
 - `chaptarr_updates` observes update metadata without installing anything.
 - `chaptarr_disk_space` returns current disk-space observations.
+- `chaptarr_queue` reads queued items and queue paging state without modifying the queue.
+- `chaptarr_queue_details` reads detailed queue items without modifying download progress or queue state.
+- `chaptarr_queue_status` reads queue status and queue health counts without modifying queue state.
 - `chaptarr_file_system` supports `contents`, `type`, and `media_files` lookups.
   Its path is query-escaped and no file operation is performed.
 
