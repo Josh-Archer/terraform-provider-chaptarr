@@ -472,7 +472,7 @@ func TestDelayProfileCreateCanMoveProfileToFirstPosition(t *testing.T) {
 	}
 }
 
-func TestDelayProfileCreateReorderFailureDoesNotSaveAfterID(t *testing.T) {
+func TestDelayProfileCreateReorderFailureKeepsPlannedAfterID(t *testing.T) {
 	t.Parallel()
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Set("Content-Type", "application/json")
@@ -516,8 +516,8 @@ func TestDelayProfileCreateReorderFailureDoesNotSaveAfterID(t *testing.T) {
 	var stateDiagnostics diag.Diagnostics
 	stateDiagnostics.Append(response.State.GetAttribute(t.Context(), path.Root("after_id"), &afterID)...)
 	stateDiagnostics.Append(response.State.GetAttribute(t.Context(), path.Root("id"), &id)...)
-	if stateDiagnostics.HasError() || !afterID.IsNull() || id.ValueString() != "2" {
-		t.Fatalf("failed create reorder must save resource with null after_id: id=%v after_id=%v diagnostics=%v", id, afterID, stateDiagnostics)
+	if stateDiagnostics.HasError() || afterID.ValueInt64() != 7 || id.ValueString() != "2" {
+		t.Fatalf("failed create reorder must keep planned after_id in state: id=%v after_id=%v diagnostics=%v", id, afterID, stateDiagnostics)
 	}
 }
 
@@ -608,6 +608,46 @@ func TestDelayProfileModifyPlanRejectsMissingTarget(t *testing.T) {
 	}
 }
 
+func TestDelayProfileModifyPlanWarnsWhenTargetDeletedInUI(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method != http.MethodGet || request.URL.Path != "/api/v1/delayprofile" {
+			t.Errorf("unexpected request %s %s", request.Method, request.URL.RequestURI())
+		}
+		_, _ = writer.Write([]byte(`[{"id":1},{"id":2}]`))
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "test-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	instance := &delayProfileResource{client: apiClient}
+	prior := delayProfileModel{
+		ID: types.StringValue("3"), EnableUsenet: types.BoolValue(true), EnableTorrent: types.BoolValue(true),
+		PreferredProtocol: types.StringValue("usenet"), UsenetDelay: types.Int64Value(0), TorrentDelay: types.Int64Value(0),
+		BypassIfHighestQuality: types.BoolValue(false), BypassIfAboveCustomFormatScore: types.BoolValue(false),
+		MinimumCustomFormatScore: types.Int64Value(0), AfterID: types.Int64Value(999),
+		Tags: types.SetNull(types.Int64Type),
+	}
+	plan := prior
+	plan.TorrentDelay = types.Int64Value(15) // unrelated edit, after_id unchanged
+	req := resource.ModifyPlanRequest{
+		State: tfsdk.State(stateForResource(t, instance, prior)),
+		Plan:  tfsdk.Plan(stateForResource(t, instance, plan)),
+	}
+	resp := &resource.ModifyPlanResponse{Plan: req.Plan}
+	instance.ModifyPlan(t.Context(), req, resp)
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("ModifyPlan should warn rather than error when target was deleted in UI: %v", resp.Diagnostics)
+	}
+	if len(resp.Diagnostics.Warnings()) == 0 {
+		t.Fatal("expected a warning when target was deleted in UI")
+	}
+	if !strings.Contains(resp.Diagnostics.Warnings()[0].Detail(), "does not exist") {
+		t.Fatalf("unexpected warning message: %v", resp.Diagnostics)
+	}
+}
+
 func TestDelayProfileUpdateRejectsGlobalProfileReorder(t *testing.T) {
 	t.Parallel()
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
@@ -653,7 +693,7 @@ func TestDelayProfileRejectsMissingAfterIDTarget(t *testing.T) {
 		t.Fatal(err)
 	}
 	var diagnostics diag.Diagnostics
-	if validateDelayProfileTarget(t.Context(), apiClient, 3, types.Int64Value(999), &diagnostics) || !diagnostics.HasError() {
+	if validateDelayProfileTarget(t.Context(), apiClient, 3, types.Int64Value(999), false, &diagnostics) || !diagnostics.HasError() {
 		t.Fatal("expected a missing target to be rejected")
 	}
 	if !strings.Contains(diagnostics.Errors()[0].Detail(), "does not exist") {
