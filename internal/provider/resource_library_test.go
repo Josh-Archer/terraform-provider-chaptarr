@@ -354,6 +354,69 @@ func TestSeriesNarratorControlsFailClosed(t *testing.T) {
 	}
 }
 
+func TestSeriesSubresourceNotFoundIsNoData(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method != http.MethodGet {
+			t.Fatalf("unexpected request: %s %s", request.Method, request.URL.Path)
+		}
+		http.Error(writer, "endpoint not found", http.StatusNotFound)
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "series-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	state := seriesTestModel(t)
+	var diagnostics diag.Diagnostics
+	if ok := (&seriesResource{client: apiClient}).loadSeriesNarratorState(t.Context(), 12, &state, &diagnostics); !ok || diagnostics.HasError() {
+		t.Fatalf("404 subresources should be treated as no data: ok=%v diagnostics=%v", ok, diagnostics)
+	}
+	if !state.NarratorAnalysis.IsNull() || !state.NarratorInheritance.IsNull() || state.Variants.IsNull() || len(state.Variants.Elements()) != 0 {
+		t.Fatalf("404 subresource state should be null/empty: analysis=%#v inheritance=%#v variants=%#v", state.NarratorAnalysis, state.NarratorInheritance, state.Variants)
+	}
+}
+
+func TestSeriesSubresourceNullResponsesAreNoData(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Method != http.MethodGet {
+			t.Fatalf("unexpected request: %s %s", request.Method, request.URL.Path)
+		}
+		_, _ = writer.Write([]byte("null"))
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "series-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	state := seriesTestModel(t)
+	var diagnostics diag.Diagnostics
+	if ok := (&seriesResource{client: apiClient}).loadSeriesNarratorState(t.Context(), 12, &state, &diagnostics); !ok || diagnostics.HasError() {
+		t.Fatalf("null subresources should be treated as no data: ok=%v diagnostics=%v", ok, diagnostics)
+	}
+	if !state.NarratorAnalysis.IsNull() || !state.NarratorInheritance.IsNull() || state.Variants.IsNull() || len(state.Variants.Elements()) != 0 {
+		t.Fatalf("null subresource state should be null/empty: analysis=%#v inheritance=%#v variants=%#v", state.NarratorAnalysis, state.NarratorInheritance, state.Variants)
+	}
+}
+
+func TestSeriesSubresourceOtherErrorsStillFail(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		http.Error(writer, "temporary server failure", http.StatusInternalServerError)
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "series-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	state := seriesTestModel(t)
+	var diagnostics diag.Diagnostics
+	if ok := (&seriesResource{client: apiClient}).loadSeriesNarratorState(t.Context(), 12, &state, &diagnostics); ok || !diagnostics.HasError() {
+		t.Fatalf("non-404 subresource errors must fail refresh: ok=%v diagnostics=%v", ok, diagnostics)
+	}
+}
+
 func seriesTestModel(t *testing.T) seriesModel {
 	t.Helper()
 	book, diagnostics := types.ObjectValue(seriesBookType().AttrTypes, map[string]attr.Value{"foreign_book_id": types.StringValue("hc:book-3"), "foreign_author_id": types.StringValue("hc:author-4")})

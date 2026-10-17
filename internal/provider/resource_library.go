@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -741,33 +742,48 @@ func (r *seriesResource) removeSeriesVariants(ctx context.Context, seriesID int6
 }
 func (r *seriesResource) loadSeriesNarratorState(ctx context.Context, seriesID int64, state *seriesModel, d *diag.Diagnostics) bool {
 	base := seriesPath(seriesID)
-	analysisBody, ok := readSeriesSubresource(ctx, r.client, base+"/narrators", "series narrators", d)
-	if !ok {
+	analysisBody, analysisFound := readSeriesSubresource(ctx, r.client, base+"/narrators", "series narrators", d)
+	if d.HasError() {
 		return false
 	}
-	inheritanceBody, ok := readSeriesSubresource(ctx, r.client, base+"/narrators/inheritance", "series narrator inheritance", d)
-	if !ok {
+	analysisFound = analysisFound && !isJSONNull(analysisBody)
+	inheritanceBody, inheritanceFound := readSeriesSubresource(ctx, r.client, base+"/narrators/inheritance", "series narrator inheritance", d)
+	if d.HasError() {
 		return false
 	}
-	variantsBody, ok := readSeriesSubresource(ctx, r.client, base+"/variants", "series variants", d)
-	if !ok {
+	inheritanceFound = inheritanceFound && !isJSONNull(inheritanceBody)
+	variantsBody, variantsFound := readSeriesSubresource(ctx, r.client, base+"/variants", "series variants", d)
+	if d.HasError() {
 		return false
 	}
-	analysis, ok := narratorAnalysisState(ctx, seriesID, analysisBody, d)
-	if !ok {
-		return false
+	variantsFound = variantsFound && !isJSONNull(variantsBody)
+	if analysisFound {
+		analysis, ok := narratorAnalysisState(ctx, seriesID, analysisBody, d)
+		if !ok {
+			return false
+		}
+		state.NarratorAnalysis = analysis
+	} else {
+		state.NarratorAnalysis = types.ObjectNull(narratorAnalysisAttrTypes())
 	}
-	inheritance, ok := narratorInheritanceState(ctx, seriesID, inheritanceBody, d)
-	if !ok {
-		return false
+	if inheritanceFound {
+		inheritance, ok := narratorInheritanceState(ctx, seriesID, inheritanceBody, d)
+		if !ok {
+			return false
+		}
+		state.NarratorInheritance = inheritance
+	} else {
+		state.NarratorInheritance = types.ObjectNull(narratorInheritanceAttrTypes())
 	}
-	variants, ok := seriesVariantsState(ctx, variantsBody, d)
-	if !ok {
-		return false
+	if variantsFound {
+		variants, ok := seriesVariantsState(ctx, variantsBody, d)
+		if !ok {
+			return false
+		}
+		state.Variants = variants
+	} else {
+		state.Variants = types.ListValueMust(seriesVariantType(), []attr.Value{})
 	}
-	state.NarratorAnalysis = analysis
-	state.NarratorInheritance = inheritance
-	state.Variants = variants
 	return true
 }
 func narratorAnalysisState(ctx context.Context, seriesID int64, body []byte, d *diag.Diagnostics) (types.Object, bool) {
@@ -889,10 +905,27 @@ func seriesPath(seriesID int64) string {
 func readSeriesSubresource(ctx context.Context, apiClient *client.Client, endpoint, label string, d *diag.Diagnostics) ([]byte, bool) {
 	response, err := apiClient.Do(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
+		if seriesLookupNotFound(err) {
+			return nil, false
+		}
 		d.AddError("Unable to read "+label, err.Error())
 		return nil, false
 	}
 	return response.Body, true
+}
+func seriesLookupNotFound(err error) bool {
+	var apiErr *client.APIError
+	if !errors.As(err, &apiErr) {
+		return false
+	}
+	if apiErr.StatusCode == http.StatusNotFound {
+		return true
+	}
+	message := strings.ToLower(apiErr.Message)
+	return strings.Contains(message, "endpoint") && (strings.Contains(message, "not found") || strings.Contains(message, "not-found"))
+}
+func isJSONNull(body []byte) bool {
+	return bytes.Equal(bytes.TrimSpace(body), []byte("null"))
 }
 func trimmedString(value string) types.String {
 	value = strings.TrimSpace(value)
