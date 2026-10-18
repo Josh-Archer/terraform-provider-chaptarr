@@ -1,17 +1,20 @@
 package provider
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/Josh-Archer/terraform-provider-chaptarr/internal/client"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -282,23 +285,110 @@ type selectedSeriesBookModel struct {
 }
 type seriesResource struct{ client *client.Client }
 type seriesModel struct {
-	ID                types.String `tfsdk:"id"`
-	ForeignSeriesID   types.String `tfsdk:"foreign_series_id"`
-	Title             types.String `tfsdk:"title"`
-	MediaType         types.String `tfsdk:"media_type"`
-	SelectedBooks     types.Set    `tfsdk:"selected_books"`
-	MonitorExisting   types.String `tfsdk:"monitor_existing"`
-	MonitorFuture     types.Bool   `tfsdk:"monitor_future"`
-	RootFolderPath    types.String `tfsdk:"root_folder_path"`
-	QualityProfileID  types.Int64  `tfsdk:"quality_profile_id"`
-	MetadataProfileID types.Int64  `tfsdk:"metadata_profile_id"`
-	Tags              types.Set    `tfsdk:"tags"`
+	ID                            types.String `tfsdk:"id"`
+	ForeignSeriesID               types.String `tfsdk:"foreign_series_id"`
+	Title                         types.String `tfsdk:"title"`
+	MediaType                     types.String `tfsdk:"media_type"`
+	SelectedBooks                 types.Set    `tfsdk:"selected_books"`
+	MonitorExisting               types.String `tfsdk:"monitor_existing"`
+	MonitorFuture                 types.Bool   `tfsdk:"monitor_future"`
+	RootFolderPath                types.String `tfsdk:"root_folder_path"`
+	QualityProfileID              types.Int64  `tfsdk:"quality_profile_id"`
+	MetadataProfileID             types.Int64  `tfsdk:"metadata_profile_id"`
+	Tags                          types.Set    `tfsdk:"tags"`
+	PreferredNarrator             types.String `tfsdk:"preferred_narrator"`
+	ApplyNarratorToBooks          types.Bool   `tfsdk:"apply_narrator_to_books"`
+	OverrideExistingBookNarrators types.Bool   `tfsdk:"override_existing_book_narrators"`
+	NarratorAnalysis              types.Object `tfsdk:"narrator_analysis"`
+	NarratorInheritance           types.Object `tfsdk:"narrator_inheritance"`
+	Variants                      types.List   `tfsdk:"variants"`
+	RemoveVariantIDs              types.Set    `tfsdk:"remove_variant_ids"`
 }
 type seriesAPI struct {
-	ID              int64  `json:"id"`
-	ForeignSeriesID string `json:"foreignSeriesId"`
-	Title           string `json:"title"`
-	MediaType       string `json:"mediaType"`
+	ID               int64  `json:"id"`
+	ForeignSeriesID  string `json:"foreignSeriesId"`
+	LocalSeriesID    string `json:"localSeriesId"`
+	Title            string `json:"title"`
+	WorkCount        int64  `json:"workCount"`
+	PrimaryWorkCount int64  `json:"primaryWorkCount"`
+	MediaType        string `json:"mediaType"`
+	Narrator         string `json:"narrator"`
+}
+type seriesNarratorIntent struct {
+	managed  bool
+	narrator string
+	apply    bool
+	override bool
+}
+type narratorAnalysisModel struct {
+	SeriesID                   types.Int64  `tfsdk:"series_id"`
+	SeriesTitle                types.String `tfsdk:"series_title"`
+	PreferredNarrator          types.String `tfsdk:"preferred_narrator"`
+	Narrators                  types.List   `tfsdk:"narrators"`
+	SequentialOverlapNarrators types.Set    `tfsdk:"sequential_overlap_narrators"`
+	BooksWithoutNarratorCount  types.Int64  `tfsdk:"books_without_narrator_count"`
+	TotalBooksInSeries         types.Int64  `tfsdk:"total_books_in_series"`
+}
+type narratorAnalysisItemModel struct {
+	Narrator             types.String  `tfsdk:"narrator"`
+	BookCount            types.Int64   `tfsdk:"book_count"`
+	Percentage           types.Float64 `tfsdk:"percentage"`
+	HasSequentialOverlap types.Bool    `tfsdk:"has_sequential_overlap"`
+	IsMainNarrator       types.Bool    `tfsdk:"is_main_narrator"`
+	IsSporadicNarrator   types.Bool    `tfsdk:"is_sporadic_narrator"`
+}
+type narratorInheritanceModel struct {
+	SeriesID                types.Int64  `tfsdk:"series_id"`
+	SeriesTitle             types.String `tfsdk:"series_title"`
+	PreferredSeriesNarrator types.String `tfsdk:"preferred_series_narrator"`
+	CanApplyInheritance     types.Bool   `tfsdk:"can_apply_inheritance"`
+	BooksWithoutNarrator    types.List   `tfsdk:"books_without_narrator"`
+}
+type inheritanceBookModel struct {
+	BookID               types.Int64  `tfsdk:"book_id"`
+	BookTitle            types.String `tfsdk:"book_title"`
+	CurrentNarrator      types.String `tfsdk:"current_narrator"`
+	CanInheritFromSeries types.Bool   `tfsdk:"can_inherit_from_series"`
+}
+type seriesVariantModel struct {
+	ID               types.Int64  `tfsdk:"id"`
+	ForeignSeriesID  types.String `tfsdk:"foreign_series_id"`
+	LocalSeriesID    types.String `tfsdk:"local_series_id"`
+	Title            types.String `tfsdk:"title"`
+	MediaType        types.String `tfsdk:"media_type"`
+	Narrator         types.String `tfsdk:"narrator"`
+	WorkCount        types.Int64  `tfsdk:"work_count"`
+	PrimaryWorkCount types.Int64  `tfsdk:"primary_work_count"`
+}
+type seriesNarratorAnalysisAPI struct {
+	SeriesID                   int64                     `json:"seriesId"`
+	SeriesTitle                string                    `json:"seriesTitle"`
+	PreferredNarrator          string                    `json:"preferredNarrator"`
+	NarratorAnalysis           []narratorAnalysisItemAPI `json:"narratorAnalysis"`
+	SequentialOverlapNarrators []string                  `json:"sequentialOverlapNarrators"`
+	BooksWithoutNarratorCount  int64                     `json:"booksWithoutNarratorCount"`
+	TotalBooksInSeries         int64                     `json:"totalBooksInSeries"`
+}
+type narratorAnalysisItemAPI struct {
+	Narrator             string  `json:"narrator"`
+	BookCount            int64   `json:"bookCount"`
+	Percentage           float64 `json:"percentage"`
+	HasSequentialOverlap bool    `json:"hasSequentialOverlap"`
+	IsMainNarrator       bool    `json:"isMainNarrator"`
+	IsSporadicNarrator   bool    `json:"isSporadicNarrator"`
+}
+type seriesNarratorInheritanceAPI struct {
+	SeriesID                int64                `json:"seriesId"`
+	SeriesTitle             string               `json:"seriesTitle"`
+	PreferredSeriesNarrator string               `json:"preferredSeriesNarrator"`
+	BooksWithoutNarrator    []inheritanceBookAPI `json:"booksWithoutNarrator"`
+	CanApplyInheritance     bool                 `json:"canApplyInheritance"`
+}
+type inheritanceBookAPI struct {
+	BookID               int64  `json:"bookId"`
+	BookTitle            string `json:"bookTitle"`
+	CurrentNarrator      string `json:"currentNarrator"`
+	CanInheritFromSeries bool   `json:"canInheritFromSeries"`
 }
 
 func seriesBookType() types.ObjectType {
@@ -309,47 +399,72 @@ func (r *seriesResource) Metadata(_ context.Context, req resource.MetadataReques
 	resp.TypeName = req.ProviderTypeName + "_series"
 }
 func (r *seriesResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = schema.Schema{MarkdownDescription: "Manage safe Chaptarr series monitoring intent. Create/update may change monitoring only; refresh is GET-only. Destroy forgets Terraform ownership because Chaptarr exposes no general series-delete endpoint.", Attributes: map[string]schema.Attribute{
+	resp.Schema = schema.Schema{MarkdownDescription: "Manage safe Chaptarr series monitoring intent, an optional preferred narrator, and explicit narrator-variant removal. Refresh only GETs the series, narrator analysis, narrator inheritance, and variants. Discover and search are never called. Destroy forgets Terraform ownership because Chaptarr exposes no general series-delete endpoint.", Attributes: map[string]schema.Attribute{
 		"id": schema.StringAttribute{Computed: true, PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}}, "foreign_series_id": schema.StringAttribute{Required: true, PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}}, "title": schema.StringAttribute{Computed: true}, "media_type": schema.StringAttribute{Required: true, Validators: []validator.String{stringvalidator.OneOf("audiobook", "ebook")}},
-		"selected_books": schema.SetNestedAttribute{Optional: true, Computed: true, NestedObject: schema.NestedAttributeObject{Attributes: map[string]schema.Attribute{"foreign_book_id": schema.StringAttribute{Required: true}, "foreign_author_id": schema.StringAttribute{Required: true}}}, MarkdownDescription: "Required for create/update. Import cannot reconstruct the original selected-book intent, so it begins empty."}, "monitor_existing": schema.StringAttribute{Optional: true, Computed: true, Validators: []validator.String{stringvalidator.OneOf("none", "all", "select")}}, "monitor_future": schema.BoolAttribute{Optional: true, Computed: true}, "root_folder_path": schema.StringAttribute{Optional: true, Computed: true}, "quality_profile_id": schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}, "metadata_profile_id": schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}, "tags": schema.SetAttribute{Optional: true, Computed: true, ElementType: types.Int64Type}}}
+		"selected_books": schema.SetNestedAttribute{Optional: true, Computed: true, NestedObject: schema.NestedAttributeObject{Attributes: map[string]schema.Attribute{"foreign_book_id": schema.StringAttribute{Required: true}, "foreign_author_id": schema.StringAttribute{Required: true}}}, MarkdownDescription: "Required for create/update. Import cannot reconstruct the original selected-book intent, so it begins empty."}, "monitor_existing": schema.StringAttribute{Optional: true, Computed: true, Validators: []validator.String{stringvalidator.OneOf("none", "all", "select")}}, "monitor_future": schema.BoolAttribute{Optional: true, Computed: true}, "root_folder_path": schema.StringAttribute{Optional: true, Computed: true}, "quality_profile_id": schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}, "metadata_profile_id": schema.Int64Attribute{Optional: true, Computed: true, Validators: []validator.Int64{int64validator.AtLeast(1)}}, "tags": schema.SetAttribute{Optional: true, Computed: true, ElementType: types.Int64Type},
+		"preferred_narrator":               schema.StringAttribute{Optional: true, Computed: true, MarkdownDescription: "Narrator stored on the series. Set it to call PUT /narrators/preferred during create and update. Omit it to observe the server value without changing it. Refresh decodes this from the series document."},
+		"apply_narrator_to_books":          schema.BoolAttribute{Optional: true, Computed: true, MarkdownDescription: "When true and preferred_narrator is set, create/update also applies that narrator to books in the series. Defaults to false and never runs during refresh or destroy."},
+		"override_existing_book_narrators": schema.BoolAttribute{Optional: true, Computed: true, MarkdownDescription: "When true, apply_narrator_to_books replaces narrators that books already have. Requires apply_narrator_to_books. Defaults to false."},
+		"narrator_analysis":                schema.SingleNestedAttribute{Computed: true, Attributes: narratorAnalysisAttributes()},
+		"narrator_inheritance":             schema.SingleNestedAttribute{Computed: true, Attributes: narratorInheritanceAttributes()},
+		"variants":                         schema.ListNestedAttribute{Computed: true, NestedObject: schema.NestedAttributeObject{Attributes: seriesVariantAttributes()}, MarkdownDescription: "Narrator variants returned for this series. Images, links, descriptions, and book payloads are omitted."},
+		"remove_variant_ids":               schema.SetAttribute{Optional: true, Computed: true, ElementType: types.Int64Type, Validators: []validator.Set{setvalidator.ValueInt64sAre(int64validator.AtLeast(1))}, MarkdownDescription: "Variant IDs to delete during create/update. Empty deletes nothing. IDs that are not current variants of this series are left untouched. The managed series ID is rejected. Already-absent variants are success. Destroy does not delete variants."},
+	}}
 }
 func (r *seriesResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	r.client = configuredResourceClient(req.ProviderData, &resp.Diagnostics)
 }
 func (r *seriesResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan seriesModel
+	var config seriesModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	r.apply(ctx, &plan, &resp.State, &resp.Diagnostics)
+	normalizeSeriesControls(ctx, &plan, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	r.apply(ctx, &plan, config, &resp.State, &resp.Diagnostics)
 }
 func (r *seriesResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state seriesModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if !resp.Diagnostics.HasError() {
-		r.refresh(ctx, &state, &resp.State, &resp.Diagnostics)
-	}
-}
-func (r *seriesResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan seriesModel
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	r.apply(ctx, &plan, &resp.State, &resp.Diagnostics)
+	normalizeSeriesControls(ctx, &state, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	r.refresh(ctx, &state, &resp.State, &resp.Diagnostics)
+}
+func (r *seriesResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var plan seriesModel
+	var config seriesModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	normalizeSeriesControls(ctx, &plan, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	r.apply(ctx, &plan, config, &resp.State, &resp.Diagnostics)
 }
 func (r *seriesResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state seriesModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.AddWarning("Series retained in Chaptarr", "Chaptarr has no general series-delete endpoint. Terraform ownership was removed without deleting media, authors, books, or monitoring state.")
+		resp.Diagnostics.AddWarning("Series retained in Chaptarr", "Chaptarr has no general series-delete endpoint. Terraform ownership was removed without deleting the series, narrator variants, authors, books, files, or monitoring state.")
 	}
 }
 func (r *seriesResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	importNumericProfile(ctx, req.ID, "series", &resp.State, &resp.Diagnostics)
 }
-func (r *seriesResource) apply(ctx context.Context, m *seriesModel, target *tfsdk.State, d *diag.Diagnostics) {
+func (r *seriesResource) apply(ctx context.Context, m *seriesModel, config seriesModel, target *tfsdk.State, d *diag.Diagnostics) {
 	if m.ForeignSeriesID.IsNull() || m.ForeignSeriesID.IsUnknown() || !validProviderID(m.ForeignSeriesID.ValueString()) {
 		d.AddAttributeError(path.Root("foreign_series_id"), "Provider-prefixed series identifier required", "Use lookup to select an explicit provider-prefixed identifier such as `hc:123`.")
 		return
@@ -362,6 +477,15 @@ func (r *seriesResource) apply(ctx context.Context, m *seriesModel, target *tfsd
 	d.Append(m.SelectedBooks.ElementsAs(ctx, &books, false)...)
 	if len(books) == 0 {
 		d.AddAttributeError(path.Root("selected_books"), "Selected books required", "Select at least one series book.")
+		return
+	}
+	intent := seriesNarratorIntentFromConfig(config, d)
+	variantIDs := seriesVariantIDs(ctx, m.RemoveVariantIDs, d)
+	if d.HasError() {
+		return
+	}
+	if existingID, ok := positiveModelID(m.ID); ok && variantIDListContains(variantIDs, existingID) {
+		d.AddAttributeError(path.Root("remove_variant_ids"), "Managed series cannot be deleted", "remove_variant_ids must not include the managed series ID. Chaptarr has no general series-delete endpoint, and this provider will not delete the series it owns.")
 		return
 	}
 	selected := make([]map[string]string, 0, len(books))
@@ -406,7 +530,17 @@ func (r *seriesResource) apply(ctx context.Context, m *seriesModel, target *tfsd
 		d.AddError("Unable to resolve series", err.Error())
 		return
 	}
+	if variantIDListContains(variantIDs, id) {
+		d.AddAttributeError(path.Root("remove_variant_ids"), "Managed series cannot be deleted", "remove_variant_ids must not include the managed series ID. Chaptarr has no general series-delete endpoint, and this provider will not delete the series it owns.")
+		return
+	}
 	m.ID = types.StringValue(strconv.FormatInt(id, 10))
+	if intent.managed && !r.setPreferredNarrator(ctx, id, intent, d) {
+		return
+	}
+	if !r.removeSeriesVariants(ctx, id, variantIDs, d) {
+		return
+	}
 	r.refresh(ctx, m, target, d)
 }
 func (r *seriesResource) findSeries(ctx context.Context, foreign string, authors []struct {
@@ -474,7 +608,332 @@ func (r *seriesResource) refresh(ctx context.Context, state *seriesModel, target
 	if state.Tags.IsNull() || state.Tags.IsUnknown() {
 		state.Tags = setInt64State(ctx, nil, d)
 	}
+	state.PreferredNarrator = trimmedString(c.Narrator)
+	if !r.loadSeriesNarratorState(ctx, c.ID, state, d) {
+		return
+	}
+	normalizeSeriesControls(ctx, state, d)
+	if d.HasError() {
+		return
+	}
 	d.Append(target.Set(ctx, state)...)
+}
+
+func seriesNarratorIntentFromConfig(config seriesModel, d *diag.Diagnostics) seriesNarratorIntent {
+	intent := seriesNarratorIntent{apply: configuredBool(config.ApplyNarratorToBooks, "apply_narrator_to_books", d), override: configuredBool(config.OverrideExistingBookNarrators, "override_existing_book_narrators", d)}
+	if config.PreferredNarrator.IsUnknown() {
+		d.AddAttributeError(path.Root("preferred_narrator"), "Preferred narrator must be known", "preferred_narrator must be known during apply. Omit it to leave the series narrator unchanged.")
+		return intent
+	}
+	if !config.PreferredNarrator.IsNull() {
+		intent.narrator = strings.TrimSpace(config.PreferredNarrator.ValueString())
+		if intent.narrator == "" {
+			d.AddAttributeError(path.Root("preferred_narrator"), "Preferred narrator required", "Set a non-empty narrator name, or omit preferred_narrator to leave the series narrator unchanged.")
+			return intent
+		}
+		intent.managed = true
+	}
+	if (intent.apply || intent.override) && !intent.managed {
+		d.AddAttributeError(path.Root("preferred_narrator"), "Preferred narrator required", "apply_narrator_to_books and override_existing_book_narrators require preferred_narrator. They default to false and do not change book narrators on their own.")
+	}
+	if intent.override && !intent.apply {
+		d.AddAttributeError(path.Root("override_existing_book_narrators"), "Book narrator override requires apply", "Set apply_narrator_to_books to true before override_existing_book_narrators can replace narrators already stored on books.")
+	}
+	return intent
+}
+func configuredBool(value types.Bool, name string, d *diag.Diagnostics) bool {
+	if value.IsUnknown() {
+		d.AddAttributeError(path.Root(name), "Value must be known", name+" must be known during apply.")
+		return false
+	}
+	if value.IsNull() {
+		return false
+	}
+	return value.ValueBool()
+}
+func normalizeSeriesControls(ctx context.Context, m *seriesModel, d *diag.Diagnostics) {
+	for _, value := range []*types.Bool{&m.ApplyNarratorToBooks, &m.OverrideExistingBookNarrators} {
+		if value.IsNull() || value.IsUnknown() {
+			*value = types.BoolValue(false)
+		}
+	}
+	if m.RemoveVariantIDs.IsNull() || m.RemoveVariantIDs.IsUnknown() {
+		m.RemoveVariantIDs = setInt64State(ctx, nil, d)
+	}
+}
+func seriesVariantIDs(ctx context.Context, value types.Set, d *diag.Diagnostics) []int64 {
+	ids := setInt64Values(ctx, value, d)
+	if d.HasError() {
+		return nil
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	seen := make(map[int64]struct{}, len(ids))
+	unique := make([]int64, 0, len(ids))
+	for _, id := range ids {
+		if id < 1 {
+			d.AddAttributeError(path.Root("remove_variant_ids"), "Invalid series variant ID", "Variant IDs must be positive Chaptarr series identifiers.")
+			return nil
+		}
+		if _, ok := seen[id]; ok {
+			continue
+		}
+		seen[id] = struct{}{}
+		unique = append(unique, id)
+	}
+	return unique
+}
+func variantIDListContains(ids []int64, want int64) bool {
+	for _, id := range ids {
+		if id == want {
+			return true
+		}
+	}
+	return false
+}
+func (r *seriesResource) setPreferredNarrator(ctx context.Context, seriesID int64, intent seriesNarratorIntent, d *diag.Diagnostics) bool {
+	body, err := json.Marshal(map[string]any{"narrator": intent.narrator, "applyToAllBooks": intent.apply, "overrideExisting": intent.override})
+	if err != nil {
+		d.AddError("Unable to encode series narrator", "The preferred narrator request could not be encoded.")
+		return false
+	}
+	response, err := r.client.Do(ctx, http.MethodPut, seriesPath(seriesID)+"/narrators/preferred", body)
+	if err != nil {
+		d.AddAttributeError(path.Root("preferred_narrator"), "Unable to set preferred series narrator", err.Error())
+		return false
+	}
+	var result struct {
+		Message        string `json:"message"`
+		AppliedToBooks bool   `json:"appliedToBooks"`
+	}
+	if json.Unmarshal(response.Body, &result) != nil || result.AppliedToBooks != intent.apply {
+		d.AddError("Invalid Chaptarr response", "Chaptarr did not confirm whether the preferred narrator was applied to books.")
+		return false
+	}
+	return true
+}
+func (r *seriesResource) removeSeriesVariants(ctx context.Context, seriesID int64, ids []int64, d *diag.Diagnostics) bool {
+	if len(ids) == 0 {
+		return true
+	}
+	body, ok := readSeriesSubresource(ctx, r.client, seriesPath(seriesID)+"/variants", "series variants", d)
+	if !ok {
+		return false
+	}
+	present, ok := seriesVariantIDsFromBody(body, d)
+	if !ok {
+		return false
+	}
+	for _, variantID := range ids {
+		if _, exists := present[variantID]; !exists {
+			continue
+		}
+		_, err := r.client.Do(ctx, http.MethodDelete, seriesPath(seriesID)+"/variants/"+strconv.FormatInt(variantID, 10), nil)
+		if err == nil {
+			continue
+		}
+		var apiErr *client.APIError
+		if errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound {
+			continue
+		}
+		d.AddAttributeError(path.Root("remove_variant_ids"), "Unable to delete series variant", err.Error())
+		return false
+	}
+	return true
+}
+func (r *seriesResource) loadSeriesNarratorState(ctx context.Context, seriesID int64, state *seriesModel, d *diag.Diagnostics) bool {
+	base := seriesPath(seriesID)
+	analysisBody, analysisFound := readSeriesLookupSubresource(ctx, r.client, base+"/narrators", "series narrators", d)
+	if d.HasError() {
+		return false
+	}
+	analysisFound = analysisFound && !isJSONNull(analysisBody)
+	inheritanceBody, inheritanceFound := readSeriesLookupSubresource(ctx, r.client, base+"/narrators/inheritance", "series narrator inheritance", d)
+	if d.HasError() {
+		return false
+	}
+	inheritanceFound = inheritanceFound && !isJSONNull(inheritanceBody)
+	variantsBody, variantsFound := readSeriesLookupSubresource(ctx, r.client, base+"/variants", "series variants", d)
+	if d.HasError() {
+		return false
+	}
+	variantsFound = variantsFound && !isJSONNull(variantsBody)
+	if analysisFound {
+		analysis, ok := narratorAnalysisState(ctx, seriesID, analysisBody, d)
+		if !ok {
+			return false
+		}
+		state.NarratorAnalysis = analysis
+	} else {
+		state.NarratorAnalysis = types.ObjectNull(narratorAnalysisAttrTypes())
+	}
+	if inheritanceFound {
+		inheritance, ok := narratorInheritanceState(ctx, seriesID, inheritanceBody, d)
+		if !ok {
+			return false
+		}
+		state.NarratorInheritance = inheritance
+	} else {
+		state.NarratorInheritance = types.ObjectNull(narratorInheritanceAttrTypes())
+	}
+	if variantsFound {
+		variants, ok := seriesVariantsState(ctx, variantsBody, d)
+		if !ok {
+			return false
+		}
+		state.Variants = variants
+	} else {
+		state.Variants = types.ListValueMust(seriesVariantType(), []attr.Value{})
+	}
+	return true
+}
+func narratorAnalysisState(ctx context.Context, seriesID int64, body []byte, d *diag.Diagnostics) (types.Object, bool) {
+	var payload seriesNarratorAnalysisAPI
+	if json.Unmarshal(body, &payload) != nil || (payload.SeriesID != 0 && payload.SeriesID != seriesID) {
+		d.AddError("Invalid Chaptarr response", "Chaptarr returned invalid series narrator analysis.")
+		return types.ObjectNull(narratorAnalysisAttrTypes()), false
+	}
+	if payload.SeriesID == 0 {
+		payload.SeriesID = seriesID
+	}
+	items := make([]narratorAnalysisItemModel, 0, len(payload.NarratorAnalysis))
+	for _, item := range payload.NarratorAnalysis {
+		items = append(items, narratorAnalysisItemModel{Narrator: trimmedString(item.Narrator), BookCount: types.Int64Value(item.BookCount), Percentage: types.Float64Value(item.Percentage), HasSequentialOverlap: types.BoolValue(item.HasSequentialOverlap), IsMainNarrator: types.BoolValue(item.IsMainNarrator), IsSporadicNarrator: types.BoolValue(item.IsSporadicNarrator)})
+	}
+	model := narratorAnalysisModel{SeriesID: types.Int64Value(payload.SeriesID), SeriesTitle: trimmedString(payload.SeriesTitle), PreferredNarrator: trimmedString(payload.PreferredNarrator), Narrators: listObjectState(ctx, narratorAnalysisItemType(), items, d), SequentialOverlapNarrators: setStringState(ctx, payload.SequentialOverlapNarrators, d), BooksWithoutNarratorCount: types.Int64Value(payload.BooksWithoutNarratorCount), TotalBooksInSeries: types.Int64Value(payload.TotalBooksInSeries)}
+	if d.HasError() {
+		return types.ObjectNull(narratorAnalysisAttrTypes()), false
+	}
+	return objectState(ctx, narratorAnalysisAttrTypes(), model, d)
+}
+func narratorInheritanceState(ctx context.Context, seriesID int64, body []byte, d *diag.Diagnostics) (types.Object, bool) {
+	var payload seriesNarratorInheritanceAPI
+	if json.Unmarshal(body, &payload) != nil || (payload.SeriesID != 0 && payload.SeriesID != seriesID) {
+		d.AddError("Invalid Chaptarr response", "Chaptarr returned invalid series narrator inheritance.")
+		return types.ObjectNull(narratorInheritanceAttrTypes()), false
+	}
+	if payload.SeriesID == 0 {
+		payload.SeriesID = seriesID
+	}
+	books := make([]inheritanceBookModel, 0, len(payload.BooksWithoutNarrator))
+	for _, book := range payload.BooksWithoutNarrator {
+		if book.BookID < 1 {
+			d.AddError("Invalid Chaptarr response", "Chaptarr returned narrator inheritance for a book without a positive id.")
+			return types.ObjectNull(narratorInheritanceAttrTypes()), false
+		}
+		books = append(books, inheritanceBookModel{BookID: types.Int64Value(book.BookID), BookTitle: trimmedString(book.BookTitle), CurrentNarrator: trimmedString(book.CurrentNarrator), CanInheritFromSeries: types.BoolValue(book.CanInheritFromSeries)})
+	}
+	model := narratorInheritanceModel{SeriesID: types.Int64Value(payload.SeriesID), SeriesTitle: trimmedString(payload.SeriesTitle), PreferredSeriesNarrator: trimmedString(payload.PreferredSeriesNarrator), CanApplyInheritance: types.BoolValue(payload.CanApplyInheritance), BooksWithoutNarrator: listObjectState(ctx, inheritanceBookType(), books, d)}
+	if d.HasError() {
+		return types.ObjectNull(narratorInheritanceAttrTypes()), false
+	}
+	return objectState(ctx, narratorInheritanceAttrTypes(), model, d)
+}
+func seriesVariantsState(ctx context.Context, body []byte, d *diag.Diagnostics) (types.List, bool) {
+	var payload []seriesAPI
+	if json.Unmarshal(body, &payload) != nil {
+		d.AddError("Invalid Chaptarr response", "Chaptarr returned an invalid series variant list.")
+		return types.ListNull(seriesVariantType()), false
+	}
+	variants := make([]seriesVariantModel, 0, len(payload))
+	for _, variant := range payload {
+		if variant.ID < 1 {
+			d.AddError("Invalid Chaptarr response", "Chaptarr returned a series variant without a positive id.")
+			return types.ListNull(seriesVariantType()), false
+		}
+		variants = append(variants, seriesVariantFromAPI(variant))
+	}
+	return listObjectState(ctx, seriesVariantType(), variants, d), !d.HasError()
+}
+func seriesVariantIDsFromBody(body []byte, d *diag.Diagnostics) (map[int64]struct{}, bool) {
+	var payload []seriesAPI
+	if json.Unmarshal(body, &payload) != nil {
+		d.AddError("Invalid Chaptarr response", "Chaptarr returned an invalid series variant list.")
+		return nil, false
+	}
+	ids := make(map[int64]struct{}, len(payload))
+	for _, variant := range payload {
+		if variant.ID < 1 {
+			d.AddError("Invalid Chaptarr response", "Chaptarr returned a series variant without a positive id.")
+			return nil, false
+		}
+		ids[variant.ID] = struct{}{}
+	}
+	return ids, true
+}
+func seriesVariantFromAPI(variant seriesAPI) seriesVariantModel {
+	return seriesVariantModel{ID: types.Int64Value(variant.ID), ForeignSeriesID: trimmedString(variant.ForeignSeriesID), LocalSeriesID: trimmedString(variant.LocalSeriesID), Title: trimmedString(variant.Title), MediaType: trimmedString(variant.MediaType), Narrator: trimmedString(variant.Narrator), WorkCount: types.Int64Value(variant.WorkCount), PrimaryWorkCount: types.Int64Value(variant.PrimaryWorkCount)}
+}
+func narratorAnalysisAttributes() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"series_id": schema.Int64Attribute{Computed: true}, "series_title": schema.StringAttribute{Computed: true}, "preferred_narrator": schema.StringAttribute{Computed: true, MarkdownDescription: "Preferred narrator reported by narrator analysis. The managed preferred_narrator value is decoded from the series document."},
+		"narrators":                    schema.ListNestedAttribute{Computed: true, NestedObject: schema.NestedAttributeObject{Attributes: map[string]schema.Attribute{"narrator": schema.StringAttribute{Computed: true}, "book_count": schema.Int64Attribute{Computed: true}, "percentage": schema.Float64Attribute{Computed: true}, "has_sequential_overlap": schema.BoolAttribute{Computed: true}, "is_main_narrator": schema.BoolAttribute{Computed: true}, "is_sporadic_narrator": schema.BoolAttribute{Computed: true}}}},
+		"sequential_overlap_narrators": schema.SetAttribute{Computed: true, ElementType: types.StringType}, "books_without_narrator_count": schema.Int64Attribute{Computed: true}, "total_books_in_series": schema.Int64Attribute{Computed: true},
+	}
+}
+func narratorInheritanceAttributes() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"series_id": schema.Int64Attribute{Computed: true}, "series_title": schema.StringAttribute{Computed: true}, "preferred_series_narrator": schema.StringAttribute{Computed: true}, "can_apply_inheritance": schema.BoolAttribute{Computed: true},
+		"books_without_narrator": schema.ListNestedAttribute{Computed: true, NestedObject: schema.NestedAttributeObject{Attributes: map[string]schema.Attribute{"book_id": schema.Int64Attribute{Computed: true}, "book_title": schema.StringAttribute{Computed: true}, "current_narrator": schema.StringAttribute{Computed: true}, "can_inherit_from_series": schema.BoolAttribute{Computed: true}}}},
+	}
+}
+func seriesVariantAttributes() map[string]schema.Attribute {
+	return map[string]schema.Attribute{"id": schema.Int64Attribute{Computed: true}, "foreign_series_id": schema.StringAttribute{Computed: true}, "local_series_id": schema.StringAttribute{Computed: true}, "title": schema.StringAttribute{Computed: true}, "media_type": schema.StringAttribute{Computed: true}, "narrator": schema.StringAttribute{Computed: true}, "work_count": schema.Int64Attribute{Computed: true}, "primary_work_count": schema.Int64Attribute{Computed: true}}
+}
+func narratorAnalysisItemType() types.ObjectType {
+	return types.ObjectType{AttrTypes: map[string]attr.Type{"narrator": types.StringType, "book_count": types.Int64Type, "percentage": types.Float64Type, "has_sequential_overlap": types.BoolType, "is_main_narrator": types.BoolType, "is_sporadic_narrator": types.BoolType}}
+}
+func narratorAnalysisAttrTypes() map[string]attr.Type {
+	return map[string]attr.Type{"series_id": types.Int64Type, "series_title": types.StringType, "preferred_narrator": types.StringType, "narrators": types.ListType{ElemType: narratorAnalysisItemType()}, "sequential_overlap_narrators": types.SetType{ElemType: types.StringType}, "books_without_narrator_count": types.Int64Type, "total_books_in_series": types.Int64Type}
+}
+func inheritanceBookType() types.ObjectType {
+	return types.ObjectType{AttrTypes: map[string]attr.Type{"book_id": types.Int64Type, "book_title": types.StringType, "current_narrator": types.StringType, "can_inherit_from_series": types.BoolType}}
+}
+func narratorInheritanceAttrTypes() map[string]attr.Type {
+	return map[string]attr.Type{"series_id": types.Int64Type, "series_title": types.StringType, "preferred_series_narrator": types.StringType, "can_apply_inheritance": types.BoolType, "books_without_narrator": types.ListType{ElemType: inheritanceBookType()}}
+}
+func seriesVariantType() types.ObjectType {
+	return types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.Int64Type, "foreign_series_id": types.StringType, "local_series_id": types.StringType, "title": types.StringType, "media_type": types.StringType, "narrator": types.StringType, "work_count": types.Int64Type, "primary_work_count": types.Int64Type}}
+}
+func objectState(ctx context.Context, attrTypes map[string]attr.Type, value any, d *diag.Diagnostics) (types.Object, bool) {
+	result, converted := types.ObjectValueFrom(ctx, attrTypes, value)
+	d.Append(converted...)
+	return result, !d.HasError()
+}
+func seriesPath(seriesID int64) string {
+	return "/api/v1/series/" + strconv.FormatInt(seriesID, 10)
+}
+func readSeriesSubresource(ctx context.Context, apiClient *client.Client, endpoint, label string, d *diag.Diagnostics) ([]byte, bool) {
+	response, err := apiClient.Do(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		d.AddError("Unable to read "+label, err.Error())
+		return nil, false
+	}
+	return response.Body, true
+}
+func readSeriesLookupSubresource(ctx context.Context, apiClient *client.Client, endpoint, label string, d *diag.Diagnostics) ([]byte, bool) {
+	response, err := apiClient.Do(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		if seriesLookupNotFound(err) {
+			return nil, false
+		}
+		d.AddError("Unable to read "+label, err.Error())
+		return nil, false
+	}
+	return response.Body, true
+}
+func seriesLookupNotFound(err error) bool {
+	var apiErr *client.APIError
+	return errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound
+}
+func isJSONNull(body []byte) bool {
+	return bytes.Equal(bytes.TrimSpace(body), []byte("null"))
+}
+func trimmedString(value string) types.String {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return types.StringNull()
+	}
+	return types.StringValue(value)
 }
 
 type libraryLookupDataSource struct {

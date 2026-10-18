@@ -35,6 +35,9 @@ resource "chaptarr_series" "series" {
   metadata_profile_id = 6
   tags                = [4]
 
+  apply_narrator_to_books          = false
+  override_existing_book_narrators = false
+
   selected_books = [{
     foreign_book_id   = "hc:book-201"
     foreign_author_id = chaptarr_author.author.foreign_author_id

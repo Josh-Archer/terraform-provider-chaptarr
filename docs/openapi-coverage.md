@@ -16,8 +16,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | data-source | implemented | 60 |
 | data-source | planned | 24 |
 | out-of-scope | excluded | 16 |
-| resource | implemented | 111 |
-| resource | planned | 48 |
+| resource | implemented | 116 |
+| resource | planned | 43 |
 
 ## Operation inventory
 
@@ -57,7 +57,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `DELETE /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | implemented | chaptarr_release_profile | #4 | `dc08eccf2d7b` |
 | `DELETE /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `547d9a343763` |
 | `DELETE /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `6e32c0e56b72` |
-| `DELETE /api/v1/series/{seriesId}/variants/{variantId}` | Series | resource | planned | chaptarr_series | #8 | `78087eff25b4` |
+| `DELETE /api/v1/series/{seriesId}/variants/{variantId}` | Series | resource | implemented | chaptarr_series | #8 | `78087eff25b4` |
 | `DELETE /api/v1/settings/proxy/{id}` | Proxy | resource | implemented | chaptarr_proxy | #7 | `f951e710fe0d` |
 | `DELETE /api/v1/system/backup/{id}` | Backup | action-only | excluded | Backup deletion or restoration is imperative maintenance and must never run during plan or refresh. | #11 | `79d71f8e275d` |
 | `DELETE /api/v1/tag/{id}` | Tag | resource | implemented | chaptarr_tag | #7 | `0389dacc955d` |
@@ -184,9 +184,9 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `GET /api/v1/series` | Series | resource | implemented | chaptarr_series | #8 | `2cd3176e3d44` |
 | `GET /api/v1/series/lookup` | SeriesLookup | data-source | implemented | chaptarr_series_lookup | #8 | `5659bf7bb9b1` |
 | `GET /api/v1/series/{seriesId}` | Series | resource | implemented | chaptarr_series | #8 | `565b6861e16d` |
-| `GET /api/v1/series/{seriesId}/narrators` | Series | resource | planned | chaptarr_series | #8 | `cc6a9f3cea1d` |
-| `GET /api/v1/series/{seriesId}/narrators/inheritance` | Series | resource | planned | chaptarr_series | #8 | `404e01627393` |
-| `GET /api/v1/series/{seriesId}/variants` | Series | resource | planned | chaptarr_series | #8 | `f9c0c47d8368` |
+| `GET /api/v1/series/{seriesId}/narrators` | Series | resource | implemented | chaptarr_series | #8 | `cc6a9f3cea1d` |
+| `GET /api/v1/series/{seriesId}/narrators/inheritance` | Series | resource | implemented | chaptarr_series | #8 | `404e01627393` |
+| `GET /api/v1/series/{seriesId}/variants` | Series | resource | implemented | chaptarr_series | #8 | `f9c0c47d8368` |
 | `GET /api/v1/settings/proxy` | Proxy | resource | planned | chaptarr_proxy | #7 | `75ee3031de7e` |
 | `GET /api/v1/settings/proxy/{id}` | Proxy | resource | implemented | chaptarr_proxy | #7 | `91251ce8ddcb` |
 | `GET /api/v1/system/backup` | Backup | data-source | planned | chaptarr_backups | #11 | `b60c7fc62722` |
@@ -337,6 +337,6 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/releaseprofile/{id}` | ReleaseProfile | resource | implemented | chaptarr_release_profile | #4 | `a3670037f70a` |
 | `PUT /api/v1/remotepathmapping/{id}` | RemotePathMapping | resource | implemented | chaptarr_remote_path_mapping | #3 | `12746ba91a1f` |
 | `PUT /api/v1/rootfolder/{id}` | RootFolder | resource | implemented | chaptarr_root_folder | #3 | `7b00820d50c4` |
-| `PUT /api/v1/series/{seriesId}/narrators/preferred` | Series | resource | planned | chaptarr_series | #8 | `1da362544b06` |
+| `PUT /api/v1/series/{seriesId}/narrators/preferred` | Series | resource | implemented | chaptarr_series | #8 | `1da362544b06` |
 | `PUT /api/v1/settings/proxy/{id}` | Proxy | resource | implemented | chaptarr_proxy | #7 | `4d282f29fe51` |
 | `PUT /api/v1/tag/{id}` | Tag | resource | implemented | chaptarr_tag | #7 | `8c393913c2f9` |

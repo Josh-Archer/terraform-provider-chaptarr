@@ -221,7 +221,7 @@
     },
     "DELETE /api/v1/series/{seriesId}/variants/{variantId}": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series",
       "tracking_issue": "#8"
     },
@@ -977,19 +977,19 @@
     },
     "GET /api/v1/series/{seriesId}/narrators": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series",
       "tracking_issue": "#8"
     },
     "GET /api/v1/series/{seriesId}/narrators/inheritance": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series",
       "tracking_issue": "#8"
     },
     "GET /api/v1/series/{seriesId}/variants": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series",
       "tracking_issue": "#8"
     },
@@ -1886,7 +1886,7 @@
     },
     "PUT /api/v1/series/{seriesId}/narrators/preferred": {
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_series",
       "tracking_issue": "#8"
     },
