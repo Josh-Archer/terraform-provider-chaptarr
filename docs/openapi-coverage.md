@@ -16,8 +16,8 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | data-source | implemented | 60 |
 | data-source | planned | 24 |
 | out-of-scope | excluded | 16 |
-| resource | implemented | 116 |
-| resource | planned | 43 |
+| resource | implemented | 117 |
+| resource | planned | 42 |
 
 ## Operation inventory
 
@@ -319,7 +319,7 @@ A `planned` row is roadmap intent only; it is not implemented provider coverage.
 | `PUT /api/v1/config/ui/{id}` | UiConfig | resource | implemented | chaptarr_ui_config | #2 | `77d0411ff96f` |
 | `PUT /api/v1/customfilter/{id}` | CustomFilter | resource | implemented | chaptarr_custom_filter | #7 | `74102fb555af` |
 | `PUT /api/v1/customformat/{id}` | CustomFormat | resource | implemented | chaptarr_custom_format | #7 | `f85c846dac80` |
-| `PUT /api/v1/delayprofile/reorder/{id}` | DelayProfile | resource | planned | chaptarr_delay_profile | #4 | `c091445cb7c9` |
+| `PUT /api/v1/delayprofile/reorder/{id}` | DelayProfile | resource | implemented | chaptarr_delay_profile | #80 | `c091445cb7c9` |
 | `PUT /api/v1/delayprofile/{id}` | DelayProfile | resource | implemented | chaptarr_delay_profile | #4 | `1a41488d7070` |
 | `PUT /api/v1/downloadclient/bulk` | DownloadClient | resource | planned | chaptarr_download_client | #5 | `af043a0d809f` |
 | `PUT /api/v1/downloadclient/{id}` | DownloadClient | resource | implemented | chaptarr_download_client | #5 | `bd3d620d9244` |
