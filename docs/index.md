@@ -70,8 +70,9 @@ per-ID exclusions, explicit external validation, safe singleton observation,
 and future multi-user GitOps routing.
 
 The [library ownership guide](resources/library.md) documents authors, series
-monitoring intent, provider-prefixed lookup identities, imports, and the
-explicit controls that keep searches, file moves, and file deletion disabled.
+monitoring intent, preferred narrators, narrator-variant removal,
+provider-prefixed lookup identities, imports, and the explicit controls that
+keep searches, narrator discovery, file moves, and file deletion disabled.
 
 The [book and edition guide](resources/books.md) documents apply-only lookup
 candidates, monitored-edition selection, narrator state, conservative destroy
