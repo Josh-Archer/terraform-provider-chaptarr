@@ -3857,9 +3857,9 @@
       ],
       "contract_fingerprint": "c091445cb7c97fa7a55fb5ec9d7d1abac4066cda2703e1b3db3a89f711b3e640",
       "classification": "resource",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_delay_profile",
-      "tracking_issue": "#4"
+      "tracking_issue": "#80"
     },
     {
       "key": "PUT /api/v1/delayprofile/{id}",
