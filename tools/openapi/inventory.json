@@ -12,7 +12,7 @@
     "tag_count": 87,
     "schema_count": 230,
     "global_contract_fingerprint": "3d237cd6f9167e2761b98ec678bb33e940c75137c4c7077d4b3914f2bcd06d4a",
-    "drift_url": "https://raw.githubusercontent.com/Chaptarr/chaptarr/develop/src/Chaptarr.Api.V1/openapi.json"
+    "drift_url": "https://api.github.com/repos/Chaptarr/chaptarr/releases/latest"
   },
   "operations": [
     {

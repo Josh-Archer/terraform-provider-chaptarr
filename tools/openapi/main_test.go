@@ -1,10 +1,88 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 )
+
+func TestCompareContractsReportsClassifiedOperationDrift(t *testing.T) {
+	t.Parallel()
+
+	policy := policy{Operations: map[string]decision{
+		"GET /changed": {Classification: "data-source"},
+		"GET /removed": {Classification: "resource"},
+	}}
+	pinned := []operation{
+		{Key: "GET /changed", ContractFingerprint: "old"},
+		{Key: "GET /removed", ContractFingerprint: "gone"},
+	}
+	upstream := []operation{
+		{Key: "GET /changed", ContractFingerprint: "new"},
+		{Key: "GET /added", ContractFingerprint: "added"},
+	}
+
+	report := compareContracts(policy, "v1.2.3", "https://example.test/openapi.json", pinned, upstream, "same", "same")
+	if !report.Drift || report.Tag != "v1.2.3" {
+		t.Fatalf("compareContracts() = %+v, want drift for v1.2.3", report)
+	}
+	want := []driftChange{
+		{Key: "GET /added", Kind: "added", Classification: "unclassified", UpstreamFingerprint: "added"},
+		{Key: "GET /changed", Kind: "changed", Classification: "data-source", PinnedFingerprint: "old", UpstreamFingerprint: "new"},
+		{Key: "GET /removed", Kind: "removed", Classification: "resource", PinnedFingerprint: "gone"},
+	}
+	if len(report.Changes) != len(want) {
+		t.Fatalf("got %d changes, want %d: %+v", len(report.Changes), len(want), report.Changes)
+	}
+	for i := range want {
+		if report.Changes[i] != want[i] {
+			t.Errorf("change %d = %+v, want %+v", i, report.Changes[i], want[i])
+		}
+	}
+}
+
+func TestCompareContractsNoDrift(t *testing.T) {
+	t.Parallel()
+
+	operations := []operation{{Key: "GET /same", ContractFingerprint: "same"}}
+	report := compareContracts(policy{}, "v1.2.3", "", operations, operations, "same", "same")
+	if report.Drift || len(report.Changes) != 0 {
+		t.Fatalf("compareContracts() = %+v, want no drift", report)
+	}
+}
+
+func TestLatestReleaseTag(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("User-Agent") != "terraform-provider-chaptarr-openapi-drift" {
+			t.Errorf("User-Agent = %q", r.Header.Get("User-Agent"))
+		}
+		_, _ = w.Write([]byte(`{"tag_name":"v0.9.965"}`))
+	}))
+	defer server.Close()
+
+	tag, err := latestReleaseTag(context.Background(), server.URL)
+	if err != nil {
+		t.Fatalf("latestReleaseTag() error = %v", err)
+	}
+	if tag != "v0.9.965" {
+		t.Fatalf("latestReleaseTag() = %q, want v0.9.965", tag)
+	}
+}
+
+func TestReleaseSpecURLUsesReleaseTag(t *testing.T) {
+	t.Parallel()
+
+	got := releaseSpecURL("Chaptarr/chaptarr", "v0.9.965")
+	want := "https://raw.githubusercontent.com/Chaptarr/chaptarr/v0.9.965/src/Chaptarr.Api.V1/openapi.json"
+	if got != want {
+		t.Fatalf("releaseSpecURL() = %q, want %q", got, want)
+	}
+}
 
 func TestFingerprintIsIndependentOfJSONMemberOrder(t *testing.T) {
 	t.Parallel()

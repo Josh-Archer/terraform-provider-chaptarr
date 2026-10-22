@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"sort"
 	"strings"
@@ -95,10 +96,10 @@ type inventory struct {
 
 func main() {
 	mode := "check"
-	if len(os.Args) > 2 {
-		fatalf("usage: go run ./tools/openapi [generate|check|drift]")
+	if len(os.Args) > 3 {
+		fatalf("usage: go run ./tools/openapi [generate|check|drift [upstream-tag]]")
 	}
-	if len(os.Args) == 2 {
+	if len(os.Args) >= 2 {
 		mode = os.Args[1]
 	}
 
@@ -118,7 +119,11 @@ func main() {
 		mustMatch(documentationPath, docs)
 		fmt.Println("OpenAPI contract and generated coverage are current")
 	case "drift":
-		if err := drift(); err != nil {
+		ref := ""
+		if len(os.Args) == 3 {
+			ref = os.Args[2]
+		}
+		if err := drift(ref); err != nil {
 			fatalf("OpenAPI drift: %v", err)
 		}
 	default:
@@ -400,7 +405,22 @@ func renderMarkdown(inv inventory) []byte {
 	return []byte(b.String())
 }
 
-func drift() error {
+type driftChange struct {
+	Key                 string `json:"key"`
+	Kind                string `json:"kind"`
+	Classification      string `json:"classification"`
+	PinnedFingerprint   string `json:"pinned_fingerprint,omitempty"`
+	UpstreamFingerprint string `json:"upstream_fingerprint,omitempty"`
+}
+
+type driftReport struct {
+	Tag     string        `json:"tag"`
+	URL     string        `json:"url"`
+	Drift   bool          `json:"drift"`
+	Changes []driftChange `json:"changes"`
+}
+
+func drift(ref string) error {
 	p, err := loadPolicy()
 	if err != nil {
 		return err
@@ -415,7 +435,14 @@ func drift() error {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, p.Source.DriftURL, nil)
+	if ref == "" {
+		ref, err = latestReleaseTag(ctx, p.Source.DriftURL)
+		if err != nil {
+			return err
+		}
+	}
+	upstreamURL := releaseSpecURL(p.Source.Repository, ref)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, upstreamURL, nil)
 	if err != nil {
 		return err
 	}
@@ -440,31 +467,79 @@ func drift() error {
 		return err
 	}
 
+	report := compareContracts(p, ref, upstreamURL, pinned, current, pinnedGlobalContractFingerprint, currentGlobalContractFingerprint)
+	encoded, err := json.Marshal(report)
+	if err != nil {
+		return fmt.Errorf("marshal drift report: %w", err)
+	}
+	fmt.Println(string(encoded))
+	return nil
+}
+
+func compareContracts(p policy, ref, upstreamURL string, pinned, current []operation, pinnedGlobalContractFingerprint, currentGlobalContractFingerprint string) driftReport {
 	pinnedMap := operationMap(pinned)
 	currentMap := operationMap(current)
-	var changes []string
+	changes := make([]driftChange, 0)
 	if pinnedGlobalContractFingerprint != currentGlobalContractFingerprint {
-		changes = append(changes, "changed root security or components")
+		changes = append(changes, driftChange{Key: "root security or components", Kind: "changed", Classification: "global"})
 	}
 	for key, old := range pinnedMap {
 		newOperation, ok := currentMap[key]
 		if !ok {
-			changes = append(changes, "removed "+key)
+			changes = append(changes, driftChange{Key: key, Kind: "removed", Classification: classificationFor(p, key), PinnedFingerprint: old.ContractFingerprint})
 		} else if old.ContractFingerprint != newOperation.ContractFingerprint || !equalStrings(old.Tags, newOperation.Tags) {
-			changes = append(changes, "changed "+key)
+			changes = append(changes, driftChange{Key: key, Kind: "changed", Classification: classificationFor(p, key), PinnedFingerprint: old.ContractFingerprint, UpstreamFingerprint: newOperation.ContractFingerprint})
 		}
 	}
 	for key := range currentMap {
 		if _, ok := pinnedMap[key]; !ok {
-			changes = append(changes, "added "+key)
+			changes = append(changes, driftChange{Key: key, Kind: "added", Classification: "unclassified", UpstreamFingerprint: currentMap[key].ContractFingerprint})
 		}
 	}
-	sort.Strings(changes)
-	if len(changes) > 0 {
-		return errors.New("upstream develop differs from the pinned contract:\n  " + strings.Join(changes, "\n  ") + "\nreview the new upstream release, classifications, and fingerprints before updating")
+	sort.Slice(changes, func(i, j int) bool {
+		if changes[i].Key == changes[j].Key {
+			return changes[i].Kind < changes[j].Kind
+		}
+		return changes[i].Key < changes[j].Key
+	})
+	return driftReport{Tag: ref, URL: upstreamURL, Drift: len(changes) > 0, Changes: changes}
+}
+
+func latestReleaseTag(ctx context.Context, releaseURL string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, releaseURL, nil)
+	if err != nil {
+		return "", err
 	}
-	fmt.Println("upstream develop matches the pinned OpenAPI operation contract")
-	return nil
+	req.Header.Set("User-Agent", "terraform-provider-chaptarr-openapi-drift")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("fetch latest upstream release: HTTP %d", resp.StatusCode)
+	}
+	var release struct {
+		TagName string `json:"tag_name"`
+	}
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&release); err != nil {
+		return "", fmt.Errorf("parse latest upstream release: %w", err)
+	}
+	if strings.TrimSpace(release.TagName) == "" {
+		return "", errors.New("latest upstream release has no tag_name")
+	}
+	return release.TagName, nil
+}
+
+func releaseSpecURL(repository, tag string) string {
+	return "https://raw.githubusercontent.com/" + repository + "/" + url.PathEscape(tag) + "/src/Chaptarr.Api.V1/openapi.json"
+}
+
+func classificationFor(p policy, key string) string {
+	if decision, ok := p.Operations[key]; ok {
+		return decision.Classification
+	}
+	return "unclassified"
 }
 
 func operationMap(operations []operation) map[string]operation {
