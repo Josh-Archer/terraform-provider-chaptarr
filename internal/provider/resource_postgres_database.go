@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -87,14 +88,17 @@ func postgresDatabaseSchema(version int64) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:            true,
-				MarkdownDescription: "Unique resource identifier (server:port:role).",
+				MarkdownDescription: "Unique resource identifier (server:port:role), computed from the resolved host, port (default 5432) and role (default 'chaptarr').",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					postgresDatabaseIDPlanModifier{},
 				},
 			},
 			"server_host": schema.StringAttribute{
 				Required:            true,
-				MarkdownDescription: "PostgreSQL server host (e.g. homelabdb.postgres.database.azure.com).",
+				MarkdownDescription: "PostgreSQL server host (e.g. homelabdb.postgres.database.azure.com). Changing this forces a new resource.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"server_port": schema.Int64Attribute{
 				Optional:            true,
@@ -128,7 +132,12 @@ func postgresDatabaseSchema(version int64) schema.Schema {
 			},
 			"role_name": schema.StringAttribute{
 				Optional:            true,
-				MarkdownDescription: "PostgreSQL database role name (default 'chaptarr').",
+				MarkdownDescription: "PostgreSQL database role name (default 'chaptarr'). Changing the effective role forces a new resource.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIf(postgresRoleNameChanged,
+						"Changing the effective role name forces a new resource.",
+						"Changing the effective role name forces a new resource."),
+				},
 			},
 			"role_password": schema.StringAttribute{
 				Optional:            true,
@@ -178,8 +187,7 @@ func (r *postgresDatabaseResource) Create(ctx context.Context, req resource.Crea
 		return
 	}
 
-	id := fmt.Sprintf("%s:%d:%s", plan.ServerHost.ValueString(), plan.ServerPort.ValueInt64(), plan.RoleName.ValueString())
-	plan.ID = types.StringValue(id)
+	plan.ID = types.StringValue(postgresDatabaseID(plan))
 	plan.IsHealthy = types.BoolValue(true)
 	clearPostgresDatabaseCredentials(&plan)
 
@@ -197,6 +205,10 @@ func (r *postgresDatabaseResource) Read(ctx context.Context, req resource.ReadRe
 	// Refresh therefore cannot safely reconnect or re-read the Vaultwarden
 	// bridge; retain only the last apply result while scrubbing legacy state.
 	clearPostgresDatabaseCredentials(&state)
+	// Repair IDs written by older versions from raw plan values (host:0:).
+	if !state.ServerHost.IsNull() && !state.ServerHost.IsUnknown() {
+		state.ID = types.StringValue(postgresDatabaseID(state))
+	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
@@ -213,9 +225,54 @@ func (r *postgresDatabaseResource) Update(ctx context.Context, req resource.Upda
 		return
 	}
 
+	plan.ID = types.StringValue(postgresDatabaseID(plan))
 	plan.IsHealthy = types.BoolValue(true)
 	clearPostgresDatabaseCredentials(&plan)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+}
+
+// postgresDatabaseID builds the server:port:role ID from resolved values.
+func postgresDatabaseID(m postgresDatabaseModel) string {
+	return fmt.Sprintf("%s:%d:%s", m.ServerHost.ValueString(), getPort(m.ServerPort), getRoleName(m.RoleName))
+}
+
+func postgresRoleNameChanged(_ context.Context, req planmodifier.StringRequest, resp *stringplanmodifier.RequiresReplaceIfFuncResponse) {
+	if req.StateValue.IsNull() && req.PlanValue.IsNull() {
+		return
+	}
+	if req.PlanValue.IsUnknown() {
+		resp.RequiresReplace = true
+		return
+	}
+	resp.RequiresReplace = getRoleName(req.StateValue) != getRoleName(req.PlanValue)
+}
+
+// postgresDatabaseIDPlanModifier plans the ID from the planned host, port and
+// role so in-place changes (e.g. server_port) plan the correct new ID.
+type postgresDatabaseIDPlanModifier struct{}
+
+func (postgresDatabaseIDPlanModifier) Description(_ context.Context) string {
+	return "Computes the ID from the resolved server_host, server_port and role_name."
+}
+
+func (m postgresDatabaseIDPlanModifier) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
+}
+
+func (postgresDatabaseIDPlanModifier) PlanModifyString(ctx context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
+	if req.Plan.Raw.IsNull() {
+		return
+	}
+	var host types.String
+	var port types.Int64
+	var role types.String
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("server_host"), &host)...)
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("server_port"), &port)...)
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("role_name"), &role)...)
+	if resp.Diagnostics.HasError() || host.IsUnknown() || host.IsNull() || port.IsUnknown() || role.IsUnknown() {
+		return
+	}
+	resp.PlanValue = types.StringValue(postgresDatabaseID(postgresDatabaseModel{ServerHost: host, ServerPort: port, RoleName: role}))
 }
 
 func (r *postgresDatabaseResource) Delete(ctx context.Context, _ resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -368,6 +425,19 @@ func (r *postgresDatabaseResource) ImportState(ctx context.Context, req resource
 	// PostgreSQL connection and bridge credentials are intentionally absent
 	// from imported state. Configure them only for a later mutation.
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	// Populate the identifying attributes from a host:port:role ID so refresh
+	// and later plans keep a consistent ID. Hosts may not contain ':' here.
+	parts := strings.Split(req.ID, ":")
+	if len(parts) != 3 || parts[0] == "" || parts[2] == "" {
+		return
+	}
+	port, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil || port <= 0 || port > 65535 {
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("server_host"), parts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("server_port"), port)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("role_name"), parts[2])...)
 }
 
 func (r *postgresDatabaseResource) UpgradeState(_ context.Context) map[int64]resource.StateUpgrader {
