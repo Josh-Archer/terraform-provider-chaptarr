@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.19](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.18...v0.11.19) (2026-10-22)
+
+
+### Features
+
+* manage series narrators and variants ([#93](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/93)) ([a566670](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/a56667068308fceec50821072bb46648869f4ac1))
+* support reordering delay profiles ([#94](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/94)) ([ef126d4](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/ef126d42a728733f7e7d144827a13c6fa527d4e0))
+
+
+### Bug Fixes
+
+* **deps:** bump Go to 1.26.10 to clear GO-2026-6809 ([#100](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/100)) ([7807c9c](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/7807c9c197dd103991c885e46cbc21183baf941d))
+* track OpenAPI drift against upstream releases ([#99](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/99)) ([f73e5c0](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/f73e5c02e761d7533021352b9d552ffaf1bb6a7a))
+
+
+### Build System
+
+* **deps:** bump goreleaser/goreleaser-action from 7.2.3 to 7.3.0 ([#97](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/97)) ([0cbd045](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/0cbd045b120642769c8ad23b206c6e544bd09408))
+* **deps:** bump the codeql-action group with 3 updates ([#96](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/96)) ([9be5967](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/9be5967af5e7c2af52293efe5157b5b79dd29885))
+
 ## [0.11.18](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.17...v0.11.18) (2026-10-17)
 
 
