@@ -21,21 +21,21 @@ resource "chaptarr_postgres_database" "main" {
 
 ## Argument Reference
 
-- `server_host` - (Required, String) PostgreSQL server hostname.
+- `server_host` - (Required, String) PostgreSQL server hostname. Changing this forces a new resource.
 - `server_port` - (Optional, Integer) PostgreSQL server port. Default `5432`.
 - `admin_username` - (Required, String) PostgreSQL administrator username.
 - `admin_password` - (Required, String, Sensitive, Write-only) PostgreSQL administrator password. It is supplied only for create or update and is never stored in plan or state artifacts.
 - `vaultwarden_bridge_url` - (Optional, String) Vaultwarden ESO bridge REST API endpoint URL.
 - `vaultwarden_bridge_token` - (Optional, String, Sensitive, Write-only) Bearer token for authenticating with the Vaultwarden bridge. It is used only during create or update.
 - `vaultwarden_secret_key` - (Optional, String, Sensitive, Write-only) Secret item path key in Vaultwarden. Default `"media/chaptarr-postgres-credentials"`; it is used only during create or update.
-- `role_name` - (Optional, String) Role name to create in PostgreSQL. Default `"chaptarr"`.
+- `role_name` - (Optional, String) Role name to create in PostgreSQL. Default `"chaptarr"`. Changing the effective role forces a new resource.
 - `role_password` - (Optional, String, Sensitive, Write-only) Explicit role password. Automatically resolved from Vaultwarden during create or update if bridge parameters are set. The resolved value is never retained.
 - `databases` - (Optional, List of String) List of databases owned by `role_name`. Default `["chaptarr-main", "chaptarr-log", "chaptarr-cache"]`.
 - `ssl_mode` - (Optional, String) PostgreSQL SSL mode (`"require"`, `"prefer"`, `"disable"`). Default `"require"`.
 
 ## Attribute Reference
 
-- `id` - Stable resource identifier (`server_host:server_port:role_name`).
+- `id` - Resource identifier (`server_host:server_port:role_name`), built from resolved values (port defaults to 5432, role to `chaptarr`) and recomputed on update. Import with this format to populate `server_host`, `server_port` and `role_name`.
 - `is_healthy` - (Boolean) Last successful create or update result.
 
 ## Credential and state handling
