@@ -2,16 +2,16 @@
   "version": 1,
   "source": {
     "repository": "Chaptarr/chaptarr",
-    "tag": "v0.9.929",
-    "commit": "537eb64f39ee1640f07ec0107aeeb8754402f0d8",
-    "blob_sha": "e8799c3f6b77eda38fd820b7d7f35802f933cbd1",
-    "sha256": "0c59f1d8079933d662fc3fbe26104e99ccff53044aedb87e58b567d47c44efdf",
+    "tag": "v0.9.965",
+    "commit": "e67374f4b3fed01bbf08f18672add944062fcb49",
+    "blob_sha": "50f2407f8c99cfb9d74e71fa00785207aa17791f",
+    "sha256": "1444bc8e56f39a741070b4434a63dea7a18b9ef7e6f0f2fb105a2882a2a352d6",
     "openapi_version": "3.0.4",
-    "path_count": 236,
-    "operation_count": 317,
+    "path_count": 235,
+    "operation_count": 316,
     "tag_count": 87,
-    "schema_count": 230,
-    "global_contract_fingerprint": "3d237cd6f9167e2761b98ec678bb33e940c75137c4c7077d4b3914f2bcd06d4a",
+    "schema_count": 229,
+    "global_contract_fingerprint": "baaa9cfd2ae58b9ab59dba250d71496fd16238f2cc08e2d05cb14d740b29da77",
     "drift_url": "https://api.github.com/repos/Chaptarr/chaptarr/releases/latest"
   },
   "operations": [
@@ -2576,19 +2576,6 @@
       "tracking_issue": "#8"
     },
     {
-      "key": "POST /api/v1/author/statistics/aggregate",
-      "method": "POST",
-      "path": "/api/v1/author/statistics/aggregate",
-      "tags": [
-        "Author"
-      ],
-      "contract_fingerprint": "e3466d8d8c259d699bcbe3477a00d2ed85cae48ffe0a633f7851113933d09d21",
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_author_statistics",
-      "tracking_issue": "#8"
-    },
-    {
       "key": "POST /api/v1/author/{id}/downloadmedia",
       "method": "POST",
       "path": "/api/v1/author/{id}/downloadmedia",
@@ -2621,7 +2608,7 @@
       "tags": [
         "Book"
       ],
-      "contract_fingerprint": "48ef1dbcfed53d3db5b93f9449b12bef7a5567e4c01f4b1e45964307cb4809cd",
+      "contract_fingerprint": "2a74e6a33b6592b23872755ace49345211f219eceda9251b21bee727e1e36351",
       "classification": "resource",
       "status": "implemented",
       "target": "chaptarr_book",

@@ -215,6 +215,10 @@ func createProfile(ctx context.Context, apiClient *client.Client, endpoint strin
 		diagnostics.AddError("Unable to create "+label, err.Error())
 		return 0
 	}
+	if response.StatusCode == http.StatusAccepted {
+		diagnostics.AddError("Chaptarr creation pending", "Chaptarr queued the "+label+" request but has not created a resource. Resolve the pending request in Chaptarr, then import the resulting resource using its resource ID before applying again. A pending request ID is not a resource ID.")
+		return 0
+	}
 	id, err := createdIdentifier(response.Body)
 	if err != nil {
 		diagnostics.AddError("Invalid Chaptarr response", err.Error())

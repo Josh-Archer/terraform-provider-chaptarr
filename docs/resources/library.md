@@ -55,3 +55,5 @@ No plan or refresh path calls download-media, file-move, image-load, narrator
 discovery, narrator search, or delete-files operations. Discover and search
 remain unregistered because they are POST operations and must not run during
 plan or refresh.
+
+For the v0.9.965 series API, `monitor_existing` maps `select` to `specificBook` (and preserves `all`/`none`) in the selected format’s `MonitorExistingMode`. `monitor_future` maps to `MonitorNewItems` values `all` or `none`; only the selected format’s monitoring policy is sent.

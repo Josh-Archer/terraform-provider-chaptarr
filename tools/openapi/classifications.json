@@ -1,17 +1,17 @@
 {
   "version": 1,
   "source": {
-    "blob_sha": "e8799c3f6b77eda38fd820b7d7f35802f933cbd1",
-    "commit": "537eb64f39ee1640f07ec0107aeeb8754402f0d8",
+    "blob_sha": "50f2407f8c99cfb9d74e71fa00785207aa17791f",
+    "commit": "e67374f4b3fed01bbf08f18672add944062fcb49",
     "drift_url": "https://api.github.com/repos/Chaptarr/chaptarr/releases/latest",
     "openapi_version": "3.0.4",
-    "operation_count": 317,
-    "path_count": 236,
+    "operation_count": 316,
+    "path_count": 235,
     "repository": "Chaptarr/chaptarr",
-    "schema_count": 230,
-    "global_contract_fingerprint": "3d237cd6f9167e2761b98ec678bb33e940c75137c4c7077d4b3914f2bcd06d4a",
-    "sha256": "0c59f1d8079933d662fc3fbe26104e99ccff53044aedb87e58b567d47c44efdf",
-    "tag": "v0.9.929",
+    "schema_count": 229,
+    "global_contract_fingerprint": "baaa9cfd2ae58b9ab59dba250d71496fd16238f2cc08e2d05cb14d740b29da77",
+    "sha256": "1444bc8e56f39a741070b4434a63dea7a18b9ef7e6f0f2fb105a2882a2a352d6",
+    "tag": "v0.9.965",
     "tag_count": 87
   },
   "operations": {
@@ -1187,12 +1187,6 @@
       "classification": "resource",
       "status": "planned",
       "target": "chaptarr_author",
-      "tracking_issue": "#8"
-    },
-    "POST /api/v1/author/statistics/aggregate": {
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_author_statistics",
       "tracking_issue": "#8"
     },
     "POST /api/v1/author/{id}/downloadmedia": {
