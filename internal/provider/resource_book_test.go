@@ -225,3 +225,50 @@ func configWithStringAttribute(t *testing.T, instance resource.Resource, name, v
 	raw[name] = tftypes.NewValue(tftypes.String, value)
 	return tfsdk.Config{Raw: tftypes.NewValue(terraformType, raw), Schema: state.Schema}
 }
+
+func TestBookPendingCreateDoesNotUseRequestID(t *testing.T) {
+	t.Parallel()
+	for _, body := range []string{`{"pendingId":51,"message":"private upstream detail"}`, `{"id":51,"pendingId":51}`, `51`} {
+		t.Run(body, func(t *testing.T) {
+			calls := 0
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/api/v1/book" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				w.WriteHeader(http.StatusAccepted)
+				_, _ = w.Write([]byte(body))
+			}))
+			defer server.Close()
+			apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "pending-test-key", UserAgent: "test/1.0"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			var diagnostics diag.Diagnostics
+			id := createProfile(t.Context(), apiClient, "/api/v1/book", map[string]any{}, "book", &diagnostics)
+			if id != 0 || !diagnostics.HasError() || calls != 1 {
+				t.Fatalf("pending create: id=%d calls=%d diagnostics=%v", id, calls, diagnostics)
+			}
+			if diagnostics[0].Summary() != "Chaptarr creation pending" || strings.Contains(diagnostics[0].Detail(), "private upstream detail") {
+				t.Fatalf("unexpected pending diagnostic: %v", diagnostics)
+			}
+		})
+	}
+}
+
+func TestBookMonitoringOverridesNullableFormatIntent(t *testing.T) {
+	t.Parallel()
+	for _, mediaType := range []string{"audiobook", "ebook"} {
+		for _, monitored := range []bool{false, true} {
+			for _, prior := range []any{nil, false, true} {
+				payload := map[string]any{mediaType + "Monitored": prior}
+				model := bookModel{ForeignBookID: types.StringValue("hc:11"), MediaType: types.StringValue(mediaType), Monitored: types.BoolValue(monitored), AnyEditionOK: types.BoolValue(true)}
+				var diagnostics diag.Diagnostics
+				overlayBookIntent(payload, model, &diagnostics)
+				if diagnostics.HasError() || payload[mediaType+"Monitored"] != monitored || payload["monitored"] != monitored {
+					t.Fatalf("monitoring payload=%v diagnostics=%v", payload, diagnostics)
+				}
+			}
+		}
+	}
+}

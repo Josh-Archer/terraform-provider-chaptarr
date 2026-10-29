@@ -217,6 +217,9 @@ func overlayBookIntent(payload map[string]any, m bookModel, d *diag.Diagnostics)
 		return
 	}
 	payload["monitored"] = m.Monitored.ValueBool()
+	// Explicit per-format values take precedence over monitored in Chaptarr.
+	// Overlay the managed format even when lookup/current values are non-null.
+	payload[m.MediaType.ValueString()+"Monitored"] = m.Monitored.ValueBool()
 	payload["anyEditionOk"] = m.AnyEditionOK.ValueBool()
 	selected := strings.TrimSpace(m.MonitoredEditionID.ValueString())
 	if m.AnyEditionOK.ValueBool() {

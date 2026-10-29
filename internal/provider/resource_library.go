@@ -498,7 +498,19 @@ func (r *seriesResource) apply(ctx context.Context, m *seriesModel, config serie
 		}
 		selected = append(selected, map[string]string{"foreignBookId": bookID, "foreignAuthorId": authorID})
 	}
-	payload := map[string]any{"foreignSeriesId": strings.TrimSpace(m.ForeignSeriesID.ValueString()), "selectedMediaType": m.MediaType.ValueString(), "selectedBooks": selected, "monitorExisting": m.MonitorExisting.ValueString(), "monitorFuture": m.MonitorFuture.ValueBool(), "tags": setInt64Values(ctx, m.Tags, d)}
+	payload := map[string]any{"foreignSeriesId": strings.TrimSpace(m.ForeignSeriesID.ValueString()), "selectedMediaType": m.MediaType.ValueString(), "selectedBooks": selected, "tags": setInt64Values(ctx, m.Tags, d)}
+	monitorMode := m.MonitorExisting.ValueString()
+	if monitorMode == "select" {
+		monitorMode = "specificBook"
+	}
+	monitorNewItems := "none"
+	if m.MonitorFuture.ValueBool() {
+		monitorNewItems = "all"
+	}
+	mediaType := m.MediaType.ValueString()
+	payload[mediaType+"MonitorExistingMode"] = monitorMode
+	payload[mediaType+"MonitorNewItems"] = monitorNewItems
+	payload[mediaType+"Monitored"] = monitorMode != "none" || m.MonitorFuture.ValueBool()
 	if m.MediaType.ValueString() == "audiobook" {
 		payload["audiobookRootFolderPath"] = m.RootFolderPath.ValueString()
 		payload["audiobookQualityProfileId"] = m.QualityProfileID.ValueInt64()

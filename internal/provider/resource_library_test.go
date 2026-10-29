@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -96,6 +97,18 @@ func TestSeriesIntentCreateRefreshAndDestroyNeverCallsAction(t *testing.T) {
 		requests = append(requests, request.Method+" "+request.URL.RequestURI()+" "+string(body))
 		switch request.Method + " " + request.URL.Path {
 		case "POST /api/v1/series/add":
+			var payload map[string]any
+			if err := json.Unmarshal(body, &payload); err != nil {
+				t.Fatal(err)
+			}
+			if payload["ebookMonitorExistingMode"] != "specificBook" || payload["ebookMonitorNewItems"] != "none" || payload["ebookMonitored"] != true {
+				t.Fatalf("incorrect series monitoring: %s", body)
+			}
+			for _, removed := range []string{"monitorExisting", "monitorFuture", "monitorAllBooksByAllAuthors", "audiobookMonitored", "audiobookMonitorNewItems"} {
+				if _, present := payload[removed]; present {
+					t.Fatalf("unexpected series field %s: %s", removed, body)
+				}
+			}
 			if strings.Contains(string(body), "search") || strings.Contains(string(body), "delete") || strings.Contains(string(body), "move") {
 				t.Fatalf("unsafe payload: %s", body)
 			}

@@ -3,19 +3,19 @@
 `openapi.json` is an unmodified snapshot from the upstream Chaptarr project.
 
 - Repository: `https://github.com/Chaptarr/chaptarr`
-- Tag: `v0.9.929`
-- Commit: `537eb64f39ee1640f07ec0107aeeb8754402f0d8`
-- Git blob: `e8799c3f6b77eda38fd820b7d7f35802f933cbd1`
+- Tag: `v0.9.965`
+- Commit: `e67374f4b3fed01bbf08f18672add944062fcb49`
+- Git blob: `50f2407f8c99cfb9d74e71fa00785207aa17791f`
 - File: `src/Chaptarr.Api.V1/openapi.json`
-- SHA-256: `0c59f1d8079933d662fc3fbe26104e99ccff53044aedb87e58b567d47c44efdf`
+- SHA-256: `1444bc8e56f39a741070b4434a63dea7a18b9ef7e6f0f2fb105a2882a2a352d6`
 - Retrieved from:
-  `https://raw.githubusercontent.com/Chaptarr/chaptarr/v0.9.929/src/Chaptarr.Api.V1/openapi.json`
+  `https://raw.githubusercontent.com/Chaptarr/chaptarr/v0.9.965/src/Chaptarr.Api.V1/openapi.json`
 
 Retrieval command:
 
 ```powershell
 Invoke-WebRequest -UseBasicParsing `
-  'https://raw.githubusercontent.com/Chaptarr/chaptarr/v0.9.929/src/Chaptarr.Api.V1/openapi.json' `
+  'https://raw.githubusercontent.com/Chaptarr/chaptarr/v0.9.965/src/Chaptarr.Api.V1/openapi.json' `
   -OutFile 'third_party/chaptarr/openapi.json'
 ```
 

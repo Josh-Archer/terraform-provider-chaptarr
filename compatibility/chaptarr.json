@@ -1,17 +1,17 @@
 {
   "version": 1,
   "contract": {
-    "chaptarr_version": "0.9.929",
-    "tag": "v0.9.929",
-    "commit": "537eb64f39ee1640f07ec0107aeeb8754402f0d8",
-    "openapi_sha256": "0c59f1d8079933d662fc3fbe26104e99ccff53044aedb87e58b567d47c44efdf"
+    "chaptarr_version": "0.9.965",
+    "tag": "v0.9.965",
+    "commit": "e67374f4b3fed01bbf08f18672add944062fcb49",
+    "openapi_sha256": "1444bc8e56f39a741070b4434a63dea7a18b9ef7e6f0f2fb105a2882a2a352d6"
   },
   "versions": [
     {
       "chaptarr_version": "0.9.929",
       "api_version": "v1",
       "image": "chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb",
-      "contract_status": "pinned-contract",
+      "contract_status": "compatibility-candidate",
       "acceptance_status": "live-verified",
       "verified_resources": ["chaptarr_tag"],
       "verified_data_sources": ["chaptarr_api_info", "chaptarr_system_status"],

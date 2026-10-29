@@ -28,3 +28,5 @@ because they can move or delete media. Rename and retag support is preview-only.
 Book destroy sends `deleteFiles=false`, `addImportListExclusion=false`, and
 `applyToBothFormats=false` unless each behavior is explicitly configured.
 Missing-book download/search endpoints are never called by refresh or plan.
+
+Chaptarr v0.9.965 can return HTTP 202 with a pending request instead of a created book. The provider reports a pending-creation error without storing that request ID as a book ID. Resolve the pending request in Chaptarr, then import the resulting book before applying again.
