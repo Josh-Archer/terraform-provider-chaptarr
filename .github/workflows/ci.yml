@@ -19,7 +19,7 @@ env:
 jobs:
   unit:
     name: Unit
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -42,7 +42,7 @@ jobs:
 
   contract:
     name: Contract
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -75,7 +75,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -109,7 +109,7 @@ jobs:
 
   acceptance:
     name: Acceptance (${{ matrix.chaptarr-version }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 20
     permissions:
       contents: read
@@ -152,7 +152,7 @@ jobs:
       - contract
       - lint
       - acceptance
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 5
     permissions:
       contents: read
@@ -171,7 +171,7 @@ jobs:
 
   secret-scan:
     name: Secret Scan
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 10
     permissions:
       contents: read
@@ -191,7 +191,7 @@ jobs:
 
   vulnerability-scan:
     name: Vulnerability Scan
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 10
     permissions:
       contents: read
@@ -212,7 +212,7 @@ jobs:
 
   release-snapshot:
     name: Release Snapshot
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
