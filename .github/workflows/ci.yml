@@ -24,6 +24,24 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -49,6 +67,24 @@ jobs:
     env:
       CHAPTARR_IMAGE: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -80,6 +116,24 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -124,6 +178,24 @@ jobs:
           - chaptarr-version: "0.9.914"
             image: chaptarr/chaptarr:0.9.914@sha256:4780b36440dc055a404f86da089f124d41e3330d32eeb92837f65fb5c82a348c
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -157,6 +229,24 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Require every quality tier to pass
         env:
           UNIT_RESULT: ${{ needs.unit.result }}
@@ -176,6 +266,24 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out complete history without persisted credentials
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -196,6 +304,24 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -217,6 +343,24 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
