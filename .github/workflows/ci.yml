@@ -163,7 +163,7 @@ jobs:
 
   acceptance:
     name: Acceptance (${{ matrix.chaptarr-version }})
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && fromJSON('["ubuntu-latest"]') || fromJSON('["self-hosted", "az-vm-gha"]') }}
     timeout-minutes: 20
     permissions:
       contents: read
