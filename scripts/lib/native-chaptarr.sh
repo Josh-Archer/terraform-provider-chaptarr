@@ -42,10 +42,15 @@ native_start() {
     if ! (exec 3<>"/dev/tcp/127.0.0.1/${candidate}") 2>/dev/null; then host_port="${candidate}"; break; fi
   done
   [[ -n "${host_port}" ]] || { echo "No free loopback port." >&2; return 1; }
+  # Seed a disposable API key so startup never waits on Chaptarr generating one;
+  # slow shared runners can spend minutes on first-run DB migrations.
+  api_key="$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+  [[ ${#api_key} -eq 32 ]] || { echo "Could not generate a disposable API key." >&2; return 1; }
   cat >"${work}/data/config.xml" <<XML
 <Config>
   <BindAddress>127.0.0.1</BindAddress>
   <Port>${host_port}</Port>
+  <ApiKey>${api_key}</ApiKey>
   <AnalyticsEnabled>False</AnalyticsEnabled>
   <UpdateMechanism>External</UpdateMechanism>
 </Config>
@@ -54,12 +59,15 @@ XML
     "${work}/root/usr/share/dotnet/dotnet" "${work}/root/app/Chaptarr.dll" -nobrowser "-data=${work}/data" >"${work}/chaptarr.log" 2>&1 &
   native_pid=$!
 
-  api_key=""
-  for _ in $(seq 1 90); do
-    kill -0 "${native_pid}" 2>/dev/null || { echo "Native Chaptarr exited early." >&2; return 1; }
-    api_key="$(sed -n 's:.*<ApiKey>\([^<]*\)</ApiKey>.*:\1:p' "${work}/data/config.xml" 2>/dev/null | tr -d '\r\n' || true)"
-    [[ -n "${api_key}" ]] && break
-    sleep 2
+  local timeout="${CHAPTARR_NATIVE_START_TIMEOUT:-420}" waited=0
+  until curl --silent --fail --output /dev/null -H "X-Api-Key: ${api_key}" "http://127.0.0.1:${host_port}/api/v1/system/status" 2>/dev/null; do
+    if ! kill -0 "${native_pid}" 2>/dev/null; then
+      echo "Native Chaptarr exited early. Last log lines:" >&2; tail -n 40 "${work}/chaptarr.log" >&2; return 1
+    fi
+    if ((waited >= timeout)); then
+      echo "Native Chaptarr did not answer within ${timeout}s. Last log lines:" >&2; tail -n 40 "${work}/chaptarr.log" >&2; return 1
+    fi
+    sleep 2; waited=$((waited + 2))
   done
-  [[ -n "${api_key}" ]] || { echo "Chaptarr did not create its disposable API credential in time." >&2; return 1; }
+  echo "Native Chaptarr ready after ${waited}s."
 }
