@@ -381,6 +381,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          trap 'rc=$?; echo "::error::registry artifact verification failed (exit ${rc}) at line ${LINENO}: ${BASH_COMMAND}"; ls -la dist || true; for f in dist/*_SHA256SUMS; do echo "== ${f}"; cat "${f}"; done || true; for t in find grep awk sha256sum python3; do command -v "$t" >/dev/null || echo "::error::missing tool on runner: $t"; done' ERR
+          set -x
           test -f dist/terraform-provider-chaptarr_linux_amd64_v1/terraform-provider-chaptarr_v0.0.0-SNAPSHOT-* || \
             find dist -type f -name 'terraform-provider-chaptarr_v*' -print -quit | grep -q .
           checksum_file="$(find dist -maxdepth 1 -type f -name 'terraform-provider-chaptarr_*_SHA256SUMS' -print -quit)"
