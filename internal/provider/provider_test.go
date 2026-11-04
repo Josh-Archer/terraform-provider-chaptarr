@@ -2,8 +2,11 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -33,8 +36,8 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 		t.Fatalf("registered %d resources, want 32", len(resources))
 	}
 	dataSources := p.DataSources(context.Background())
-	if len(dataSources) != 46 {
-		t.Fatalf("registered %d data sources, want 46", len(dataSources))
+	if len(dataSources) != 55 {
+		t.Fatalf("registered %d data sources, want 55", len(dataSources))
 	}
 	registeredDataSources := make(map[string]struct{}, len(dataSources))
 	for _, factory := range dataSources {
@@ -65,9 +68,45 @@ func TestProviderMetadataAndRegistrations(t *testing.T) {
 		"chaptarr_queue",
 		"chaptarr_queue_details",
 		"chaptarr_queue_status",
+		"chaptarr_ping",
+		"chaptarr_backups",
+		"chaptarr_settings_backups",
+		"chaptarr_history",
+		"chaptarr_ignored",
+		"chaptarr_manual_import_candidates",
+		"chaptarr_pending_author_import",
+		"chaptarr_cutoff_wanted",
+		"chaptarr_missing",
 	} {
 		if _, ok := registeredDataSources[typeName]; !ok {
 			t.Fatalf("missing registered data source %q", typeName)
+		}
+	}
+
+	rawInventory, err := os.ReadFile(filepath.Join("..", "..", "tools", "openapi", "inventory.json"))
+	if err != nil {
+		t.Fatalf("read OpenAPI inventory: %v", err)
+	}
+	var inv struct {
+		Operations []struct {
+			Key            string `json:"key"`
+			Classification string `json:"classification"`
+			Status         string `json:"status"`
+			Target         string `json:"target"`
+		} `json:"operations"`
+	}
+	if err := json.Unmarshal(rawInventory, &inv); err != nil {
+		t.Fatalf("decode OpenAPI inventory: %v", err)
+	}
+	for _, op := range inv.Operations {
+		if op.Classification != "data-source" {
+			continue
+		}
+		if op.Status != "implemented" {
+			t.Fatalf("data-source operation %s still has non-implemented status %q", op.Key, op.Status)
+		}
+		if _, ok := registeredDataSources[op.Target]; !ok {
+			t.Fatalf("implemented data-source operation %s targets unregistered %q", op.Key, op.Target)
 		}
 	}
 }

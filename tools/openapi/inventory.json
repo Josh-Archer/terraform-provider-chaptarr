@@ -1284,7 +1284,7 @@
       ],
       "contract_fingerprint": "03a7fc4c03cdf17b1c33523bd8ea783843d1bf997b15def75dc119da5d4f1633",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_history",
       "tracking_issue": "#11"
     },
@@ -1297,7 +1297,7 @@
       ],
       "contract_fingerprint": "731950500f6e904c323f0a91249aabe03ceb8884fc032c4cbaec816d0326dd29",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_history",
       "tracking_issue": "#11"
     },
@@ -1310,7 +1310,7 @@
       ],
       "contract_fingerprint": "d1d23b56e54750a13cb67bdc9cd39127eda9835ebc4b25d21c0c326feeb1afd4",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_history",
       "tracking_issue": "#11"
     },
@@ -1323,7 +1323,7 @@
       ],
       "contract_fingerprint": "9a40fa1f3e908a77c5e648095b4305169f39971668635321a70838ede092746e",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ignored",
       "tracking_issue": "#11"
     },
@@ -1565,7 +1565,7 @@
       ],
       "contract_fingerprint": "d964caab68d3ad64eaac5ac52c09296e1b1d6a231a725f9e5e81aae5943449b7",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_manual_import_candidates",
       "tracking_issue": "#11"
     },
@@ -1604,7 +1604,7 @@
       ],
       "contract_fingerprint": "0d74ded37d06763836fce27e64509c14eeb2cfade47cddb3ad10b1c2932cb710",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_cover",
       "tracking_issue": "#10"
     },
@@ -1617,7 +1617,7 @@
       ],
       "contract_fingerprint": "23927348c3100f47ec82bbc483033dd1f067e63a9770baf7ebd4d7b311ce5bb6",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_cover",
       "tracking_issue": "#10"
     },
@@ -1773,7 +1773,7 @@
       ],
       "contract_fingerprint": "008d9e72e294f4f3ef2a1ba6b655fd0471d5d3069b15d687397119a625345f62",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_pending_author_import",
       "tracking_issue": "#11"
     },
@@ -1786,7 +1786,7 @@
       ],
       "contract_fingerprint": "cf618c309ca110c3fce585095506f7431070ce5ba24c950d1ff96b4db0fc4928",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_pending_author_import",
       "tracking_issue": "#11"
     },
@@ -1799,7 +1799,7 @@
       ],
       "contract_fingerprint": "eddeee82e7925a37424572bf6889166ab78f1e99e57c659947d49490a63cb2ee",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_pending_author_import",
       "tracking_issue": "#11"
     },
@@ -1812,7 +1812,7 @@
       ],
       "contract_fingerprint": "902c9b2558a4816a118172de6ae47a6e83c58d9c45b7a672838c4d5680fdf422",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_pending_author_import",
       "tracking_issue": "#11"
     },
@@ -1928,10 +1928,10 @@
         "Release"
       ],
       "contract_fingerprint": "a45ef8624d3e1b50b90ad71b82dc169533cd6e6e009095ccf7362ef406503b8b",
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_release_search",
-      "tracking_issue": "#5"
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#5",
+      "rationale": "Release search launches external indexer queries and returns passkey-bearing download URLs, so it must never run during plan or refresh."
     },
     {
       "key": "GET /api/v1/releaseprofile",
@@ -2176,7 +2176,7 @@
       ],
       "contract_fingerprint": "b60c7fc62722f674d94b76b21f6ee45b626e72738a58e5f181c261c5e7961c48",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_backups",
       "tracking_issue": "#11"
     },
@@ -2227,7 +2227,7 @@
       ],
       "contract_fingerprint": "e468ddaead915df4b4736a230954eda9fc30335b64aa5384f28e5e32ba99cd82",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_settings_backups",
       "tracking_issue": "#11"
     },
@@ -2240,7 +2240,7 @@
       ],
       "contract_fingerprint": "ef9950a11f12c90da47531a522a7a22b2665c9d4bec36aa28cf320307649f084",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_settings_backups",
       "tracking_issue": "#11"
     },
@@ -2370,7 +2370,7 @@
       ],
       "contract_fingerprint": "1e64d2e53e722940362ab9e7d225f369f2091096c1b0a1f84e0970a334155418",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_cutoff_wanted",
       "tracking_issue": "#11"
     },
@@ -2383,7 +2383,7 @@
       ],
       "contract_fingerprint": "fcdc7bc85c66c3bbf770642f99590341fa1960726a90f6b85ddb8cf3dbc9ee8b",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_cutoff_wanted",
       "tracking_issue": "#11"
     },
@@ -2396,7 +2396,7 @@
       ],
       "contract_fingerprint": "336bce2da2505d916cc95b6199dc8f49ef23dc0b0877a65424d474c934330b61",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_missing",
       "tracking_issue": "#11"
     },
@@ -2409,7 +2409,7 @@
       ],
       "contract_fingerprint": "45a87938dff32d9cbcc14a3adea1488e0c4fea827724edfbf7c931ecc92a413c",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_missing",
       "tracking_issue": "#11"
     },
@@ -2520,7 +2520,7 @@
       ],
       "contract_fingerprint": "b16d6144ad53f42a5e6a771bee56446eefdba2c3fd0617375218ec864a96691a",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ping",
       "tracking_issue": "#10"
     },
@@ -2545,7 +2545,7 @@
       ],
       "contract_fingerprint": "b16d6144ad53f42a5e6a771bee56446eefdba2c3fd0617375218ec864a96691a",
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ping",
       "tracking_issue": "#10"
     },
@@ -3389,10 +3389,10 @@
         "Series"
       ],
       "contract_fingerprint": "247122ba34c95854cc94393867b249290a2764f38865e1d7b54a7f43250da2c7",
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_series_narrator_discovery",
-      "tracking_issue": "#8"
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#8",
+      "rationale": "Narrator discovery and narrator search are POST operations that trigger external provider queries and must never run during plan or refresh."
     },
     {
       "key": "POST /api/v1/series/{seriesId}/narrators/search",
@@ -3402,10 +3402,10 @@
         "Series"
       ],
       "contract_fingerprint": "bf37e1089d44039821f7543cd6954b8aaf39fa7c3f80c0a594a33bae785eac9e",
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_series_narrator_discovery",
-      "tracking_issue": "#8"
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#8",
+      "rationale": "Narrator discovery and narrator search are POST operations that trigger external provider queries and must never run during plan or refresh."
     },
     {
       "key": "POST /api/v1/settings/proxy",

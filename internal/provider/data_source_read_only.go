@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -31,6 +32,7 @@ type readOnlyDefinition struct {
 	name        string
 	description string
 	attributes  map[string]schema.Attribute
+	httpMethod  func(context.Context, datasource.ReadRequest, *datasource.ReadResponse) string
 	request     func(context.Context, datasource.ReadRequest, *datasource.ReadResponse) (string, string)
 	decode      func(*client.Response) (map[string]any, error)
 }
@@ -74,7 +76,14 @@ func (d *readOnlyDataSource) Read(ctx context.Context, req datasource.ReadReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	response, err := d.client.Do(ctx, http.MethodGet, requestPath, nil)
+	httpMethod := http.MethodGet
+	if d.definition.httpMethod != nil {
+		httpMethod = d.definition.httpMethod(ctx, req, resp)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+	response, err := d.client.Do(ctx, httpMethod, requestPath, nil)
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to read Chaptarr data", err.Error())
 		return
@@ -197,6 +206,7 @@ func readOnlyDefinitions() []readOnlyDefinition {
 				"deprecated": schema.ListAttribute{Computed: true, ElementType: types.StringType},
 			}, request: noQuery("/api", "api-info"), decode: decodeAPIInfo,
 		},
+		pingDefinition(),
 		{
 			name: "author_statistics", description: "Read author disk size statistics for a specified author and media type.",
 			attributes: map[string]schema.Attribute{
@@ -439,9 +449,11 @@ func mediaCoverDefinition() readOnlyDefinition {
 	return readOnlyDefinition{
 		name: "media_cover", description: "Read bounded metadata for an existing cover image. Image bytes are hashed and are not stored in Terraform state.",
 		attributes: map[string]schema.Attribute{
-			"kind":      schema.StringAttribute{Required: true, Validators: []validator.String{stringvalidator.OneOf("author", "book")}},
-			"object_id": schema.Int64Attribute{Required: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
-			"filename":  schema.StringAttribute{Required: true}, "content_type": schema.StringAttribute{Computed: true},
+			"kind":           schema.StringAttribute{Required: true, Validators: []validator.String{stringvalidator.OneOf("author", "book")}},
+			"object_id":      schema.Int64Attribute{Required: true, Validators: []validator.Int64{int64validator.AtLeast(1)}},
+			"filename":       schema.StringAttribute{Required: true},
+			"legacy_route":   schema.BoolAttribute{Optional: true, MarkdownDescription: "Use the legacy upstream media-cover route (`/api/v1/mediacover/{authorId}/{filename}` or `/api/v1/mediacover/books/{bookId}/{filename}`)."},
+			"content_type":   schema.StringAttribute{Computed: true},
 			"content_length": schema.Int64Attribute{Computed: true}, "sha256": schema.StringAttribute{Computed: true},
 		},
 		request: func(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) (string, string) {
@@ -451,6 +463,15 @@ func mediaCoverDefinition() readOnlyDefinition {
 				resp.Diagnostics.AddAttributeError(path.Root("filename"), "Unsafe cover filename", "`filename` must be a single filename without path separators.")
 			}
 			objectID, _ := intInput(ctx, req, resp, "object_id")
+			legacyRoute, _ := boolInput(ctx, req, resp, "legacy_route")
+			if legacyRoute {
+				if kind == "book" {
+					requestPath := fmt.Sprintf("/api/v1/mediacover/books/%d/%s", objectID, url.PathEscape(filename))
+					return requestPath, fingerprintID("media-cover-legacy", kind, strconv.FormatInt(objectID, 10), filename)
+				}
+				requestPath := fmt.Sprintf("/api/v1/mediacover/%d/%s", objectID, url.PathEscape(filename))
+				return requestPath, fingerprintID("media-cover-legacy", kind, strconv.FormatInt(objectID, 10), filename)
+			}
 			segment := "author"
 			if kind == "book" {
 				segment = "book"
@@ -460,6 +481,70 @@ func mediaCoverDefinition() readOnlyDefinition {
 		},
 		decode: fingerprintDecode,
 	}
+}
+
+func pingDefinition() readOnlyDefinition {
+	return readOnlyDefinition{
+		name:        "ping",
+		description: "Probe Chaptarr's lightweight `/ping` readiness endpoint with `GET` or `HEAD` without mutating state.",
+		attributes: map[string]schema.Attribute{
+			"method": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				MarkdownDescription: "HTTP method used to probe `/ping` (`GET` or `HEAD`). Defaults to `GET`.",
+				Validators:          []validator.String{stringvalidator.OneOf(http.MethodGet, http.MethodHead)},
+			},
+			"status": schema.StringAttribute{
+				Computed:            true,
+				MarkdownDescription: "Reported ping status (`OK` for JSON `GET /ping`, or empty string for `HEAD /ping`).",
+			},
+			"http_status": schema.Int64Attribute{
+				Computed:            true,
+				MarkdownDescription: "HTTP status code returned by `/ping`.",
+			},
+		},
+		httpMethod: func(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) string {
+			var value types.String
+			resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("method"), &value)...)
+			if value.IsNull() || value.IsUnknown() || strings.TrimSpace(value.ValueString()) == "" {
+				return http.MethodGet
+			}
+			return strings.TrimSpace(value.ValueString())
+		},
+		request: func(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) (string, string) {
+			method := stringInput(ctx, req, resp, "method", false)
+			if method == "" {
+				method = http.MethodGet
+				resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("method"), method)...)
+			}
+			if method != http.MethodGet && method != http.MethodHead {
+				resp.Diagnostics.AddAttributeError(path.Root("method"), "Invalid ping HTTP method", "`method` must be `GET` or `HEAD`.")
+				return "", ""
+			}
+			return "/ping", "ping:" + strings.ToLower(method)
+		},
+		decode: decodePing,
+	}
+}
+
+func decodePing(response *client.Response) (map[string]any, error) {
+	trimmed := bytes.TrimSpace(response.Body)
+	if len(trimmed) == 0 {
+		return map[string]any{
+			"status":      "",
+			"http_status": int64(response.StatusCode),
+		}, nil
+	}
+	var value struct {
+		Status string `json:"status"`
+	}
+	if err := json.Unmarshal(trimmed, &value); err != nil {
+		return nil, fmt.Errorf("chaptarr returned invalid ping status")
+	}
+	return map[string]any{
+		"status":      value.Status,
+		"http_status": int64(response.StatusCode),
+	}, nil
 }
 
 func calendarFeedDefinition() readOnlyDefinition {
