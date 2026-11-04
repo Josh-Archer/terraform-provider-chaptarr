@@ -55,19 +55,42 @@ native_start() {
   <UpdateMechanism>External</UpdateMechanism>
 </Config>
 XML
-  DOTNET_ROOT="${work}/root/usr/share/dotnet" DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 TZ=UTC \
-    "${work}/root/usr/share/dotnet/dotnet" "${work}/root/app/Chaptarr.dll" -nobrowser "-data=${work}/data" >"${work}/chaptarr.log" 2>&1 &
-  native_pid=$!
-
-  local timeout="${CHAPTARR_NATIVE_START_TIMEOUT:-420}" waited=0
-  until curl --silent --fail --output /dev/null -H "X-Api-Key: ${api_key}" "http://127.0.0.1:${host_port}/api/v1/system/status" 2>/dev/null; do
-    if ! kill -0 "${native_pid}" 2>/dev/null; then
-      echo "Native Chaptarr exited early. Last log lines:" >&2; tail -n 40 "${work}/chaptarr.log" >&2; return 1
+  local timeout="${CHAPTARR_NATIVE_START_TIMEOUT:-300}" attempt waited
+  for attempt in 1 2; do
+    # Workstation GC with TieredPGO off keeps the runtime
+    # from stalling on CPU-throttled shared runner pods.
+    DOTNET_ROOT="${work}/root/usr/share/dotnet" DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+      DOTNET_gcServer=0 DOTNET_TieredPGO=0 DOTNET_EnableDiagnostics=0 TZ=UTC \
+      "${work}/root/usr/share/dotnet/dotnet" "${work}/root/app/Chaptarr.dll" -nobrowser "-data=${work}/data" >"${work}/chaptarr.log" 2>&1 &
+    native_pid=$!
+    waited=0
+    until curl --silent --fail --output /dev/null -H "X-Api-Key: ${api_key}" "http://127.0.0.1:${host_port}/api/v1/system/status" 2>/dev/null; do
+      if ! kill -0 "${native_pid}" 2>/dev/null; then
+        echo "Native Chaptarr exited early (attempt ${attempt}). Last log lines:" >&2; tail -n 40 "${work}/chaptarr.log" >&2
+        break
+      fi
+      if ((waited >= timeout)); then
+        echo "Native Chaptarr did not answer within ${timeout}s (attempt ${attempt}). Last log lines:" >&2
+        tail -n 40 "${work}/chaptarr.log" >&2
+        native_diagnostics >&2
+        kill "${native_pid}" 2>/dev/null; sleep 5; kill -9 "${native_pid}" 2>/dev/null || true
+        break
+      fi
+      sleep 2; waited=$((waited + 2))
+    done
+    if kill -0 "${native_pid}" 2>/dev/null && ((waited < timeout)); then
+      echo "Native Chaptarr ready after ${waited}s (attempt ${attempt})."
+      return 0
     fi
-    if ((waited >= timeout)); then
-      echo "Native Chaptarr did not answer within ${timeout}s. Last log lines:" >&2; tail -n 40 "${work}/chaptarr.log" >&2; return 1
-    fi
-    sleep 2; waited=$((waited + 2))
+    rm -f "${work}/data/"*.db* 2>/dev/null || true
   done
-  echo "Native Chaptarr ready after ${waited}s."
+  return 1
+}
+
+native_diagnostics() {
+  echo "--- native diagnostics: nproc=$(nproc 2>/dev/null) loadavg=$(cut -d' ' -f1-3 /proc/loadavg 2>/dev/null)"
+  grep -E 'MemTotal|MemAvailable' /proc/meminfo 2>/dev/null
+  cat /sys/fs/cgroup/cpu.max /sys/fs/cgroup/memory.max 2>/dev/null
+  ps -o pid,stat,etime,time,rss,args -p "${native_pid}" 2>/dev/null | cut -c1-160
+  ls -la "${work}/data" 2>/dev/null
 }
