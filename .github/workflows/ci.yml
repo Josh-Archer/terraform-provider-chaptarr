@@ -19,11 +19,29 @@ env:
 jobs:
   unit:
     name: Unit
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -42,13 +60,31 @@ jobs:
 
   contract:
     name: Contract
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
     env:
       CHAPTARR_IMAGE: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -75,11 +111,29 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -109,7 +163,7 @@ jobs:
 
   acceptance:
     name: Acceptance (${{ matrix.chaptarr-version }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && fromJSON('["ubuntu-latest"]') || fromJSON('["uecb-shared"]') }}
     timeout-minutes: 20
     permissions:
       contents: read
@@ -124,6 +178,25 @@ jobs:
           - chaptarr-version: "0.9.914"
             image: chaptarr/chaptarr:0.9.914@sha256:4780b36440dc055a404f86da089f124d41e3330d32eeb92837f65fb5c82a348c
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          # uecb-shared has no Docker/BuildKit: acceptance runs Chaptarr natively (scripts/lib/native-chaptarr.sh).
+          if ! command -v jq >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends jq
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -142,6 +215,8 @@ jobs:
         env:
           CHAPTARR_IMAGE: ${{ matrix.image }}
           CHAPTARR_VERSION: ${{ matrix.chaptarr-version }}
+          # Fork PRs fall back to GitHub-hosted runners, which have Docker.
+          CHAPTARR_RUNTIME: ${{ github.event.pull_request.head.repo.fork && 'docker' || 'native' }}
         run: bash ./scripts/test-acceptance.sh
 
   quality:
@@ -152,11 +227,29 @@ jobs:
       - contract
       - lint
       - acceptance
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 5
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Require every quality tier to pass
         env:
           UNIT_RESULT: ${{ needs.unit.result }}
@@ -171,11 +264,29 @@ jobs:
 
   secret-scan:
     name: Secret Scan
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 10
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out complete history without persisted credentials
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -191,11 +302,29 @@ jobs:
 
   vulnerability-scan:
     name: Vulnerability Scan
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 10
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -212,11 +341,29 @@ jobs:
 
   release-snapshot:
     name: Release Snapshot
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+          fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -237,6 +384,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          trap 'rc=$?; echo "::error::registry artifact verification failed (exit ${rc}) at line ${LINENO}: ${BASH_COMMAND}"; ls -la dist || true; for f in dist/*_SHA256SUMS; do echo "== ${f}"; cat "${f}"; done || true; for t in find grep awk sha256sum python3; do command -v "$t" >/dev/null || echo "::error::missing tool on runner: $t"; done' ERR
+          set -x
           test -f dist/terraform-provider-chaptarr_linux_amd64_v1/terraform-provider-chaptarr_v0.0.0-SNAPSHOT-* || \
             find dist -type f -name 'terraform-provider-chaptarr_v*' -print -quit | grep -q .
           checksum_file="$(find dist -maxdepth 1 -type f -name 'terraform-provider-chaptarr_*_SHA256SUMS' -print -quit)"

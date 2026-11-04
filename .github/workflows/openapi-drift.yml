@@ -23,7 +23,7 @@ env:
 jobs:
   drift:
     name: Upstream OpenAPI Drift
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 10
     permissions:
       contents: read
