@@ -163,7 +163,7 @@ jobs:
 
   acceptance:
     name: Acceptance (${{ matrix.chaptarr-version }})
-    runs-on: ${{ github.event.pull_request.head.repo.fork && fromJSON('["ubuntu-latest"]') || fromJSON('["self-hosted", "az-vm-gha"]') }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && fromJSON('["ubuntu-latest"]') || fromJSON('["uecb-shared"]') }}
     timeout-minutes: 20
     permissions:
       contents: read
@@ -191,10 +191,11 @@ jobs:
             $SUDO apt-get update -qq
             $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
           fi
-          if ! docker compose version >/dev/null 2>&1; then
+          # uecb-shared has no Docker/BuildKit: acceptance runs Chaptarr natively (scripts/lib/native-chaptarr.sh).
+          if ! command -v jq >/dev/null 2>&1; then
             SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
             $SUDO apt-get update -qq
-            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends docker-compose-v2
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends jq
           fi
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -214,6 +215,8 @@ jobs:
         env:
           CHAPTARR_IMAGE: ${{ matrix.image }}
           CHAPTARR_VERSION: ${{ matrix.chaptarr-version }}
+          # Fork PRs fall back to GitHub-hosted runners, which have Docker.
+          CHAPTARR_RUNTIME: ${{ github.event.pull_request.head.repo.fork && 'docker' || 'native' }}
         run: bash ./scripts/test-acceptance.sh
 
   quality:

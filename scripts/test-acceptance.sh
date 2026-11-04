@@ -3,11 +3,30 @@ set -euo pipefail
 
 # Purpose: exercise a representative provider lifecycle against disposable Chaptarr.
 # Usage: CHAPTARR_IMAGE=<tag@digest> CHAPTARR_VERSION=<version> ./scripts/test-acceptance.sh
-# Prerequisites: Docker Compose, Go 1.25.13, OpenTofu 1.11.2, and curl.
+# Prerequisites: Go 1.25.13, OpenTofu 1.11.2, curl, and either Docker Compose
+# (CHAPTARR_RUNTIME=docker) or curl+jq+tar+sha256sum (CHAPTARR_RUNTIME=native,
+# which unpacks the same digest-pinned image and runs it as a loopback-only
+# process for runners without Docker). Default: docker if available, else native.
+# Only a disposable 127.0.0.1 instance started here is ever targeted; any
+# pre-existing CHAPTARR_URL/CHAPTARR_API_KEY in the environment is discarded.
 
 export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.13+auto}"
 
-for command in docker go tofu curl; do
+unset CHAPTARR_URL CHAPTARR_API_KEY
+runtime="${CHAPTARR_RUNTIME:-}"
+if [[ -z "${runtime}" ]]; then
+  if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+    runtime=docker
+  else
+    runtime=native
+  fi
+fi
+case "${runtime}" in
+  docker) required=(docker go tofu curl) ;;
+  native) required=(go tofu curl jq tar sha256sum) ;;
+  *) echo "CHAPTARR_RUNTIME must be docker or native." >&2; exit 1 ;;
+esac
+for command in "${required[@]}"; do
   if ! command -v "${command}" >/dev/null 2>&1; then
     echo "${command} is required for Chaptarr acceptance testing." >&2
     exit 1
@@ -30,13 +49,19 @@ cleanup() {
   local cleanup_status=0
   trap - EXIT INT TERM
 
-  if ! docker compose -f "${compose_file}" down --volumes --remove-orphans >/dev/null 2>&1; then
+  if [[ "${runtime}" == native ]]; then
+    if [[ -n "${native_pid:-}" ]] && kill -0 "${native_pid}" 2>/dev/null; then
+      kill "${native_pid}" 2>/dev/null || true
+      for _ in $(seq 1 20); do kill -0 "${native_pid}" 2>/dev/null || break; sleep 1; done
+      kill -9 "${native_pid}" 2>/dev/null || true
+    fi
+  elif ! docker compose -f "${compose_file}" down --volumes --remove-orphans >/dev/null 2>&1; then
     echo "Disposable Chaptarr teardown failed." >&2
     cleanup_status=1
   fi
-  if docker ps -a --filter "label=com.docker.compose.project=${project_name}" --format '{{.ID}}' | grep -q . ||
+  if [[ "${runtime}" == docker ]] && { docker ps -a --filter "label=com.docker.compose.project=${project_name}" --format '{{.ID}}' | grep -q . ||
     docker volume ls --filter "label=com.docker.compose.project=${project_name}" --quiet | grep -q . ||
-    docker network ls --filter "label=com.docker.compose.project=${project_name}" --quiet | grep -q .; then
+    docker network ls --filter "label=com.docker.compose.project=${project_name}" --quiet | grep -q .; }; then
     echo "Disposable Chaptarr project resources remain after teardown." >&2
     cleanup_status=1
   fi
@@ -82,7 +107,8 @@ run_tofu() {
 mkdir -p "${test_root}/bin" "${test_root}/configuration"
 cp "${repo_root}/acceptance/main.tf" "${test_root}/configuration/main.tf"
 
-echo "Starting disposable loopback-only Chaptarr ${CHAPTARR_VERSION}."
+echo "Starting disposable loopback-only Chaptarr ${CHAPTARR_VERSION} (${runtime})."
+if [[ "${runtime}" == docker ]]; then
 docker pull "${CHAPTARR_IMAGE}" >/dev/null
 docker compose -f "${compose_file}" config --quiet
 docker compose -f "${compose_file}" up -d >/dev/null
@@ -102,6 +128,11 @@ fi
 
 published="$(docker compose -f "${compose_file}" port chaptarr 8789)"
 host_port="${published##*:}"
+else
+  # shellcheck source=scripts/lib/native-chaptarr.sh
+  source "${repo_root}/scripts/lib/native-chaptarr.sh"
+  native_start "${CHAPTARR_IMAGE}" "${test_root}/native"
+fi
 base_url="http://127.0.0.1:${host_port}"
 for _ in $(seq 1 90); do
   if curl --silent --show-error --fail --output /dev/null -H "X-Api-Key: ${api_key}" "${base_url}/api/v1/system/status" 2>/dev/null; then
