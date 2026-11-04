@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
-const operationalSyntheticAPIKey = "operational-api-key-sentinel-9c31"
+const operationalSyntheticAPIKey = "test-api-key-not-real"
 
 func TestOperationalDataSourceSchemasValidateImplementation(t *testing.T) {
 	t.Parallel()
