@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.21](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.20...v0.11.21) (2026-11-05)
+
+
+### Continuous Integration
+
+* restore CodeQL pull_request trigger for the required check ([#116](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/116)) ([ea1e1b3](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/ea1e1b3da643864fba42fecd8d96dfea8180c148))
+* run release-please PR checks on GitHub-hosted runners ([#114](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/114)) ([f6e46e4](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/f6e46e4c2e347c7c9bedca178267a84b1fa70538))
+* wait for native Chaptarr credential on a deadline and surface its log ([#115](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/115)) ([91fe4df](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/91fe4df1d156e191bd4cb2b2dba0727fad1e16c2))
+
 ## [0.11.20](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.19...v0.11.20) (2026-11-04)
 
 
