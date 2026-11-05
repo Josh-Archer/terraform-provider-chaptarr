@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.20](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.19...v0.11.20) (2026-11-04)
+
+
+### Bug Fixes
+
+* **postgres_database:** compute ID from resolved values and replace on host/role change ([#102](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/102)) ([546d5c2](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/546d5c23b93b295a903f8370e924fe980029cd9e)), closes [#101](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/101)
+
+
+### Build System
+
+* **deps:** bump the codeql-action group with 3 updates ([#107](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/107)) ([6cd71f9](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/6cd71f9fe036453caf7ee6dccba949cb7ea65c9c))
+
+
+### Continuous Integration
+
+* drop pull_request trigger from CodeQL ([#112](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/112)) ([3015f78](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/3015f78804775195de2143872989300ecf88ee09))
+* run on the shared UECB runner pool ([#111](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/111)) ([c27db87](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/c27db8750fd25414568e214d4a5f5a14868eacc7))
+
 ## [0.11.19](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.18...v0.11.19) (2026-10-22)
 
 
