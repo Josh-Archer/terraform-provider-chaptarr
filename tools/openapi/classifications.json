@@ -598,25 +598,25 @@
     },
     "GET /api/v1/history": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_history",
       "tracking_issue": "#11"
     },
     "GET /api/v1/history/author": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_history",
       "tracking_issue": "#11"
     },
     "GET /api/v1/history/since": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_history",
       "tracking_issue": "#11"
     },
     "GET /api/v1/ignored": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ignored",
       "tracking_issue": "#11"
     },
@@ -725,7 +725,7 @@
     },
     "GET /api/v1/manualimport": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_manual_import_candidates",
       "tracking_issue": "#11"
     },
@@ -743,13 +743,13 @@
     },
     "GET /api/v1/mediacover/books/{bookId}/{filename}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_cover",
       "tracking_issue": "#10"
     },
     "GET /api/v1/mediacover/{authorId}/{filename}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_media_cover",
       "tracking_issue": "#10"
     },
@@ -821,25 +821,25 @@
     },
     "GET /api/v1/pendingauthorimport": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_pending_author_import",
       "tracking_issue": "#11"
     },
     "GET /api/v1/pendingauthorimport/author/exists/{providerId}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_pending_author_import",
       "tracking_issue": "#11"
     },
     "GET /api/v1/pendingauthorimport/profiles/options": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_pending_author_import",
       "tracking_issue": "#11"
     },
     "GET /api/v1/pendingauthorimport/{id}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_pending_author_import",
       "tracking_issue": "#11"
     },
@@ -892,10 +892,10 @@
       "tracking_issue": "#11"
     },
     "GET /api/v1/release": {
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_release_search",
-      "tracking_issue": "#5"
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#5",
+      "rationale": "Release search launches external indexer queries and returns passkey-bearing download URLs, so it must never run during plan or refresh."
     },
     "GET /api/v1/releaseprofile": {
       "classification": "resource",
@@ -1007,7 +1007,7 @@
     },
     "GET /api/v1/system/backup": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_backups",
       "tracking_issue": "#11"
     },
@@ -1030,13 +1030,13 @@
     },
     "GET /api/v1/system/settingsbackup/files": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_settings_backups",
       "tracking_issue": "#11"
     },
     "GET /api/v1/system/settingsbackup/locations": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_settings_backups",
       "tracking_issue": "#11"
     },
@@ -1096,25 +1096,25 @@
     },
     "GET /api/v1/wanted/cutoff": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_cutoff_wanted",
       "tracking_issue": "#11"
     },
     "GET /api/v1/wanted/cutoff/{id}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_cutoff_wanted",
       "tracking_issue": "#11"
     },
     "GET /api/v1/wanted/missing": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_missing",
       "tracking_issue": "#11"
     },
     "GET /api/v1/wanted/missing/{id}": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_missing",
       "tracking_issue": "#11"
     },
@@ -1162,7 +1162,7 @@
     },
     "GET /ping": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ping",
       "tracking_issue": "#10"
     },
@@ -1173,7 +1173,7 @@
     },
     "HEAD /ping": {
       "classification": "data-source",
-      "status": "planned",
+      "status": "implemented",
       "target": "chaptarr_ping",
       "tracking_issue": "#10"
     },
@@ -1562,16 +1562,16 @@
       "tracking_issue": "#8"
     },
     "POST /api/v1/series/{seriesId}/narrators/discover": {
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_series_narrator_discovery",
-      "tracking_issue": "#8"
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#8",
+      "rationale": "Narrator discovery and narrator search are POST operations that trigger external provider queries and must never run during plan or refresh."
     },
     "POST /api/v1/series/{seriesId}/narrators/search": {
-      "classification": "data-source",
-      "status": "planned",
-      "target": "chaptarr_series_narrator_discovery",
-      "tracking_issue": "#8"
+      "classification": "action-only",
+      "status": "excluded",
+      "tracking_issue": "#8",
+      "rationale": "Narrator discovery and narrator search are POST operations that trigger external provider queries and must never run during plan or refresh."
     },
     "POST /api/v1/settings/proxy": {
       "classification": "resource",

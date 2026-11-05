@@ -1,0 +1,2 @@
+# Synthetic test fixture from f98a272, already replaced with test-api-key-not-real (not a real credential).
+f98a272ffa6947506066d0c3b36e46aeb4cc845b:internal/provider/data_source_operational_test.go:generic-api-key:16
