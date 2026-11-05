@@ -54,12 +54,30 @@ XML
     "${work}/root/usr/share/dotnet/dotnet" "${work}/root/app/Chaptarr.dll" -nobrowser "-data=${work}/data" >"${work}/chaptarr.log" 2>&1 &
   native_pid=$!
 
+  # Chaptarr writes <ApiKey> during startup, after its main + log DB
+  # migrations. Locally that takes ~15s, but on uecb-shared (where setup-go's
+  # cache save alone ran >6 min) the process was still alive when the old fixed
+  # 90x2s window expired. Wait on a deadline while the process is alive, and on failure show
+  # a redacted log tail so the cause is visible in CI instead of guessed at.
+  local deadline=$((SECONDS + ${CHAPTARR_STARTUP_TIMEOUT:-600}))
   api_key=""
-  for _ in $(seq 1 90); do
-    kill -0 "${native_pid}" 2>/dev/null || { echo "Native Chaptarr exited early." >&2; return 1; }
+  while ((SECONDS < deadline)); do
+    kill -0 "${native_pid}" 2>/dev/null || { echo "Native Chaptarr exited early." >&2; native_log_tail "${work}"; return 1; }
     api_key="$(sed -n 's:.*<ApiKey>\([^<]*\)</ApiKey>.*:\1:p' "${work}/data/config.xml" 2>/dev/null | tr -d '\r\n' || true)"
     [[ -n "${api_key}" ]] && break
     sleep 2
   done
-  [[ -n "${api_key}" ]] || { echo "Chaptarr did not create its disposable API credential in time." >&2; return 1; }
+  if [[ -z "${api_key}" ]]; then
+    echo "Chaptarr did not create its disposable API credential in time." >&2
+    native_log_tail "${work}"
+    return 1
+  fi
+}
+
+# Print the last Chaptarr log lines with anything key-like redacted.
+native_log_tail() {
+  local log="$1/chaptarr.log"
+  [[ -f "${log}" ]] || return 0
+  echo "--- last 40 lines of native Chaptarr log (redacted) ---" >&2
+  tail -n 40 "${log}" | sed -E 's/[0-9a-fA-F]{32,}/[REDACTED]/g; s/(api[_-]?key|apikey|token|password|secret)([^A-Za-z0-9]+)[^ ]+/\1\2[REDACTED]/Ig' >&2
 }
