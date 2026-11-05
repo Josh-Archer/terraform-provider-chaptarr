@@ -19,7 +19,7 @@ env:
 jobs:
   unit:
     name: Unit
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -60,7 +60,7 @@ jobs:
 
   contract:
     name: Contract
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -111,7 +111,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -163,7 +163,7 @@ jobs:
 
   acceptance:
     name: Acceptance (${{ matrix.chaptarr-version }})
-    runs-on: ${{ github.event.pull_request.head.repo.fork && fromJSON('["ubuntu-latest"]') || fromJSON('["uecb-shared"]') }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && fromJSON('["ubuntu-latest"]') || fromJSON('["uecb-shared"]') }}
     timeout-minutes: 20
     permissions:
       contents: read
@@ -216,7 +216,7 @@ jobs:
           CHAPTARR_IMAGE: ${{ matrix.image }}
           CHAPTARR_VERSION: ${{ matrix.chaptarr-version }}
           # Fork PRs fall back to GitHub-hosted runners, which have Docker.
-          CHAPTARR_RUNTIME: ${{ github.event.pull_request.head.repo.fork && 'docker' || 'native' }}
+          CHAPTARR_RUNTIME: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'docker' || 'native' }}
         run: bash ./scripts/test-acceptance.sh
 
   quality:
@@ -227,7 +227,7 @@ jobs:
       - contract
       - lint
       - acceptance
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 5
     permissions:
       contents: read
@@ -264,7 +264,7 @@ jobs:
 
   secret-scan:
     name: Secret Scan
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 10
     permissions:
       contents: read
@@ -302,7 +302,7 @@ jobs:
 
   vulnerability-scan:
     name: Vulnerability Scan
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 10
     permissions:
       contents: read
@@ -341,7 +341,7 @@ jobs:
 
   release-snapshot:
     name: Release Snapshot
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 30
     permissions:
       contents: read
