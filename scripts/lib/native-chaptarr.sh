@@ -55,7 +55,11 @@ native_start() {
   <UpdateMechanism>External</UpdateMechanism>
 </Config>
 XML
-  local timeout="${CHAPTARR_NATIVE_START_TIMEOUT:-300}" attempt waited
+  # Main's credential wait: deadline-based (CHAPTARR_STARTUP_TIMEOUT, default 600s)
+  # while the process is alive, with a redacted log tail on failure. With the
+  # seeded key above the credential is present immediately, so the deadline also
+  # bounds the HTTP readiness probe. Two attempts with a fresh DB on failure.
+  local timeout="${CHAPTARR_STARTUP_TIMEOUT:-${CHAPTARR_NATIVE_START_TIMEOUT:-600}}" attempt deadline started
   for attempt in 1 2; do
     # Workstation GC with TieredPGO off keeps the runtime
     # from stalling on CPU-throttled shared runner pods.
@@ -63,24 +67,34 @@ XML
       DOTNET_gcServer=0 DOTNET_TieredPGO=0 DOTNET_EnableDiagnostics=0 TZ=UTC \
       "${work}/root/usr/share/dotnet/dotnet" "${work}/root/app/Chaptarr.dll" -nobrowser "-data=${work}/data" >"${work}/chaptarr.log" 2>&1 &
     native_pid=$!
-    waited=0
-    until curl --silent --fail --output /dev/null -H "X-Api-Key: ${api_key}" "http://127.0.0.1:${host_port}/api/v1/system/status" 2>/dev/null; do
+    started=${SECONDS}
+    deadline=$((SECONDS + timeout))
+    local cfg_key="" ready=0
+    while ((SECONDS < deadline)); do
       if ! kill -0 "${native_pid}" 2>/dev/null; then
-        echo "Native Chaptarr exited early (attempt ${attempt}). Last log lines:" >&2; tail -n 40 "${work}/chaptarr.log" >&2
+        echo "Native Chaptarr exited early (attempt ${attempt})." >&2; native_log_tail "${work}"
         break
       fi
-      if ((waited >= timeout)); then
-        echo "Native Chaptarr did not answer within ${timeout}s (attempt ${attempt}). Last log lines:" >&2
-        tail -n 40 "${work}/chaptarr.log" >&2
-        native_diagnostics >&2
-        kill "${native_pid}" 2>/dev/null; sleep 5; kill -9 "${native_pid}" 2>/dev/null || true
-        break
+      cfg_key="$(sed -n 's:.*<ApiKey>\([^<]*\)</ApiKey>.*:\1:p' "${work}/data/config.xml" 2>/dev/null | tr -d '\r\n' || true)"
+      [[ -n "${cfg_key}" ]] && api_key="${cfg_key}"
+      if [[ -n "${api_key}" ]] && curl --silent --fail --output /dev/null -H "X-Api-Key: ${api_key}" "http://127.0.0.1:${host_port}/api/v1/system/status" 2>/dev/null; then
+        ready=1; break
       fi
-      sleep 2; waited=$((waited + 2))
+      sleep 2
     done
-    if kill -0 "${native_pid}" 2>/dev/null && ((waited < timeout)); then
-      echo "Native Chaptarr ready after ${waited}s (attempt ${attempt})."
+    if ((ready)); then
+      echo "Native Chaptarr ready after $((SECONDS - started))s (attempt ${attempt})."
       return 0
+    fi
+    if kill -0 "${native_pid}" 2>/dev/null; then
+      if [[ -z "${cfg_key}" ]]; then
+        echo "Chaptarr did not create its disposable API credential in time (attempt ${attempt})." >&2
+      else
+        echo "Native Chaptarr did not answer within ${timeout}s (attempt ${attempt})." >&2
+      fi
+      native_log_tail "${work}"
+      native_diagnostics >&2
+      kill "${native_pid}" 2>/dev/null; sleep 5; kill -9 "${native_pid}" 2>/dev/null || true
     fi
     rm -f "${work}/data/"*.db* 2>/dev/null || true
   done
@@ -93,4 +107,12 @@ native_diagnostics() {
   cat /sys/fs/cgroup/cpu.max /sys/fs/cgroup/memory.max 2>/dev/null
   ps -o pid,stat,etime,time,rss,args -p "${native_pid}" 2>/dev/null | cut -c1-160
   ls -la "${work}/data" 2>/dev/null
+}
+
+# Print the last Chaptarr log lines with anything key-like redacted.
+native_log_tail() {
+  local log="$1/chaptarr.log"
+  [[ -f "${log}" ]] || return 0
+  echo "--- last 40 lines of native Chaptarr log (redacted) ---" >&2
+  tail -n 40 "${log}" | sed -E 's/[0-9a-fA-F]{32,}/[REDACTED]/g; s/(api[_-]?key|apikey|token|password|secret)([^A-Za-z0-9]+)[^ ]+/\1\2[REDACTED]/Ig' >&2
 }

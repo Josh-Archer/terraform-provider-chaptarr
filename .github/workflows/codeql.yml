@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "21 5 * * 2"
   workflow_dispatch:
@@ -17,7 +20,7 @@ env:
 jobs:
   analyze:
     name: CodeQL
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 20
     permissions:
       contents: read
