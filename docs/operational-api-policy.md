@@ -22,16 +22,25 @@ execution, upgrades, process restart/shutdown/reset, or release pushes.
 
 ## Read-only observations
 
-The following families remain candidates for future typed and redacted data
-sources: command status, queue status, history, wanted/missing/cutoff lists,
-blocklist and ignored entries, manual-import candidates, pending-author-import
-status, and backup inventory. They remain `planned` until their state schemas
-can prove that operational URLs, request bodies, paths, and other sensitive
-details are excluded.
+Read-only operational observations—including command status, queue status,
+activity history (`chaptarr_history`), wanted/missing/cutoff lists
+(`chaptarr_missing`, `chaptarr_cutoff_wanted`), blocklist and ignored entries
+(`chaptarr_blocklist`, `chaptarr_ignored`), manual-import candidates
+(`chaptarr_manual_import_candidates`), pending-author-import status
+(`chaptarr_pending_author_import`), and backup/settings-backup inventory
+(`chaptarr_backups`, `chaptarr_settings_backups`)—are implemented only as
+non-mutating data sources. Redacted operational schemas omit server filesystem
+paths, operational/passkey URLs, raw error/rejection messages, and caller
+identity details from Terraform state.
 
-The typed, whitelisted health/system/update observations implemented under
-issue #10 are separate: they use only `GET`, bound responses, and deliberately
-limited state.
+Endpoints whose execution triggers external searches or mutations—such as
+`GET /api/v1/release` (live indexer search returning passkey-bearing URLs) and
+`POST /api/v1/series/{seriesId}/narrators/{discover,search}`—are classified
+`action-only` and `excluded` so they never run during `plan` or `refresh`.
+
+The typed, whitelisted health/system/update/ping observations implemented under
+issue #10 likewise use only `GET` (or `HEAD` for `chaptarr_ping`), bound
+responses, and deliberately limited state.
 
 ## Imperative maintenance
 

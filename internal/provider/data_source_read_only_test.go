@@ -26,7 +26,7 @@ func TestReadOnlyDefinitionsAreUniqueAndNonMutating(t *testing.T) {
 
 	want := []string{
 		"api_info", "author_statistics", "blocklist", "calendar", "calendar_feed", "commands", "database_status", "disk_space", "file_system", "health",
-		"languages", "library_search", "localization", "media_cover", "parse",
+		"languages", "library_search", "localization", "media_cover", "parse", "ping",
 		"queue", "queue_details", "queue_status",
 		"remote_path_mapping_suggestions", "remote_path_mappings", "root_folders", "search", "system_routes",
 		"system_statistics", "system_status", "tasks", "updates",
@@ -193,6 +193,7 @@ func TestMediaCoverRequestEscapesFilenameAndHashesIdentifier(t *testing.T) {
 		"kind":           tftypes.NewValue(tftypes.String, "book"),
 		"object_id":      tftypes.NewValue(tftypes.Number, int64(42)),
 		"filename":       tftypes.NewValue(tftypes.String, "private title.jpg"),
+		"legacy_route":   tftypes.NewValue(tftypes.Bool, nil),
 		"content_type":   unknownString(),
 		"content_length": unknownNumber(),
 		"sha256":         unknownString(),
@@ -205,6 +206,119 @@ func TestMediaCoverRequestEscapesFilenameAndHashesIdentifier(t *testing.T) {
 	}
 	if strings.Contains(identifier, "private") || strings.Contains(identifier, "title") {
 		t.Fatalf("identifier leaked filename: %q", identifier)
+	}
+
+	legacyBookPath, legacyBookID, diagnostics := buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":             unknownString(),
+		"kind":           tftypes.NewValue(tftypes.String, "book"),
+		"object_id":      tftypes.NewValue(tftypes.Number, int64(42)),
+		"filename":       tftypes.NewValue(tftypes.String, "private title.jpg"),
+		"legacy_route":   tftypes.NewValue(tftypes.Bool, true),
+		"content_type":   unknownString(),
+		"content_length": unknownNumber(),
+		"sha256":         unknownString(),
+	})
+	if diagnostics.HasError() {
+		t.Fatalf("unexpected legacy book diagnostics: %v", diagnostics)
+	}
+	if legacyBookPath != "/api/v1/mediacover/books/42/private%20title.jpg" {
+		t.Fatalf("legacy book request path = %q", legacyBookPath)
+	}
+	if strings.Contains(legacyBookID, "private") || legacyBookID == identifier {
+		t.Fatalf("legacy book identifier invalid: %q", legacyBookID)
+	}
+
+	legacyAuthorPath, legacyAuthorID, diagnostics := buildDefinitionRequest(t, definition, map[string]tftypes.Value{
+		"id":             unknownString(),
+		"kind":           tftypes.NewValue(tftypes.String, "author"),
+		"object_id":      tftypes.NewValue(tftypes.Number, int64(7)),
+		"filename":       tftypes.NewValue(tftypes.String, "poster.jpg"),
+		"legacy_route":   tftypes.NewValue(tftypes.Bool, true),
+		"content_type":   unknownString(),
+		"content_length": unknownNumber(),
+		"sha256":         unknownString(),
+	})
+	if diagnostics.HasError() {
+		t.Fatalf("unexpected legacy author diagnostics: %v", diagnostics)
+	}
+	if legacyAuthorPath != "/api/v1/mediacover/7/poster.jpg" {
+		t.Fatalf("legacy author request path = %q", legacyAuthorPath)
+	}
+	if strings.Contains(legacyAuthorID, "poster") {
+		t.Fatalf("legacy author identifier leaked filename: %q", legacyAuthorID)
+	}
+}
+
+func TestPingDataSourceSupportsGetAndHead(t *testing.T) {
+	t.Parallel()
+
+	var methods []string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		methods = append(methods, r.Method)
+		if r.URL.Path != "/ping" {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if r.Method == http.MethodGet {
+			_, _ = w.Write([]byte(`{"status":"OK"}`))
+		}
+	}))
+	defer server.Close()
+
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: readOnlySyntheticKey, UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	definition := definitionByName(t, "ping")
+	instance := &readOnlyDataSource{definition: definition, client: apiClient}
+	schemaResponse := &datasource.SchemaResponse{}
+	instance.Schema(t.Context(), datasource.SchemaRequest{}, schemaResponse)
+	typeValue := schemaResponse.Schema.Type().TerraformType(context.Background())
+
+	for _, tc := range []struct {
+		methodValue tftypes.Value
+		wantMethod  string
+		wantID      string
+		wantStatus  string
+	}{
+		{
+			methodValue: tftypes.NewValue(tftypes.String, nil),
+			wantMethod:  http.MethodGet,
+			wantID:      "ping:get",
+			wantStatus:  "OK",
+		},
+		{
+			methodValue: tftypes.NewValue(tftypes.String, http.MethodHead),
+			wantMethod:  http.MethodHead,
+			wantID:      "ping:head",
+			wantStatus:  "",
+		},
+	} {
+		raw := tftypes.NewValue(typeValue, map[string]tftypes.Value{
+			"id":          unknownString(),
+			"method":      tc.methodValue,
+			"status":      unknownString(),
+			"http_status": unknownNumber(),
+		})
+		readResponse := &datasource.ReadResponse{State: tfsdk.State{Raw: raw, Schema: schemaResponse.Schema}}
+		instance.Read(t.Context(), datasource.ReadRequest{Config: tfsdk.Config{Raw: raw, Schema: schemaResponse.Schema}}, readResponse)
+		if readResponse.Diagnostics.HasError() {
+			t.Fatalf("unexpected diagnostics for %s: %v", tc.wantMethod, readResponse.Diagnostics)
+		}
+		var gotID, gotMethod, gotStatus types.String
+		var gotHTTPStatus types.Int64
+		readResponse.Diagnostics.Append(readResponse.State.GetAttribute(t.Context(), path.Root("id"), &gotID)...)
+		readResponse.Diagnostics.Append(readResponse.State.GetAttribute(t.Context(), path.Root("method"), &gotMethod)...)
+		readResponse.Diagnostics.Append(readResponse.State.GetAttribute(t.Context(), path.Root("status"), &gotStatus)...)
+		readResponse.Diagnostics.Append(readResponse.State.GetAttribute(t.Context(), path.Root("http_status"), &gotHTTPStatus)...)
+		if gotID.ValueString() != tc.wantID || gotMethod.ValueString() != tc.wantMethod || gotStatus.ValueString() != tc.wantStatus || gotHTTPStatus.ValueInt64() != http.StatusOK {
+			t.Fatalf("ping state = id:%q method:%q status:%q http_status:%d", gotID.ValueString(), gotMethod.ValueString(), gotStatus.ValueString(), gotHTTPStatus.ValueInt64())
+		}
+	}
+	if !reflect.DeepEqual(methods, []string{http.MethodGet, http.MethodHead}) {
+		t.Fatalf("recorded methods = %v, want [GET HEAD]", methods)
 	}
 }
 

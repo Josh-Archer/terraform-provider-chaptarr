@@ -28,9 +28,10 @@ Plan and refresh never test providers. The provider never calls provider
 
 Treat `test_on_apply = true` as explicit authorization for Chaptarr to contact
 the configured service during that apply. Alternatively, run tests separately
-in the Chaptarr UI or access-controlled operational tooling. Release search remains unimplemented because
-the GET endpoint can launch indexer searches; release download and release push
-remain explicit action-only operations.
+in the Chaptarr UI or access-controlled operational tooling. Release search,
+release download, and release push are classified as excluded action-only
+operations because `GET /api/v1/release` launches external indexer queries and
+returns passkey-bearing download URLs.
 
 ## Tags and routing
 

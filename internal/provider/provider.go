@@ -179,6 +179,16 @@ func (p *ChaptarrProvider) DataSources(context.Context) []func() datasource.Data
 	for _, definition := range bookReadOnlyDefinitions() {
 		dataSources = append(dataSources, newReadOnlyDataSource(definition))
 	}
+	dataSources = append(dataSources,
+		newBackupsDataSource,
+		newSettingsBackupsDataSource,
+		newHistoryDataSource,
+		newIgnoredDataSource,
+		newManualImportCandidatesDataSource,
+		newPendingAuthorImportDataSource,
+		newCutoffWantedDataSource,
+		newMissingDataSource,
+	)
 	return dataSources
 }
 
