@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -39,7 +40,7 @@ func integrationBaseAttributes() map[string]schema.Attribute {
 		"enable":                schema.BoolAttribute{Required: true},
 		"test_on_apply":         schema.BoolAttribute{Optional: true, Computed: true, MarkdownDescription: "Explicitly permit Chaptarr's built-in provider connection/test call when enable is true during create or update."},
 		"tags":                  schema.SetAttribute{Optional: true, Computed: true, ElementType: types.Int64Type, MarkdownDescription: "Omit to preserve associations managed outside Terraform; configure explicitly to replace them."},
-		"field_values_json":     schema.StringAttribute{Required: true, MarkdownDescription: "JSON object mapping non-secret provider setting names to values."},
+		"field_values_json":     schema.StringAttribute{Required: true, MarkdownDescription: "JSON object mapping non-secret provider setting names to values. Refresh keeps these keys and preserves this JSON when Chaptarr echoes the same values. Omitted server defaults stay unmanaged. Import records every non-secret field because no configured key set exists yet."},
 		"field_values_sha256":   schema.StringAttribute{Computed: true},
 		"secret_fields":         schema.MapAttribute{Optional: true, Sensitive: true, WriteOnly: true, ElementType: types.StringType, MarkdownDescription: "Apply-only map of password, token, or API-key field names to values."},
 		"protected_field_names": schema.SetAttribute{Computed: true, ElementType: types.StringType},
@@ -135,19 +136,72 @@ func validateIntegrationFields(ctx context.Context, apiClient *client.Client, en
 	return !diagnostics.HasError()
 }
 
-func integrationFieldState(fields []providerFieldAPI) (string, string, []string) {
+func integrationFieldState(fields []providerFieldAPI, configured types.String) (string, string, []string) {
+	planned, filter := configuredFieldValues(configured)
 	values := map[string]any{}
 	protected := []string{}
+	seen := map[string]bool{}
 	for _, field := range fields {
 		if sensitiveProviderField(field) {
 			protected = append(protected, field.Name)
 			continue
 		}
+		if filter {
+			if _, keep := planned[field.Name]; !keep {
+				continue
+			}
+		}
 		values[field.Name] = field.Value
+		seen[field.Name] = true
+	}
+	if filter {
+		for name, value := range planned {
+			if !seen[name] {
+				values[name] = value
+			}
+		}
 	}
 	sort.Strings(protected)
 	canonical, hash := canonicalValue(values)
+	// Apply consistency requires the planned string, not a re-encoding and not
+	// Chaptarr's unspecified defaults (null categories, addPaused, and so on).
+	if filter && jsonValuesEqual(planned, values) {
+		raw := configured.ValueString()
+		if raw != canonical {
+			hash = hashString(raw)
+		}
+		return raw, hash, protected
+	}
 	return canonical, hash, protected
+}
+
+func configuredFieldValues(configured types.String) (map[string]any, bool) {
+	if configured.IsNull() || configured.IsUnknown() {
+		return nil, false
+	}
+	values := map[string]any{}
+	if json.Unmarshal([]byte(configured.ValueString()), &values) != nil {
+		return nil, false
+	}
+	return values, true
+}
+
+func jsonValuesEqual(left, right map[string]any) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for key, value := range left {
+		other, ok := right[key]
+		if !ok {
+			return false
+		}
+		leftJSON, leftErr := json.Marshal(value)
+		rightJSON, rightErr := json.Marshal(other)
+		if leftErr != nil || rightErr != nil || !bytes.Equal(leftJSON, rightJSON) {
+			return false
+		}
+	}
+	return true
 }
 
 func setIntegrationBaseState(ctx context.Context, current integrationBaseAPI, id, name, implementationName, implementation, contract *types.String, enable *types.Bool, tags *types.Set, valuesJSON, valuesHash *types.String, secrets *types.Map, protected *types.Set, diagnostics *diag.Diagnostics) {
@@ -158,7 +212,8 @@ func setIntegrationBaseState(ctx context.Context, current integrationBaseAPI, id
 	*contract = types.StringValue(current.ConfigContract)
 	*enable = types.BoolValue(current.Enable)
 	*tags = setInt64State(ctx, current.Tags, diagnostics)
-	canonical, hash, protectedNames := integrationFieldState(current.Fields)
+	priorValues := *valuesJSON
+	canonical, hash, protectedNames := integrationFieldState(current.Fields, priorValues)
 	*valuesJSON, *valuesHash = types.StringValue(canonical), types.StringValue(hash)
 	*secrets = types.MapNull(types.StringType)
 	*protected = setStringState(ctx, protectedNames, diagnostics)

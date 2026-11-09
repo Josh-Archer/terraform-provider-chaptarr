@@ -62,19 +62,27 @@ Readarr metadata identities and Chaptarr identities are not interchangeable.
 This workflow is an example only and has not been live-validated as a complete
 Readarr migration.
 
-## `terraform/arr-config` integration gate
+## `terraform/arr-config` replay gate
 
-An example integration is intentionally deferred. Propose it only after the
-immutable-image acceptance matrix passes on the exact provider head and a
-dedicated sandbox validates the required resources without production media or
-credentials. The later proposal must pin a provider release, start with
-destructive controls disabled, document rollback, and carry its own plan and
-apply evidence.
+`test/consumer/arr-config` is a sanitized copy of the Chaptarr resources in
+the consumer `terraform/arr-config` module. The CI job `Consumer Replay
+(arr-config)` applies it to a disposable loopback Chaptarr, requires a clean
+re-plan, then repeats that from the previous published provider. The candidate
+build is installed only from a filesystem mirror. Ambient `CHAPTARR_URL` and
+`CHAPTARR_API_KEY` values are discarded.
+
+Release publication waits on that gate. A stable tag is promoted when the
+tagged commit's Consumer Replay check succeeded, or when the release workflow
+replays the tagged source and that replay succeeds. See
+[release gates](release-gates.md). This is disposable-instance evidence, not a
+production apply.
 
 ## Registry and release boundary
 
-CI can validate unit, contract, lint, acceptance, vulnerability, secret, and
-unsigned release-snapshot tiers. Registry namespace authorization, public
+CI can validate unit, contract, lint, acceptance (OpenTofu and Terraform),
+consumer replay, vulnerability, secret, and unsigned release-snapshot tiers.
+Registry install checks for both public registries run on a schedule and after
+publication. Registry namespace authorization, public
 signing-key registration, protected-environment private keys/passphrases,
 signing, and any publisher terms or attestations remain owner actions. Tests
 and contributors must never read or print those secrets.

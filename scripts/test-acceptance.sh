@@ -2,17 +2,27 @@
 set -euo pipefail
 
 # Purpose: exercise a representative provider lifecycle against disposable Chaptarr.
-# Usage: CHAPTARR_IMAGE=<tag@digest> CHAPTARR_VERSION=<version> ./scripts/test-acceptance.sh
-# Prerequisites: Go 1.25.13, OpenTofu 1.11.2, curl, and either Docker Compose
-# (CHAPTARR_RUNTIME=docker) or curl+jq+tar+sha256sum (CHAPTARR_RUNTIME=native,
-# which unpacks the same digest-pinned image and runs it as a loopback-only
-# process for runners without Docker). Default: docker if available, else native.
+# Usage: CHAPTARR_IMAGE=<tag@digest> CHAPTARR_VERSION=<version> [CHAPTARR_ENGINE=tofu|terraform] ./scripts/test-acceptance.sh
+# Prerequisites: Go 1.25.13, OpenTofu 1.11.2 or Terraform 1.11.2 (write-only
+# attributes), curl, and either Docker Compose (CHAPTARR_RUNTIME=docker) or
+# curl+jq+tar+sha256sum (CHAPTARR_RUNTIME=native, which unpacks the same
+# digest-pinned image and runs it as a loopback-only process for runners
+# without Docker). Default engine is OpenTofu. Default runtime is docker if
+# available, else native.
 # Only a disposable 127.0.0.1 instance started here is ever targeted; any
 # pre-existing CHAPTARR_URL/CHAPTARR_API_KEY in the environment is discarded.
+# Each run uses its own working directory, lock file, and registry source
+# address (registry.opentofu.org for OpenTofu, registry.terraform.io for Terraform).
 
 export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.13+auto}"
 
 unset CHAPTARR_URL CHAPTARR_API_KEY
+engine="${CHAPTARR_ENGINE:-tofu}"
+case "${engine}" in
+  tofu) registry_source="registry.opentofu.org/josh-archer/chaptarr" ;;
+  terraform) registry_source="registry.terraform.io/josh-archer/chaptarr" ;;
+  *) echo "CHAPTARR_ENGINE must be tofu or terraform." >&2; exit 1 ;;
+esac
 runtime="${CHAPTARR_RUNTIME:-}"
 if [[ -z "${runtime}" ]]; then
   if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
@@ -22,8 +32,8 @@ if [[ -z "${runtime}" ]]; then
   fi
 fi
 case "${runtime}" in
-  docker) required=(docker go tofu curl) ;;
-  native) required=(go tofu curl jq tar sha256sum) ;;
+  docker) required=(docker go "${engine}" curl) ;;
+  native) required=(go "${engine}" curl jq tar sha256sum) ;;
   *) echo "CHAPTARR_RUNTIME must be docker or native." >&2; exit 1 ;;
 esac
 for command in "${required[@]}"; do
@@ -79,11 +89,11 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-run_tofu() {
+run_tf() {
   local stage="$1"
   shift
-  if ! tofu -chdir="${tofu_test_root}/configuration" "$@" >"${test_root}/${stage}.out" 2>&1; then
-    local classification="unclassified OpenTofu failure"
+  if ! "${engine}" -chdir="${tofu_test_root}/configuration" "$@" >"${test_root}/${stage}.out" 2>&1; then
+    local classification="unclassified ${engine} failure"
     if grep -q "Inconsistent dependency lock file" "${test_root}/${stage}.out"; then
       classification="dependency lock initialization"
     elif grep -qE "Failed to (load plugin schemas|instantiate provider)|could not load the schema" "${test_root}/${stage}.out"; then
@@ -149,17 +159,18 @@ provider_source="${repo_root}"
 provider_binary="${test_root}/bin/terraform-provider-chaptarr"
 if [[ "$(go env GOOS)" == "windows" ]]; then
   if ! command -v cygpath >/dev/null 2>&1; then
-    echo "cygpath is required to normalize disposable paths for Windows OpenTofu." >&2
+    echo "cygpath is required to normalize disposable paths for Windows ${engine}." >&2
     exit 1
   fi
   tofu_test_root="$(cygpath -m -- "${test_root}")"
   provider_binary="${provider_binary}.exe"
 fi
 go build -trimpath -o "${provider_binary}" "${provider_source}"
+sed -i "s#source = \"josh-archer/chaptarr\"#source = \"${registry_source}\"#" "${test_root}/configuration/main.tf"
 cat >"${test_root}/tofurc" <<EOF
 provider_installation {
   dev_overrides {
-    "josh-archer/chaptarr" = "${tofu_test_root}/bin"
+    "${registry_source}" = "${tofu_test_root}/bin"
   }
   direct {}
 }
@@ -169,10 +180,14 @@ export CHAPTARR_URL="${base_url}"
 export CHAPTARR_API_KEY="${api_key}"
 export TF_CLI_CONFIG_FILE="${tofu_test_root}/tofurc"
 export TF_VAR_tag_label="tf-acceptance-${CHAPTARR_VERSION//./-}-initial"
+echo "Lifecycle engine ${engine}: $("${engine}" version | head -n 1)"
+echo "Lifecycle registry source: ${registry_source}"
 
-run_tofu create apply -auto-approve -input=false -no-color
-tag_id="$(tofu -chdir="${tofu_test_root}/configuration" output -raw tag_id 2>/dev/null)"
-actual_version="$(tofu -chdir="${tofu_test_root}/configuration" output -raw chaptarr_version 2>/dev/null)"
+run_tf init init -input=false -no-color
+run_tf create apply -auto-approve -input=false -no-color
+run_tf refresh refresh -input=false -no-color
+tag_id="$("${engine}" -chdir="${tofu_test_root}/configuration" output -raw tag_id 2>/dev/null)"
+actual_version="$("${engine}" -chdir="${tofu_test_root}/configuration" output -raw chaptarr_version 2>/dev/null)"
 if [[ ! "${tag_id}" =~ ^[1-9][0-9]*$ ]]; then
   echo "Disposable Chaptarr tag identity verification failed." >&2
   exit 1
@@ -183,12 +198,14 @@ if [[ "${actual_version}" != "${CHAPTARR_VERSION}" && "${actual_version}" != "${
 fi
 
 export TF_VAR_tag_label="tf-acceptance-${CHAPTARR_VERSION//./-}-updated"
-run_tofu update apply -auto-approve -input=false -no-color
-run_tofu forget state rm chaptarr_tag.acceptance
-run_tofu import import -input=false -no-color chaptarr_tag.acceptance "${tag_id}"
+run_tf update apply -auto-approve -input=false -no-color
+run_tf refresh-updated refresh -input=false -no-color
+run_tf forget state rm chaptarr_tag.acceptance
+run_tf import import -input=false -no-color chaptarr_tag.acceptance "${tag_id}"
+run_tf refresh-imported refresh -input=false -no-color
 
 set +e
-tofu -chdir="${tofu_test_root}/configuration" plan -detailed-exitcode -input=false -no-color >"${test_root}/no-drift.out" 2>&1
+"${engine}" -chdir="${tofu_test_root}/configuration" plan -detailed-exitcode -input=false -no-color >"${test_root}/no-drift.out" 2>&1
 plan_status=$?
 set -e
 if [[ ${plan_status} -ne 0 ]]; then
@@ -197,11 +214,11 @@ if [[ ${plan_status} -ne 0 ]]; then
 fi
 echo "Acceptance stage no-drift passed."
 
-run_tofu destroy destroy -auto-approve -input=false -no-color
+run_tf destroy destroy -auto-approve -input=false -no-color
 status="$(curl --silent --output /dev/null --write-out '%{http_code}' -H "X-Api-Key: ${api_key}" "${base_url}/api/v1/tag/${tag_id}" || true)"
 if [[ "${status}" != "404" ]]; then
   echo "Disposable tag was not removed cleanly." >&2
   exit 1
 fi
 
-echo "Disposable Chaptarr ${CHAPTARR_VERSION} tag CRUD/import and read-only smoke passed."
+echo "Disposable Chaptarr ${CHAPTARR_VERSION} lifecycle passed with ${engine} $("${engine}" version | head -n 1)."

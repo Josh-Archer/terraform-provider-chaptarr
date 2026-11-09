@@ -84,8 +84,13 @@ secret-delivery, workload, and migration responsibilities it does not manage.
 
 ## Development
 
-Prerequisites are Go 1.25.13 and OpenTofu 1.11.2 or newer. OpenTofu 1.11 is
-required for write-only configuration and Calibre credential attributes. Run:
+Prerequisites are Go 1.25.13 and OpenTofu 1.11.2 or newer. Terraform 1.11.2 or
+newer is the other supported engine. OpenTofu 1.11 and Terraform 1.11 are
+required for write-only configuration and Calibre credential attributes.
+Pull-request CI tests OpenTofu 1.11.2 and Terraform 1.17.1. A weekly workflow
+also tests Terraform 1.11.2 and OpenTofu 1.13.9. Expected compatibility is
+`>= 1.11.2` on both engines; a tested pin is not a claim that every later
+release was executed. Run:
 
 ```shell
 go mod download
@@ -112,6 +117,12 @@ WSL and use a different Docker or Go environment.
 
 The harness uses only synthetic runtime credentials and empty ephemeral media
 volumes. It never targets an existing Chaptarr instance.
+
+The consumer replay gate uses the same disposable rule. It replays
+[`test/consumer/arr-config`](test/consumer/arr-config) (apply, clean re-plan,
+upgrade from the previous release) and blocks release publication until that
+gate has passed. Details are in the [release gates](docs/release-gates.md)
+note.
 
 ## Security and releases
 

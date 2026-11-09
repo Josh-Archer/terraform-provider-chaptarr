@@ -14,9 +14,13 @@ go test -race ./...
 
 Changes to resources, data sources, compatibility claims, or the acceptance
 harness must also run `go run ./tools/compatibility check` and the relevant
-immutable-image lane in `scripts/test-acceptance.sh`. The harness must use only
-its generated API key and disposable empty volumes; never point it at a local
-or production Chaptarr configuration or media path.
+immutable-image lane in `scripts/test-acceptance.sh`. Set `CHAPTARR_ENGINE` to
+`tofu` or `terraform`. The harness must use only its generated API key and
+disposable empty volumes; never point it at a local or production Chaptarr
+configuration or media path. `scripts/test-consumer-replay.sh` has the same
+rule: it discards ambient endpoints and starts its own loopback instance.
+`bash ./scripts/test-consumer-replay_test.sh` checks the upgrade-baseline
+selection without applying anything.
 On Windows, run the shell gates from Git Bash so `bash`, Docker, Go, and
 OpenTofu share the same Windows environment.
 

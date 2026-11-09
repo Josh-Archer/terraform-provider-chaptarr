@@ -2,7 +2,7 @@
 
 fmt:
 	gofmt -w $$(find . -name '*.go' -not -path './third_party/*')
-	tofu fmt -recursive examples acceptance
+	tofu fmt -recursive examples acceptance test/consumer
 
 generate:
 	go run ./tools/openapi generate

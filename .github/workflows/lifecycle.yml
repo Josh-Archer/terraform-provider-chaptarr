@@ -1,0 +1,94 @@
+name: Lifecycle Matrix
+
+# Broader engine/upstream matrix. Pull requests keep a smaller set in ci.yml:
+# OpenTofu 1.11.2 on every acceptance image, and Terraform 1.17.1 on Chaptarr
+# 0.9.929. This workflow adds the Terraform 1.11.2 minimum, current Terraform
+# on the older images, and current OpenTofu on the primary image.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: lifecycle-matrix-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  GOTOOLCHAIN: local
+
+jobs:
+  lifecycle:
+    name: Lifecycle (${{ matrix.engine }} ${{ matrix.engine_version }}, Chaptarr ${{ matrix.chaptarr_version }})
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - engine: terraform
+            engine_version: "1.11.2"
+            chaptarr_version: "0.9.929"
+            image: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
+          - engine: terraform
+            engine_version: "1.17.1"
+            chaptarr_version: "0.9.925"
+            image: chaptarr/chaptarr:0.9.925@sha256:8e29f4941acaf74c80bba4322237dfd2549816b3dd1b581f176b1be5d1ccb46b
+          - engine: terraform
+            engine_version: "1.17.1"
+            chaptarr_version: "0.9.914"
+            image: chaptarr/chaptarr:0.9.914@sha256:4780b36440dc055a404f86da089f124d41e3330d32eeb92837f65fb5c82a348c
+          - engine: tofu
+            engine_version: "1.13.9"
+            chaptarr_version: "0.9.929"
+            image: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
+    steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! command -v jq >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends jq
+          fi
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Set up Terraform
+        if: matrix.engine == 'terraform'
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
+        with:
+          terraform_version: ${{ matrix.engine_version }}
+          terraform_wrapper: false
+      - name: Set up OpenTofu
+        if: matrix.engine == 'tofu'
+        uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version: ${{ matrix.engine_version }}
+          tofu_wrapper: false
+      - name: Verify disposable Chaptarr lifecycle
+        env:
+          CHAPTARR_ENGINE: ${{ matrix.engine }}
+          CHAPTARR_IMAGE: ${{ matrix.image }}
+          CHAPTARR_VERSION: ${{ matrix.chaptarr_version }}
+          CHAPTARR_RUNTIME: native
+        run: bash ./scripts/test-acceptance.sh

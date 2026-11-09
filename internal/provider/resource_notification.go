@@ -8,6 +8,7 @@ import (
 
 	"github.com/Josh-Archer/terraform-provider-chaptarr/internal/client"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -93,7 +94,7 @@ func (r *notificationResource) Schema(_ context.Context, _ resource.SchemaReques
 		a[name] = schema.BoolAttribute{Required: true}
 	}
 	a["supported_events"] = schema.SetAttribute{Computed: true, ElementType: types.StringType}
-	resp.Schema = schema.Schema{MarkdownDescription: "Manage a Chaptarr notification provider such as ntfy. Dynamic settings are schema-validated; tokens and passwords are apply-only. Test actions are never invoked.", Attributes: a}
+	resp.Schema = schema.Schema{MarkdownDescription: "Manage a Chaptarr notification provider such as ntfy. Dynamic settings are schema-validated; tokens and passwords are apply-only. Chaptarr derives enable from event triggers and sends a test message on create when any trigger is set. The provider never calls the test endpoint, and it rejects enable when it disagrees with those triggers.", Attributes: a}
 }
 func (r *notificationResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	r.client = configuredResourceClient(req.ProviderData, &resp.Diagnostics)
@@ -103,7 +104,7 @@ func (r *notificationResource) Create(ctx context.Context, req resource.CreateRe
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &p)...)
 	loadIntegrationSecrets(ctx, req.Config, &p.SecretFields, &resp.Diagnostics)
 	payload := notificationPayload(ctx, p, 0, &resp.Diagnostics)
-	if !validateIntegrationActivation(p.Enable, p.TestOnApply, &resp.Diagnostics) || resp.Diagnostics.HasError() || !validateIntegrationFields(ctx, r.client, "/api/v1/notification/schema", payload.Implementation, payload.ConfigContract, payload.Fields, &resp.Diagnostics) {
+	if !validateNotificationActivation(p, &resp.Diagnostics) || resp.Diagnostics.HasError() || !validateIntegrationFields(ctx, r.client, "/api/v1/notification/schema", payload.Implementation, payload.ConfigContract, payload.Fields, &resp.Diagnostics) {
 		return
 	}
 	id := createProfile(ctx, r.client, "/api/v1/notification", payload, "notification", &resp.Diagnostics)
@@ -129,7 +130,7 @@ func (r *notificationResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 	payload := notificationPayload(ctx, p, id, &resp.Diagnostics)
-	if !validateIntegrationActivation(p.Enable, p.TestOnApply, &resp.Diagnostics) || resp.Diagnostics.HasError() || !validateIntegrationFields(ctx, r.client, "/api/v1/notification/schema", payload.Implementation, payload.ConfigContract, payload.Fields, &resp.Diagnostics) {
+	if !validateNotificationActivation(p, &resp.Diagnostics) || resp.Diagnostics.HasError() || !validateIntegrationFields(ctx, r.client, "/api/v1/notification/schema", payload.Implementation, payload.ConfigContract, payload.Fields, &resp.Diagnostics) {
 		return
 	}
 	updateProfile(ctx, r.client, "/api/v1/notification/"+strconv.FormatInt(id, 10), payload, "notification", &resp.Diagnostics)
@@ -147,6 +148,25 @@ func (r *notificationResource) Delete(ctx context.Context, req resource.DeleteRe
 func (r *notificationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	importNumericProfile(ctx, req.ID, "notification", &resp.State, &resp.Diagnostics)
 }
+func validateNotificationActivation(model notificationModel, diagnostics *diag.Diagnostics) bool {
+	derived := notificationDerivedEnable(model)
+	if derived != valueBool(model.Enable) {
+		diagnostics.AddAttributeError(path.Root("enable"), "Notification enablement follows event triggers", "Chaptarr treats a notification as enabled when any event trigger is set, and it sends a test message during create even when enable is false. Set enable to match those triggers. Clear every trigger to save without a test. The forceSave query parameter does not skip that create-time test.")
+		return false
+	}
+	return validateIntegrationActivation(model.Enable, model.TestOnApply, diagnostics)
+}
+
+// notificationDerivedEnable matches Chaptarr's NotificationDefinition.Enable getter.
+// AudioBookShelf is always enabled. on_upgrade is not independent: Chaptarr only
+// considers it together with on_release_import, which is already sufficient.
+func notificationDerivedEnable(model notificationModel) bool {
+	if model.Implementation.ValueString() == "AudioBookShelf" {
+		return true
+	}
+	return valueBool(model.OnGrab) || valueBool(model.OnReleaseImport) || valueBool(model.OnRename) || valueBool(model.OnAuthorAdded) || valueBool(model.OnBookAdded) || valueBool(model.OnAuthorDelete) || valueBool(model.OnBookDelete) || valueBool(model.OnBookFileDelete) || valueBool(model.OnBookFileDeleteForUpgrade) || valueBool(model.OnHealthIssue) || valueBool(model.OnDownloadFailure) || valueBool(model.OnImportFailure) || valueBool(model.OnBookRetag) || valueBool(model.OnApplicationUpdate)
+}
+
 func notificationPayload(ctx context.Context, p notificationModel, id int64, d *diag.Diagnostics) notificationAPI {
 	supported := map[string]bool{}
 	for _, name := range setStringValues(ctx, p.SupportedEvents, d) {
