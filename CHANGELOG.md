@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.22](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.21...v0.11.22) (2026-11-09)
+
+
+### Features
+
+* **importer:** generate HCL and import blocks from a live Chaptarr instance ([#122](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/122)) ([6201d10](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/6201d10f25eb9285d047c749bf7d13c08f5fd85b)), closes [#105](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/105)
+
+
+### Documentation
+
+* define provider 1.0 stability criteria ([#120](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/120)) ([31bb95b](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/31bb95bf0516d50c2d3a9ce1156ba5dcba8f81e5))
+
+
+### Build System
+
+* **deps:** bump the codeql-action group with 3 updates ([#118](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/118)) ([844f749](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/844f74949822092912eb51f9ceaf13c3b94bcba5))
+
+
+### Continuous Integration
+
+* port Seerr release-confidence gates ([#104](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/104)) ([#121](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/121)) ([f6529b2](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/f6529b2f7376535c3d4b96dd6cf89a9a77951542))
+
 ## [0.11.21](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.20...v0.11.21) (2026-11-05)
 
 
