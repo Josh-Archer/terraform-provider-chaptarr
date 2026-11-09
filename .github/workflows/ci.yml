@@ -108,6 +108,7 @@ jobs:
           docker compose -f acceptance/compose.yaml config --quiet
           bash ./scripts/test-plan-leak.sh
           bash ./scripts/test-release-assets.sh
+          bash ./scripts/test-consumer-replay_test.sh
 
   lint:
     name: Lint
@@ -154,7 +155,7 @@ jobs:
           test "$(go env GOVERSION)" = "go1.26.10"
           test -z "$(gofmt -l main.go internal tools)"
           go vet ./...
-          tofu fmt -check -recursive examples acceptance
+          tofu fmt -check -recursive examples acceptance test/consumer
           git diff --check
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
@@ -219,6 +220,113 @@ jobs:
           CHAPTARR_RUNTIME: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'docker' || 'native' }}
         run: bash ./scripts/test-acceptance.sh
 
+  acceptance-terraform:
+    name: Acceptance Terraform (${{ matrix.chaptarr-version }})
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Current Terraform on the primary image. Older images and the 1.11.2
+          # minimum run in the weekly lifecycle workflow. OpenTofu 1.11.2 keeps
+          # the full image matrix in the acceptance job above.
+          - chaptarr-version: "0.9.929"
+            image: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
+            terraform-version: "1.17.1"
+    steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! command -v jq >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends jq
+          fi
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
+        with:
+          terraform_version: ${{ matrix.terraform-version }}
+          terraform_wrapper: false
+      - name: Verify disposable Chaptarr lifecycle
+        env:
+          CHAPTARR_ENGINE: terraform
+          CHAPTARR_IMAGE: ${{ matrix.image }}
+          CHAPTARR_VERSION: ${{ matrix.chaptarr-version }}
+          CHAPTARR_RUNTIME: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'docker' || 'native' }}
+        run: bash ./scripts/test-acceptance.sh
+
+  # Candidate provider comes from the local build (filesystem mirror).
+  # The upgrade step installs only the previous published release.
+  # Release promotion treats a successful run of this job as the replay gate.
+  consumer-replay:
+    name: Consumer Replay (arr-config)
+    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    env:
+      CHAPTARR_IMAGE: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
+      CHAPTARR_VERSION: "0.9.929"
+      CHAPTARR_RUNTIME: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'docker' || 'native' }}
+      CHAPTARR_ARTIFACT_DIR: ${{ github.workspace }}/test-artifacts/consumer-replay
+    steps:
+      - name: Ensure base toolchain (uecb-shared image lacks it)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Stopgap until ghcr.io/josh-archer/shared-runner (home gitops/images/shared-runner) is published and pinned.
+          missing=""
+          for t in make gcc g++ ruby wget pkg-config; do command -v "$t" >/dev/null 2>&1 || missing="$missing $t"; done
+          if [ -n "$missing" ] && command -v apt-get >/dev/null 2>&1; then
+            echo "Installing missing tools:$missing"
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends build-essential pkg-config ruby wget ca-certificates
+          fi
+          if ! command -v jq >/dev/null 2>&1; then
+            SUDO=""; [ "$(id -u)" = 0 ] || SUDO=sudo
+            $SUDO apt-get update -qq
+            $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends jq
+          fi
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Set up OpenTofu
+        uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version: 1.11.2
+          tofu_wrapper: false
+      - name: Replay consumer config (apply, clean re-plan, upgrade from previous release)
+        run: bash ./scripts/test-consumer-replay.sh
+
   quality:
     name: Quality
     if: always()
@@ -227,6 +335,8 @@ jobs:
       - contract
       - lint
       - acceptance
+      - acceptance-terraform
+      - consumer-replay
     runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 5
     permissions:
@@ -256,11 +366,15 @@ jobs:
           CONTRACT_RESULT: ${{ needs.contract.result }}
           LINT_RESULT: ${{ needs.lint.result }}
           ACCEPTANCE_RESULT: ${{ needs.acceptance.result }}
+          TERRAFORM_ACCEPTANCE_RESULT: ${{ needs.acceptance-terraform.result }}
+          CONSUMER_REPLAY_RESULT: ${{ needs.consumer-replay.result }}
         run: |
           test "${UNIT_RESULT}" = success
           test "${CONTRACT_RESULT}" = success
           test "${LINT_RESULT}" = success
           test "${ACCEPTANCE_RESULT}" = success
+          test "${TERRAFORM_ACCEPTANCE_RESULT}" = success
+          test "${CONSUMER_REPLAY_RESULT}" = success
 
   secret-scan:
     name: Secret Scan

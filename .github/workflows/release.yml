@@ -20,7 +20,116 @@ env:
   GOTOOLCHAIN: local
 
 jobs:
+  # The candidate provider is not in the registry until this workflow promotes
+  # it. Replay the tagged source here when the commit has no successful
+  # Consumer Replay check. Install only the previous published release from
+  # the registry; the candidate build comes from the local filesystem mirror.
+  consumer-replay-gate:
+    name: Release candidate replay
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    permissions:
+      contents: read
+      checks: read
+    timeout-minutes: 40
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      CHAPTARR_IMAGE: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
+      CHAPTARR_VERSION: "0.9.929"
+      CHAPTARR_RUNTIME: native
+    steps:
+      - name: Ensure release tag and choose replay mode
+        id: meta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          semver_pattern='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'
+          if [[ ! "${RELEASE_TAG}" =~ ${semver_pattern} ]]; then
+            echo "Invalid release tag: ${RELEASE_TAG}" >&2
+            exit 1
+          fi
+          if ! tag_error="$(gh api --silent "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" 2>&1)"; then
+            echo "Release tag ${RELEASE_TAG} is not present: ${tag_error}" >&2
+            exit 1
+          fi
+          if [[ "${RELEASE_TAG}" == *-* ]]; then
+            echo "mode=skip" >> "${GITHUB_OUTPUT}"
+            echo "${RELEASE_TAG} is a prerelease; consumer replay gate applies to stable promotion only."
+            exit 0
+          fi
+          version="${RELEASE_TAG#v}"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          if response="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq '{draft: .draft, has_sums: ([.assets[].name | select(endswith("_SHA256SUMS"))] | length > 0)}' 2>&1)"; then
+            is_draft="$(echo "${response}" | jq -r '.draft')"
+            has_sums="$(echo "${response}" | jq -r '.has_sums')"
+            if [[ "${is_draft}" == "false" && "${has_sums}" == "true" ]]; then
+              echo "mode=skip" >> "${GITHUB_OUTPUT}"
+              echo "Release ${RELEASE_TAG} is already published with artifacts; replay is not required."
+              exit 0
+            fi
+          elif [[ "${response}" != *"(HTTP 404)"* ]]; then
+            echo "Unable to inspect GitHub Release ${RELEASE_TAG}: ${response}" >&2
+            exit 1
+          fi
+          sha="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${RELEASE_TAG}" --jq '.sha')"
+          if ! conclusion="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${sha}/check-runs?filter=latest&per_page=100" \
+            --jq '[.check_runs[] | select(.name | startswith("Consumer Replay"))] | if length == 0 then "missing" else (map(.conclusion // "pending") | if all(. == "success") then "success" else join(",") end) end' 2>&1)"; then
+            echo "Unable to read Consumer Replay checks; replaying the tagged source."
+            echo "mode=replay" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          if [[ "${conclusion}" == "success" ]]; then
+            echo "mode=skip" >> "${GITHUB_OUTPUT}"
+            echo "Consumer Replay passed on ${sha}; promotion allowed."
+            exit 0
+          fi
+          echo "mode=replay" >> "${GITHUB_OUTPUT}"
+          echo "Consumer Replay check on ${sha} is '${conclusion}'. Replaying the tagged source with the local candidate build."
+
+      - name: Checkout release controls
+        if: steps.meta.outputs.mode == 'replay'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: release-control
+          persist-credentials: false
+
+      - name: Checkout tagged source for consumer replay
+        if: steps.meta.outputs.mode == 'replay'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          path: source
+          persist-credentials: false
+
+      - name: Set up Go
+        if: steps.meta.outputs.mode == 'replay'
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: source/go.mod
+          cache-dependency-path: source/go.sum
+          cache: true
+
+      - name: Setup OpenTofu
+        if: steps.meta.outputs.mode == 'replay'
+        uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version: 1.11.2
+          tofu_wrapper: false
+
+      - name: Replay tagged source with the local candidate build
+        if: steps.meta.outputs.mode == 'replay'
+        working-directory: source
+        env:
+          CHAPTARR_REPLAY_RELEASE_VERSION: ${{ steps.meta.outputs.version }}
+          CHAPTARR_ARTIFACT_DIR: ${{ github.workspace }}/test-artifacts/consumer-replay
+        shell: bash
+        run: bash "${GITHUB_WORKSPACE}/release-control/scripts/test-consumer-replay.sh"
+
   goreleaser:
+    needs: consumer-replay-gate
     name: Signed Release
     if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}

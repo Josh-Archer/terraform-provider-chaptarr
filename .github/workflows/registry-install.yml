@@ -1,0 +1,112 @@
+name: Registry Install Check
+
+# Verifies the signed provider installs from both public registries using the
+# latest published version, with signature verification left enabled.
+# Snapshot builds and the consumer replay gate stay separate: this job runs
+# only after publication (or on a schedule / manual dispatch). A failure is a
+# failed verification, not a silent success, and this workflow does not delete
+# or re-sign a release.
+on:
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+  release:
+    types: [published]
+
+concurrency:
+  group: registry-install-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: ${{ matrix.tool }} init
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [terraform, tofu]
+    steps:
+      - name: Setup Terraform
+        if: matrix.tool == 'terraform'
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
+        with:
+          terraform_wrapper: false
+
+      - name: Setup OpenTofu
+        if: matrix.tool == 'tofu'
+        uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_wrapper: false
+
+      - name: Resolve latest published version
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${RELEASE_TAG:-}"
+          if [ -z "$tag" ]; then
+            tag=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name')
+          fi
+          version="${tag#v}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Unexpected release tag '$tag'"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Install provider from registry (with retries for index lag)
+        env:
+          TOOL: ${{ matrix.tool }}
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir=$(mktemp -d)
+          cd "$dir"
+          if [ "$TOOL" = "tofu" ]; then
+            source_addr="registry.opentofu.org/josh-archer/chaptarr"
+          else
+            source_addr="registry.terraform.io/josh-archer/chaptarr"
+          fi
+          cat > main.tf <<TF
+          terraform {
+            required_providers {
+              chaptarr = {
+                source  = "${source_addr}"
+                version = "= ${VERSION}"
+              }
+            }
+          }
+          TF
+          # New releases can take a while to appear in the registries.
+          # Retries cover index lag only. The last failure is reported as a
+          # failed job. Do not delete or re-sign the release from this workflow.
+          log=$(mktemp)
+          for attempt in 1 2 3 4 5 6; do
+            if "$TOOL" init -input=false -no-color >"$log" 2>&1; then
+              break
+            fi
+            if [ "$attempt" = 6 ]; then
+              if grep -Eiq 'signature|checksum|does not match the checksum|signed' "$log"; then
+                echo "::error::$TOOL init failed signature or checksum verification for chaptarr ${VERSION} from ${source_addr}. Leave the release in place and follow docs/release-gates.md."
+              elif grep -Eiq 'no available releases match|does not match|could not retrieve' "$log"; then
+                echo "::error::$TOOL init still cannot see chaptarr ${VERSION} from ${source_addr} after retries (index lag or a missing release)."
+              else
+                echo "::error::$TOOL init failed to install chaptarr ${VERSION} from ${source_addr}."
+              fi
+              sed -E 's/[0-9a-fA-F]{32,}/[REDACTED]/g' "$log" >&2
+              exit 1
+            fi
+            echo "Attempt $attempt failed; retrying in 120s"
+            sleep 120
+          done
+          grep -q "version     = \"${VERSION}\"" .terraform.lock.hcl
+          grep -q 'zh:' .terraform.lock.hcl
+          echo "${TOOL} installed chaptarr ${VERSION} from ${source_addr}"
