@@ -342,7 +342,14 @@ jobs:
 
   release-snapshot:
     name: Release Snapshot
-    runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
+    # GitHub-hosted, not uecb-shared. Run 42670430694 scheduled this job on the
+    # control-plane node (pod uecb-runner-63a903fbbb04da7f on homelab0). The
+    # kubelet stopped that runner 17s into setup-go, before goreleaser ran.
+    # Required pod anti-affinity is one runner per node, so a saturated pool
+    # lands this job on homelab0. The snapshot is a pure Go cross-compile and
+    # does not need the shared image. The goreleaser invocation and registry
+    # artifact checks below are unchanged.
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
