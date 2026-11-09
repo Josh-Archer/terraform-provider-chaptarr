@@ -39,6 +39,8 @@ Supported-version evidence is recorded in the generated
 [Chaptarr compatibility matrix](docs/compatibility.md), and configuration,
 migration, destructive-control, and release boundaries are documented in the
 [consumer readiness guide](docs/consumer-readiness.md).
+To generate HCL and import blocks from an existing server, use the
+[migration guide](docs/guides/migration.md).
 Imperative queue, import, backup, upgrade, and process operations follow the
 [operational API policy](docs/operational-api-policy.md).
 

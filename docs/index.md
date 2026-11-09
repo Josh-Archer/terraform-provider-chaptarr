@@ -96,6 +96,10 @@ The [PostgreSQL composition boundary guide](guides/azure-postgresql.md)
 explains the scope and limits of `chaptarr_postgres_database`, including its
 write-only database credentials and mutation-only Vaultwarden bridge lookup.
 
+The [migration guide](guides/migration.md) generates HCL and import blocks
+from an existing Chaptarr instance. PostgreSQL composition and a populated
+Hardcover token stay manual.
+
 The [operational API policy](operational-api-policy.md) records why queue,
 import, backup/restore, upgrade, process, log, and release-push operations are
 not Terraform resources and recommends access-controlled operational tooling.
