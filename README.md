@@ -42,6 +42,8 @@ migration, destructive-control, and release boundaries are documented in the
 Provider 1.0 waits on the upstream API tag, coverage threshold, and release
 gates in the
 [1.0 stability criteria](docs/consumer-readiness.md#provider-1-0-stability-criteria).
+To generate HCL and import blocks from an existing server, use the
+[migration guide](docs/guides/migration.md).
 Imperative queue, import, backup, upgrade, and process operations follow the
 [operational API policy](docs/operational-api-policy.md).
 

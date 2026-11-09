@@ -61,7 +61,7 @@ jobs:
   contract:
     name: Contract
     runs-on: ${{ (github.event.pull_request.head.repo.fork || github.actor == 'github-actions[bot]') && 'ubuntu-latest' || 'uecb-shared' }}
-    timeout-minutes: 15
+    timeout-minutes: 25
     permissions:
       contents: read
     env:
@@ -99,6 +99,8 @@ jobs:
         with:
           tofu_version: 1.11.2
           tofu_wrapper: false
+      - name: Import a populated fixture and require a clean plan
+        run: go test -count=1 -timeout 20m ./tools/importer -run 'TestImporterImportPreservesLiveSettings|TestImporterCLIOutputValidates'
       - name: Verify contract and generated content
         run: |
           test "$(go env GOVERSION)" = "go1.26.10"

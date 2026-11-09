@@ -22,6 +22,11 @@ Imported objects cannot recover apply-only credentials. Configure required
 write-only values before the next update. Series imports also cannot recover
 the original selected-book intent and must be completed before update.
 
+The [migration guide](guides/migration.md) can generate configuration and
+import blocks from a live instance. It does not manage every resource.
+PostgreSQL composition and a populated Hardcover token stay manual, and
+settings the importer cannot reconstruct are named instead of emitted.
+
 ## Sensitive settings
 
 Provider API keys, OIDC secrets, Calibre passwords, proxy passwords, metadata
