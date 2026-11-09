@@ -15,7 +15,10 @@ Non-secret settings belong in `field_values_json`. Password, token, cookie, and
 API-key fields belong only in the Sensitive and WriteOnly `secret_fields` map.
 The provider validates that separation against the current server schema during
 apply, removes protected values from schema data sources and refresh state, and
-stores only canonical non-secret JSON plus its SHA-256 fingerprint.
+stores the configured non-secret JSON plus its SHA-256 fingerprint. Refresh
+keeps only those configured keys. When Chaptarr echoes the same values, the
+planned JSON is preserved. Defaults for omitted keys stay unmanaged. Import has
+no configured key set, so it records every non-secret field the server returns.
 
 ## Safety and testing
 
@@ -25,6 +28,19 @@ integration is created or updated. To prevent surprise external traffic,
 Leave the integration disabled to apply settings without a connection test.
 Plan and refresh never test providers. The provider never calls provider
 `test`, `testall`, `action`, release-download, or release-push endpoints.
+
+Notification `enable` is not an independent flag. Chaptarr derives it from
+event triggers (`on_grab`, `on_release_import`, `on_rename`, `on_author_added`,
+`on_book_added`, `on_author_delete`, `on_book_delete`, `on_book_file_delete`,
+`on_book_file_delete_for_upgrade`, `on_health_issue`, `on_download_failure`,
+`on_import_failure`, `on_book_retag`, and `on_application_update`).
+`on_upgrade` alone does not enable the notification. AudioBookShelf is always
+enabled. Create sends a test
+message whenever that derived value is true, even if the request body says
+`enable = false`. The OpenAPI `forceSave` parameter does not skip that
+create-time test; it only skips the test on update. The provider rejects
+`enable` when it disagrees with the triggers. Clear every trigger to save a
+notification without a test.
 
 Treat `test_on_apply = true` as explicit authorization for Chaptarr to contact
 the configured service during that apply. Alternatively, run tests separately

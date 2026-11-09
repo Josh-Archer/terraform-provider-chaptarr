@@ -199,13 +199,10 @@ resource "chaptarr_download_client" "transmission" {
   audiobook_tags             = []
   ebook_tags                 = []
 
-  field_values_json = jsonencode({
-    host              = "transmission.example.invalid"
-    port              = 9091
-    urlBase           = "/transmission/"
-    audiobookCategory = "audiobooks"
-    ebookCategory     = "ebooks"
-  })
+  # Full object Chaptarr 0.9.929 echoes, including null defaults. The released
+  # provider stores that object, and apply requires it to match the plan.
+  # jsonencode drops nulls, so this is a literal canonical string.
+  field_values_json = "{\"addPaused\":false,\"audiobookCategory\":\"audiobooks\",\"ebookCategory\":\"ebooks\",\"host\":\"transmission.example.invalid\",\"musicCategory\":null,\"olderTvPriority\":0,\"port\":9091,\"recentTvPriority\":0,\"tvDirectory\":null,\"urlBase\":\"/transmission/\",\"useSsl\":false,\"username\":null}"
 
   lifecycle {
     ignore_changes = [field_values_json]
@@ -213,13 +210,15 @@ resource "chaptarr_download_client" "transmission" {
 }
 
 resource "chaptarr_notification" "media_updates" {
-  name                            = "ntfy-media-updates"
-  implementation                  = "Ntfy"
-  config_contract                 = "NtfySettings"
-  enable                          = false
-  test_on_apply                   = false
-  on_grab                         = true
-  on_release_import               = true
+  name            = "ntfy-media-updates"
+  implementation  = "Ntfy"
+  config_contract = "NtfySettings"
+  enable          = false
+  test_on_apply   = false
+  # Every trigger stays false. Chaptarr treats any trigger as enable and
+  # tests on create; enable=false and forceSave do not skip that test.
+  on_grab                         = false
+  on_release_import               = false
   on_upgrade                      = false
   on_rename                       = false
   on_author_added                 = false
@@ -228,7 +227,7 @@ resource "chaptarr_notification" "media_updates" {
   on_book_delete                  = false
   on_book_file_delete             = false
   on_book_file_delete_for_upgrade = false
-  on_health_issue                 = true
+  on_health_issue                 = false
   include_health_warnings         = true
   on_download_failure             = false
   on_import_failure               = false
@@ -236,12 +235,9 @@ resource "chaptarr_notification" "media_updates" {
   on_application_update           = false
   tags                            = []
 
-  field_values_json = jsonencode({
-    priority  = 3
-    serverUrl = var.ntfy_server_url
-    tags      = []
-    topics    = [var.ntfy_topic_media]
-  })
+  # Same canonical object 0.9.929 stores. Null defaults must remain in the
+  # string; jsonencode would omit them and the released provider would disagree.
+  field_values_json = "{\"clickUrl\":null,\"priority\":3,\"serverUrl\":\"${var.ntfy_server_url}\",\"tags\":[],\"topics\":[\"${var.ntfy_topic_media}\"],\"userName\":null}"
 
   lifecycle {
     ignore_changes = [field_values_json]

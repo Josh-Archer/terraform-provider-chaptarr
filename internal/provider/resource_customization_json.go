@@ -261,6 +261,10 @@ func canonicalObjectArray(raw, name string, diagnostics *diag.Diagnostics) (stri
 }
 func canonicalValue(value any) (string, string) {
 	canonical, _ := json.Marshal(value)
-	sum := sha256.Sum256(canonical)
-	return string(canonical), hex.EncodeToString(sum[:])
+	return string(canonical), hashString(string(canonical))
+}
+
+func hashString(value string) string {
+	sum := sha256.Sum256([]byte(value))
+	return hex.EncodeToString(sum[:])
 }

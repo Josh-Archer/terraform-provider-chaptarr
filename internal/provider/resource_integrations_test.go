@@ -64,7 +64,7 @@ func TestIntegrationSecretsAreApplyOnlyAndSchemaValidated(t *testing.T) {
 	if !validateIntegrationFields(t.Context(), apiClient, "/api/v1/indexer/schema", payload.Implementation, payload.ConfigContract, payload.Fields, &diagnostics) || diagnostics.HasError() {
 		t.Fatalf("valid separated settings rejected: %v", diagnostics)
 	}
-	canonical, _, protected := integrationFieldState(payload.Fields)
+	canonical, _, protected := integrationFieldState(payload.Fields, types.StringNull())
 	if strings.Contains(canonical, integrationSecretSentinel) || len(protected) != 1 || protected[0] != "apiToken" {
 		t.Fatal("protected integration field entered persistent state")
 	}
@@ -220,5 +220,78 @@ func TestIntegrationSchemaDataSourceSanitizesNestedSecrets(t *testing.T) {
 	response.Diagnostics.Append(response.State.GetAttribute(t.Context(), path.Root("templates_json"), &templates)...)
 	if response.Diagnostics.HasError() || strings.Contains(templates.ValueString(), integrationSecretSentinel) || strings.Count(templates.ValueString(), `"value":null`) != 2 {
 		t.Fatalf("schema data source leaked protected values: %s diagnostics=%v", templates.ValueString(), response.Diagnostics)
+	}
+}
+
+func TestDownloadClientRefreshKeepsConfiguredFieldValues(t *testing.T) {
+	t.Parallel()
+	const planned = `{"audiobookCategory":"audiobooks","ebookCategory":"ebooks","host":"transmission.example.invalid","port":9091,"urlBase":"/transmission/"}`
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		switch request.Method + " " + request.URL.Path {
+		case "GET /api/v1/downloadclient/schema":
+			_, _ = writer.Write([]byte(`[{"implementation":"Transmission","configContract":"TransmissionSettings","fields":[{"name":"host"},{"name":"port"},{"name":"urlBase"},{"name":"audiobookCategory"},{"name":"ebookCategory"},{"name":"addPaused"},{"name":"username","privacy":"userName"},{"name":"password","privacy":"password","type":"password"}]}]`))
+		case "POST /api/v1/downloadclient":
+			_, _ = writer.Write([]byte(`{"id":7}`))
+		case "GET /api/v1/downloadclient/7":
+			_, _ = writer.Write([]byte(`{"id":7,"name":"Transmission","implementationName":"Transmission","implementation":"Transmission","configContract":"TransmissionSettings","enable":false,"protocol":"torrent","priority":1,"removeCompletedDownloads":true,"removeFailedDownloads":true,"copyUnmanagedDownloads":false,"audiobookTags":[],"ebookTags":[],"tags":[],"fields":[{"name":"addPaused","value":false},{"name":"audiobookCategory","value":"audiobooks"},{"name":"ebookCategory","value":"ebooks"},{"name":"host","value":"transmission.example.invalid"},{"name":"musicCategory","value":null},{"name":"olderTvPriority","value":0},{"name":"password","privacy":"password","type":"password","value":"` + integrationSecretSentinel + `"},{"name":"port","value":9091},{"name":"recentTvPriority","value":0},{"name":"tvDirectory","value":null},{"name":"urlBase","value":"/transmission/"},{"name":"useSsl","value":false},{"name":"username","privacy":"userName","value":null}]}`))
+		default:
+			t.Fatalf("unexpected download client request %s %s", request.Method, request.URL.RequestURI())
+		}
+	}))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "download-client-field-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	instance := &downloadClientResource{client: apiClient}
+	model := downloadClientModel{ID: types.StringNull(), Name: types.StringValue("Transmission"), ImplementationName: types.StringNull(), Implementation: types.StringValue("Transmission"), ConfigContract: types.StringValue("TransmissionSettings"), Enable: types.BoolValue(false), TestOnApply: types.BoolValue(false), Tags: types.SetNull(types.Int64Type), FieldValuesJSON: types.StringValue(planned), FieldValuesSHA256: types.StringNull(), SecretFields: types.MapNull(types.StringType), ProtectedFieldNames: types.SetNull(types.StringType), Protocol: types.StringValue("torrent"), Priority: types.Int64Value(1), AudiobookTags: types.SetNull(types.Int64Type), EbookTags: types.SetNull(types.Int64Type), RemoveCompleted: types.BoolValue(true), RemoveFailed: types.BoolValue(true), CopyUnmanaged: types.BoolValue(false)}
+	planState := stateForResource(t, instance, model)
+	response := &resource.CreateResponse{State: emptyStateForResource(t, instance)}
+	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan(planState), Config: tfsdk.Config(planState)}, response)
+	if response.Diagnostics.HasError() {
+		t.Fatalf("create failed: %v", response.Diagnostics)
+	}
+	var state downloadClientModel
+	response.Diagnostics.Append(response.State.Get(t.Context(), &state)...)
+	if response.Diagnostics.HasError() || state.FieldValuesJSON.ValueString() != planned || strings.Contains(state.FieldValuesJSON.ValueString(), "addPaused") || strings.Contains(state.FieldValuesJSON.ValueString(), "username") || strings.Contains(response.State.Raw.String(), integrationSecretSentinel) {
+		t.Fatalf("download client state adopted server defaults: %s diagnostics=%v", state.FieldValuesJSON.ValueString(), response.Diagnostics)
+	}
+	echoed, _, _ := integrationFieldState([]providerFieldAPI{{Name: "addPaused", Value: false}, {Name: "host", Value: "transmission.example.invalid"}, {Name: "port", Value: float64(9091)}}, types.StringNull())
+	if !strings.Contains(echoed, "addPaused") || !strings.Contains(echoed, `"port":9091`) {
+		t.Fatalf("import with no configured keys dropped server fields: %s", echoed)
+	}
+}
+
+func TestNotificationTriggersMustMatchEnableBeforeTest(t *testing.T) {
+	t.Parallel()
+	requests := 0
+	server := httptest.NewServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) { requests++ }))
+	defer server.Close()
+	apiClient, err := client.New(client.Config{BaseURL: server.URL, APIKey: "notification-test-key", UserAgent: "test/1.0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	instance := &notificationResource{client: apiClient}
+	model := notificationModel{Name: types.StringValue("ntfy-media-updates"), Implementation: types.StringValue("Ntfy"), ConfigContract: types.StringValue("NtfySettings"), Enable: types.BoolValue(false), TestOnApply: types.BoolValue(false), Tags: types.SetNull(types.Int64Type), FieldValuesJSON: types.StringValue(`{"serverUrl":"https://ntfy.example.invalid","topics":["replay-media"]}`), SecretFields: types.MapNull(types.StringType), ProtectedFieldNames: types.SetNull(types.StringType), SupportedEvents: types.SetNull(types.StringType), OnGrab: types.BoolValue(true), OnReleaseImport: types.BoolValue(true), OnHealthIssue: types.BoolValue(true)}
+	planState := stateForResource(t, instance, model)
+	response := &resource.CreateResponse{State: emptyStateForResource(t, instance)}
+	instance.Create(t.Context(), resource.CreateRequest{Plan: tfsdk.Plan(planState), Config: tfsdk.Config(planState)}, response)
+	matched := false
+	for _, diagnostic := range response.Diagnostics {
+		if diagnostic.Summary() == "Notification enablement follows event triggers" {
+			matched = true
+		}
+	}
+	if !matched || requests != 0 {
+		t.Fatalf("event triggers with enable=false reached the API requests=%d diagnostics=%v", requests, response.Diagnostics)
+	}
+	if notificationDerivedEnable(notificationModel{OnUpgrade: types.BoolValue(true)}) {
+		t.Fatal("on_upgrade alone must not count as Chaptarr notification enablement")
+	}
+	if !notificationDerivedEnable(notificationModel{Implementation: types.StringValue("AudioBookShelf")}) {
+		t.Fatal("AudioBookShelf must count as Chaptarr notification enablement")
+	}
+	if !notificationDerivedEnable(notificationModel{OnGrab: types.BoolValue(true)}) || notificationDerivedEnable(notificationModel{}) {
+		t.Fatal("notification enablement did not follow Chaptarr event triggers")
 	}
 }

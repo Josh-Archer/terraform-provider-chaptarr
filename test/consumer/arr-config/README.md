@@ -20,12 +20,23 @@ services or get stuck on destroy:
 
 - Download client and notification stay `enable = false` with
   `test_on_apply = false`. Home enables them and opts into connection tests.
+- Notification event triggers stay false. Chaptarr 0.9.929 derives notification
+  `enable` from those triggers and sends a test message on create whenever any
+  trigger is set. `enable = false` does not suppress that test, and the
+  OpenAPI `forceSave` parameter does not skip it on create (only on update).
+  A placeholder ntfy server is unnecessary when every trigger is off.
 - Hardcover is omitted. Home creates it only when a token is set, and that
   path calls Hardcover during apply.
 - `allow_destroy = true` and Terraform `prevent_destroy` is omitted so phase 2
   can remove the disposable root folder. Home sets `prevent_destroy`.
 - `ignore_changes = [field_values_json]` matches home. Chaptarr canonicalizes
-  that JSON.
+  that JSON. This copy lists the full canonical object Chaptarr 0.9.929
+  echoes, including null defaults, because provider releases through 0.11.21
+  store every non-secret field and Terraform requires that string to match the
+  plan. The provider under test also accepts a partial object and keeps only
+  the configured keys. `jsonencode` cannot represent the null defaults, so the
+  values are literal JSON. `ntfy_server_url` and `ntfy_topic_media` must not
+  contain quotes or backslashes.
 - Quality-profile items, cutoffs, and format scores come from the live schema
   data source. Home imports existing numeric IDs.
 - Profile and root-folder names are prefixed with `Home` so they do not collide
