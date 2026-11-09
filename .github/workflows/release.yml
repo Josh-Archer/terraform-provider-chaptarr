@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Exact version tag to build with the current hardened release workflow
+        description: Exact SemVer tag to build. v1.0.0 also requires docs/consumer-readiness.md#provider-1-0-checklist
         required: true
         type: string
 
@@ -229,6 +229,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
 
+      # v1.0.0 uses the signed step above. See
+      # docs/consumer-readiness.md#provider-1-0-checklist.
       - name: Run GoReleaser (unsigned fallback)
         if: steps.release_state.outputs.published != 'true' && steps.import_gpg.outputs.fingerprint == ''
         uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0

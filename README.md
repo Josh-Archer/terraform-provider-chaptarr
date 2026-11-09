@@ -39,6 +39,11 @@ Supported-version evidence is recorded in the generated
 [Chaptarr compatibility matrix](docs/compatibility.md), and configuration,
 migration, destructive-control, and release boundaries are documented in the
 [consumer readiness guide](docs/consumer-readiness.md).
+Provider 1.0 waits on the upstream API tag, coverage threshold, and release
+gates in the
+[1.0 stability criteria](docs/consumer-readiness.md#provider-1-0-stability-criteria).
+To generate HCL and import blocks from an existing server, use the
+[migration guide](docs/guides/migration.md).
 Imperative queue, import, backup, upgrade, and process operations follow the
 [operational API policy](docs/operational-api-policy.md).
 
@@ -131,8 +136,12 @@ checksum signature asset to exist, but cryptographic re-verification of an
 already-published signature remains an owner/registry check until the public
 signing key and fingerprint are registered and safely available to automation.
 
+A `v1.0.0` tag waits on the
+[provider 1.0 checklist](docs/consumer-readiness.md#provider-1-0-checklist).
+Release Please keeps automated bumps on 0.x until that checklist is complete.
+
 See [SECURITY.md](SECURITY.md) for vulnerability reporting and
-[CONTRIBUTING.md](CONTRIBUTING.md) for validation requirements.
+[CONTRIBUTING.md](CONTRIBUTING.md) for validation and release requirements.
 
 Original provider code is licensed under MPL-2.0. The pinned upstream OpenAPI
 artifact retains Chaptarr's GPL-3.0 license; see

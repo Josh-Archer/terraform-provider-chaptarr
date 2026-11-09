@@ -32,6 +32,24 @@ OpenAPI changes require an upstream version pin, provenance update, review of
 every changed operation classification, regenerated inventory and docs, and a
 passing `go run ./tools/openapi check`.
 
+## Releases
+
+0.x is the release line. The manifest in `.release-please-manifest.json` is
+the version release-please will tag. `bump-minor-pre-major` and
+`bump-patch-for-minor-pre-major` keep breaking changes and features on 0.x.
+
+`v1.0.0` waits on the checklist in
+[docs/consumer-readiness.md](docs/consumer-readiness.md#provider-1-0-checklist).
+Complete that checklist in the pull request that proposes the tag. Link
+evidence for the upstream API stable tag, the coverage threshold, and the
+release gates. Dispatch `.github/workflows/release.yml` for that exact tag
+only after the checklist is complete. Leave `bump-minor-pre-major` enabled
+until that pull request updates the manifest.
+
+`scripts/calculate-next-version.sh` can print a major tag when it sees a
+breaking-change trailer. A printed tag leaves the checklist incomplete.
+
 Release signing keys and passphrases are owner-managed secrets in the protected
 GitHub `release` environment. Contributors and tests must never read or print
-them.
+them. The `v1.0.0` publication run signs checksums. It uses the signed
+GoReleaser step in the Release workflow.

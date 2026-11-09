@@ -89,12 +89,17 @@ The generated [compatibility matrix](compatibility.md) separates pinned
 contract coverage, compatibility candidates, and live disposable acceptance
 evidence. The [consumer readiness guide](consumer-readiness.md) covers provider
 configuration, imports, sensitive settings, destructive controls, Readarr
-migration boundaries, Registry ownership, and the deferred `terraform/arr-config`
-integration gate.
+migration boundaries, Registry ownership, the deferred `terraform/arr-config`
+integration gate, and the
+[provider 1.0 stability criteria](consumer-readiness.md#provider-1-0-stability-criteria).
 
 The [PostgreSQL composition boundary guide](guides/azure-postgresql.md)
 explains the scope and limits of `chaptarr_postgres_database`, including its
 write-only database credentials and mutation-only Vaultwarden bridge lookup.
+
+The [migration guide](guides/migration.md) generates HCL and import blocks
+from an existing Chaptarr instance. PostgreSQL composition and a populated
+Hardcover token stay manual.
 
 The [operational API policy](operational-api-policy.md) records why queue,
 import, backup/restore, upgrade, process, log, and release-push operations are
