@@ -10,3 +10,5 @@ configuration, Terraform state, or raw application log. Replace sensitive
 values with synthetic placeholders before sharing diagnostics.
 
 Supported versions will be listed after the first signed provider release.
+A 1.0 support line follows the checklist in
+[docs/consumer-readiness.md](docs/consumer-readiness.md#provider-1-0-checklist).

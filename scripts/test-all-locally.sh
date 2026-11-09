@@ -6,6 +6,8 @@ export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.13+auto}"
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${repo_root}"
 
+bash ./scripts/check-doc-links.sh
+
 unformatted="$(gofmt -l main.go internal tools)"
 if [[ -n "${unformatted}" ]]; then
   echo "Go files require gofmt:" >&2

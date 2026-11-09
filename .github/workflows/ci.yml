@@ -108,6 +108,7 @@ jobs:
           docker compose -f acceptance/compose.yaml config --quiet
           bash ./scripts/test-plan-leak.sh
           bash ./scripts/test-release-assets.sh
+          bash ./scripts/check-doc-links.sh
 
   lint:
     name: Lint
