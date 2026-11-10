@@ -110,6 +110,7 @@ jobs:
           docker compose -f acceptance/compose.yaml config --quiet
           bash ./scripts/test-plan-leak.sh
           bash ./scripts/test-release-assets.sh
+          bash ./scripts/test-release-state.sh
           bash ./scripts/test-consumer-replay_test.sh
           bash ./scripts/check-doc-links.sh
 

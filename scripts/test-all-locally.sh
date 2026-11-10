@@ -26,4 +26,5 @@ CHAPTARR_IMAGE='chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f753
   docker compose -f acceptance/compose.yaml config --quiet
 bash ./scripts/test-plan-leak.sh
 bash ./scripts/test-release-assets.sh
+bash ./scripts/test-release-state.sh
 git diff --check

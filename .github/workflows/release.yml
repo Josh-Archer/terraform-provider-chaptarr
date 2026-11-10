@@ -135,7 +135,7 @@ jobs:
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     permissions:
       contents: write
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       RELEASE_TAG: ${{ inputs.release_tag }}
     steps:
@@ -152,37 +152,43 @@ jobs:
           fi
           gh api --silent "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}"
 
-      - name: Check release state
-        id: release_state
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
+      - name: Detect signing availability
+        id: signing
         run: |
-          set -euo pipefail
-          if release_json="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" 2>&1)"; then
-            is_draft="$(echo "${release_json}" | jq -r '.draft')"
-            asset_count="$(echo "${release_json}" | jq -r '.assets | length')"
-            if [[ "${is_draft}" == "false" && "${asset_count}" -ge 15 ]]; then
-              echo "published=true" >> "$GITHUB_OUTPUT"
-              echo "Release ${RELEASE_TAG} is already published with ${asset_count} assets; nothing to do."
-            else
-              echo "published=false" >> "$GITHUB_OUTPUT"
-              echo "Release ${RELEASE_TAG} needs assets (draft=${is_draft}, assets=${asset_count}); proceeding with build."
-            fi
-          elif [[ "${release_json}" == *"(HTTP 404)"* ]]; then
-            echo "published=false" >> "$GITHUB_OUTPUT"
+          if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ] && [ -n "${{ secrets.PASSPHRASE }}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Unable to inspect GitHub Release ${RELEASE_TAG}: ${release_json}" >&2
-            exit 1
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout release controls
-        if: steps.release_state.outputs.published != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
           path: release-control
           persist-credentials: false
+
+      - name: Check release state
+        id: release_state
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          SIGNING_ENABLED: ${{ steps.signing.outputs.enabled }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_json="${RUNNER_TEMP}/release.json"
+          if gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" >"${release_json}" 2>"${RUNNER_TEMP}/release-fetch.err"; then
+            args=("${RELEASE_TAG}" "${SIGNING_ENABLED}" "${release_json}")
+          elif grep -q "(HTTP 404)" "${RUNNER_TEMP}/release-fetch.err"; then
+            args=("${RELEASE_TAG}" "${SIGNING_ENABLED}")
+          else
+            cat "${RUNNER_TEMP}/release-fetch.err" >&2
+            exit 1
+          fi
+          # Fails closed before anything is built when a stable tag would
+          # publish unsigned. An already complete release stays a quiet skip.
+          bash release-control/scripts/check-release-state.sh "${args[@]}" | tee -a "$GITHUB_OUTPUT"
 
       - name: Checkout tagged source
         if: steps.release_state.outputs.published != 'true'
@@ -200,16 +206,6 @@ jobs:
           go-version-file: source/go.mod
           cache-dependency-path: source/go.sum
           cache: true
-
-      - name: Detect signing availability
-        if: steps.release_state.outputs.published != 'true'
-        id: signing
-        run: |
-          if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ] && [ -n "${{ secrets.PASSPHRASE }}" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Import GPG key
         if: steps.release_state.outputs.published != 'true' && steps.signing.outputs.enabled == 'true'
@@ -284,4 +280,37 @@ jobs:
 
           if [[ "${indexed}" != "true" ]]; then
             echo "Note: OpenTofu registry indexing is still pending for ${RELEASE_TAG}. It usually finishes within 10-15 minutes."
+          fi
+
+      - name: Verify HashiCorp registry indexing
+        if: steps.release_state.outputs.published != 'true'
+        env:
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          echo "Checking HashiCorp registry indexing for version ${version}..."
+          provider_namespace="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]' | sed 's/terraform-provider-//')"
+          registry_url="https://registry.terraform.io/v1/providers/${provider_namespace}/versions"
+          deadline=$((SECONDS + 1200))
+          indexed="false"
+
+          while (( SECONDS < deadline )); do
+            if response="$(curl -fsSL "${registry_url}" 2>/dev/null)"; then
+              # registry.terraform.io serves compact JSON ("version":"x"),
+              # so allow optional whitespace around the colon.
+              if echo "${response}" | grep -Eq "\"version\": *\"${version}\""; then
+                echo "HashiCorp registry has successfully indexed ${RELEASE_TAG}."
+                indexed="true"
+                break
+              fi
+            fi
+            echo "Waiting for HashiCorp registry indexer to pick up ${RELEASE_TAG}... (${SECONDS}s elapsed)"
+            sleep 60
+          done
+
+          if [[ "${indexed}" != "true" ]]; then
+            echo "::error::registry.terraform.io still does not list ${RELEASE_TAG} after 20 minutes with complete signed assets. The HashiCorp registry syncs each version from the GitHub release event and does not self-heal a missed sync: re-running this workflow will not fix it, and the release must not be deleted or re-signed. An owner must resync from the registry provider settings (or redeliver the release webhook event); see docs/release-gates.md."
+            exit 1
           fi

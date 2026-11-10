@@ -97,7 +97,7 @@ jobs:
               if grep -Eiq 'signature|checksum|does not match the checksum|signed' "$log"; then
                 echo "::error::$TOOL init failed signature or checksum verification for chaptarr ${VERSION} from ${source_addr}. Leave the release in place and follow docs/release-gates.md."
               elif grep -Eiq 'no available releases match|does not match|could not retrieve' "$log"; then
-                echo "::error::$TOOL init still cannot see chaptarr ${VERSION} from ${source_addr} after retries (index lag or a missing release)."
+                echo "::error::$TOOL init still cannot see chaptarr ${VERSION} from ${source_addr} after retries (index lag or a missing release). If the GitHub release has complete signed assets, this is a missed registry sync, not lag: see docs/release-gates.md for the owner resync. Do not delete or re-sign the release."
               else
                 echo "::error::$TOOL init failed to install chaptarr ${VERSION} from ${source_addr}."
               fi
