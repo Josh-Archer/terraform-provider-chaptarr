@@ -61,3 +61,34 @@ signing key and the registry namespace, which stay outside CI. An index-lag
 error after the retries means the registry has not listed the version yet;
 rerun the workflow once the registry shows it. Snapshot artifact checks in CI
 and the consumer replay gate remain the pre-publication checks.
+
+## HashiCorp registry sync
+
+`registry.terraform.io` syncs each provider version from the GitHub release
+event and only lists a version whose release carries complete signed assets
+(`*_SHA256SUMS` plus the detached `*_SHA256SUMS.sig` from the registered key).
+It does not poll GitHub and does not self-heal a missed sync, unlike
+`registry.opentofu.org`, which indexes releases on its own. Three distinct
+miss shapes have occurred; only the last one needs no further repo change:
+
+- Empty releases (`v0.11.8`, `v0.11.9`: release-please tags with zero assets)
+  can never be listed anywhere. Leave them as history.
+- Unsigned releases (`v0.11.10` through `v0.11.17`: no `.sig`) can never be
+  listed by the HashiCorp registry. The release workflow now refuses to
+  publish a stable tag without signing, and the release-state gate treats an
+  unsigned stable release as unfinished, so re-dispatching one of these tags
+  with signing available appends the missing signature instead of skipping.
+- Signed releases whose sync was missed (`v0.11.18` through `v0.11.20`, and
+  `v0.11.22`, all signed with the registered key and carrying complete
+  assets) stay missing until an owner resyncs. `v0.11.21` shows the pipeline
+  works when the signed release is complete at publish time.
+
+A missed sync is an owner action outside CI and outside any workflow in this
+repo: re-running the release workflow will not fix it (the gate correctly
+reports the release as already published, and no new release event fires),
+and the release must not be deleted or re-signed. Resync from the registry
+provider settings for `josh-archer/chaptarr` (or redeliver the `release:
+published` webhook event for the tag), then rerun Registry Install Check.
+The release workflow now verifies HashiCorp indexing for ~20 minutes after
+each publish and fails loudly with this pointer instead of going silently
+stale.
