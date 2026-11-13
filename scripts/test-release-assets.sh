@@ -40,4 +40,21 @@ for invalid_tag in 'not-a-tag' 'v1.2.3-01' 'v1.2.3-alpha.01'; do
   fi
 done
 
+if bash "${validator}" "v${version}" </dev/null >/dev/null 2>&1; then
+  echo "release validator accepted an empty asset set" >&2
+  exit 1
+fi
+
+long_assets=("${assets[@]}")
+for ((i = 1; i <= 3000; i++)); do
+  long_assets+=("${prefix}_extra_${i}.zip")
+done
+long_input="$(printf '%s\n' "${long_assets[@]}")"
+for ((run = 1; run <= 200; run++)); do
+  if ! bash "${validator}" "v${version}" <<<"${long_input}" >/dev/null; then
+    echo "release validator failed on long asset list (run ${run})" >&2
+    exit 1
+  fi
+done
+
 echo "Release asset validator accepts complete asset-name sets and rejects unsafe sets."
