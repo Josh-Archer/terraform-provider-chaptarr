@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.23](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.22...v0.11.23) (2026-11-13)
+
+
+### Bug Fixes
+
+* **ci:** harden release publishing against missed HashiCorp registry syncs ([#124](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/124)) ([077cf02](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/077cf02feaa9f59a96efff56718f4d24527f19f8))
+* **ci:** install pinned Terraform before unit tests ([#127](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/127)) ([c4e2a95](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/c4e2a95fbff2e0c7e00e35568ac8b0ae98b9ae87))
+* **release:** avoid SIGPIPE race in validate-release-assets.sh ([#133](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/133)) ([c769ff5](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/c769ff5842a92cd3b284a0fe78320b12fe5ad569))
+
 ## [0.11.22](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.21...v0.11.22) (2026-11-09)
 
 
