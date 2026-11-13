@@ -40,7 +40,14 @@ for target in \
 done
 
 for expected in "${required[@]}"; do
-  if ! printf '%s\n' "${assets[@]}" | grep -F -x -q -- "${expected}"; then
+  found=false
+  for asset in "${assets[@]}"; do
+    if [[ "${asset}" == "${expected}" ]]; then
+      found=true
+      break
+    fi
+  done
+  if [[ "${found}" != "true" ]]; then
     echo "published release is missing required asset: ${expected}" >&2
     exit 1
   fi

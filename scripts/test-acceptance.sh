@@ -69,9 +69,9 @@ cleanup() {
     echo "Disposable Chaptarr teardown failed." >&2
     cleanup_status=1
   fi
-  if [[ "${runtime}" == docker ]] && { docker ps -a --filter "label=com.docker.compose.project=${project_name}" --format '{{.ID}}' | grep -q . ||
-    docker volume ls --filter "label=com.docker.compose.project=${project_name}" --quiet | grep -q . ||
-    docker network ls --filter "label=com.docker.compose.project=${project_name}" --quiet | grep -q .; }; then
+  if [[ "${runtime}" == docker ]] && { grep -q . <<<"$(docker ps -a --filter "label=com.docker.compose.project=${project_name}" --format '{{.ID}}')" ||
+    grep -q . <<<"$(docker volume ls --filter "label=com.docker.compose.project=${project_name}" --quiet)" ||
+    grep -q . <<<"$(docker network ls --filter "label=com.docker.compose.project=${project_name}" --quiet)"; }; then
     echo "Disposable Chaptarr project resources remain after teardown." >&2
     cleanup_status=1
   fi
