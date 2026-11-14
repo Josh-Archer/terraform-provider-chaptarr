@@ -6,6 +6,7 @@ export GOTOOLCHAIN="${GOTOOLCHAIN:-go1.25.13+auto}"
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${repo_root}"
 
+python3 ./scripts/test-go-cache.py
 bash ./scripts/check-doc-links.sh
 
 unformatted="$(gofmt -l main.go internal tools)"

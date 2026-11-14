@@ -104,6 +104,9 @@ jobs:
           path: source
           persist-credentials: false
 
+      - name: Ensure Go caches
+        if: steps.meta.outputs.mode == 'replay'
+        uses: ./release-control/.github/actions/ensure-go-cache
       - name: Set up Go
         if: steps.meta.outputs.mode == 'replay'
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -199,6 +202,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Ensure Go caches
+        if: steps.release_state.outputs.published != 'true'
+        uses: ./release-control/.github/actions/ensure-go-cache
       - name: Set up Go
         if: steps.release_state.outputs.published != 'true'
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
