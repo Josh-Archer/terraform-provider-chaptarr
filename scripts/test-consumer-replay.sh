@@ -390,6 +390,9 @@ VERSIONS
     run docker pull "${CHAPTARR_IMAGE}" >/dev/null
     docker compose -f "${compose_file}" config --quiet
     docker compose -f "${compose_file}" up -d >/dev/null
+    # Docker creates a new named volume owned by root. Chaptarr runs as
+    # PUID/PGID 1000 and must be able to create files in its library.
+    docker compose -f "${compose_file}" exec -T -u 0 chaptarr chown 1000:1000 /audiobooks
     api_key=""
     for _ in $(seq 1 90); do
       api_key="$(docker compose -f "${compose_file}" exec -T chaptarr sh -c "sed -n 's:.*<ApiKey>\\([^<]*\\)</ApiKey>.*:\\1:p' /config/config.xml 2>/dev/null" 2>/dev/null | tr -d '\r\n' || true)"
