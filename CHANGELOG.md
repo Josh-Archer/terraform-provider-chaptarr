@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.24](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.23...v0.11.24) (2026-11-15)
+
+
+### Bug Fixes
+
+* **ci:** bootstrap Go caches on headless runners ([#137](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/137)) ([2595bf7](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/2595bf74543b01c3f2cd229e4cf3c28dac93b149))
+* **ci:** use dedicated Release Please token ([#135](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/135)) ([cfcd591](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/cfcd591c148f36c6c21d265f0c06b652392ad6e6))
+
 ## [0.11.23](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.22...v0.11.23) (2026-11-14)
 
 
