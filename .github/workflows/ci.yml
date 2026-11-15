@@ -124,6 +124,7 @@ jobs:
           bash ./scripts/test-plan-leak.sh
           bash ./scripts/test-release-assets.sh
           python3 ./scripts/test-go-cache.py
+          python3 ./scripts/test-release-prereqs.py
           bash ./scripts/test-release-state.sh
           bash ./scripts/test-consumer-replay_test.sh
           bash ./scripts/check-doc-links.sh

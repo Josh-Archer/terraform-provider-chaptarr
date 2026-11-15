@@ -38,6 +38,17 @@ jobs:
       CHAPTARR_VERSION: "0.9.929"
       CHAPTARR_RUNTIME: native
     steps:
+      - name: Checkout release controls
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: release-control
+          persist-credentials: false
+
+      - name: Ensure GitHub CLI
+        shell: bash
+        run: bash release-control/.github/actions/ensure-gh/ensure-gh.sh
+
       - name: Ensure release tag and choose replay mode
         id: meta
         env:
@@ -88,14 +99,6 @@ jobs:
           echo "mode=replay" >> "${GITHUB_OUTPUT}"
           echo "Consumer Replay check on ${sha} is '${conclusion}'. Replaying the tagged source with the local candidate build."
 
-      - name: Checkout release controls
-        if: steps.meta.outputs.mode == 'replay'
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.sha }}
-          path: release-control
-          persist-credentials: false
-
       - name: Checkout tagged source for consumer replay
         if: steps.meta.outputs.mode == 'replay'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -142,6 +145,17 @@ jobs:
     env:
       RELEASE_TAG: ${{ inputs.release_tag }}
     steps:
+      - name: Checkout release controls
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: release-control
+          persist-credentials: false
+
+      - name: Ensure GitHub CLI
+        shell: bash
+        run: bash release-control/.github/actions/ensure-gh/ensure-gh.sh
+
       - name: Validate release tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -163,13 +177,6 @@ jobs:
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Checkout release controls
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.sha }}
-          path: release-control
-          persist-credentials: false
 
       - name: Check release state
         id: release_state

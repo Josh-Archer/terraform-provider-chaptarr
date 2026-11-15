@@ -367,6 +367,7 @@ VERSIONS
   trap 'exit 143' TERM
 
   command -v tofu >/dev/null || { echo "tofu is required" >&2; exit 1; }
+  command -v jq >/dev/null || { echo "jq is required" >&2; exit 1; }
   command -v go >/dev/null || { echo "go is required" >&2; exit 1; }
   if [[ "${runtime}" == docker ]]; then
     command -v docker >/dev/null || { echo "docker is required" >&2; exit 1; }
@@ -441,6 +442,11 @@ VERSIONS
     echo "consumer replay FAILED: Chaptarr did not become ready in time." >&2
     exit 1
   fi
+
+  # /system/status is only HTTP readiness, not completion of async health work.
+  # Keep the later exact plan exit-code gate unchanged, including all outputs.
+  source "$(dirname "${BASH_SOURCE[0]}")/lib/replay-health.sh"
+  wait_for_replay_health "${base_url}" "${api_key}"
 
   export TF_VAR_chaptarr_url="${base_url}"
   export TF_VAR_chaptarr_api_key="${api_key}"
