@@ -46,6 +46,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -98,6 +100,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -119,6 +123,7 @@ jobs:
           docker compose -f acceptance/compose.yaml config --quiet
           bash ./scripts/test-plan-leak.sh
           bash ./scripts/test-release-assets.sh
+          python3 ./scripts/test-go-cache.py
           bash ./scripts/test-release-state.sh
           bash ./scripts/test-consumer-replay_test.sh
           bash ./scripts/check-doc-links.sh
@@ -152,6 +157,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -215,6 +222,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -272,6 +281,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -327,6 +338,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -419,6 +432,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -456,6 +471,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
@@ -503,6 +520,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Ensure Go caches
+        uses: ./.github/actions/ensure-go-cache
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
