@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.25](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.24...v0.11.25) (2026-11-15)
+
+
+### Bug Fixes
+
+* **ci:** prepare release CLI and stable replay health ([#138](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/138)) ([319f4a9](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/319f4a96944a488b1425f8a43036fd3bc2652aae))
+
 ## [0.11.24](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.23...v0.11.24) (2026-11-15)
 
 
