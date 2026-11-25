@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.26](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.25...v0.11.26) (2026-11-25)
+
+
+### Build System
+
+* **deps:** bump actions/setup-go from 7.0.0 to 7.1.0 ([#141](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/141)) ([4f7f830](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/4f7f830a09765f143b8d96eeac6819c8c7163114))
+* **deps:** bump the codeql-action group with 3 updates ([#140](https://github.com/Josh-Archer/terraform-provider-chaptarr/issues/140)) ([6a118ed](https://github.com/Josh-Archer/terraform-provider-chaptarr/commit/6a118ed495d37a57e3e9f520cb0d2cb96ba74740))
+
 ## [0.11.25](https://github.com/Josh-Archer/terraform-provider-chaptarr/compare/v0.11.24...v0.11.25) (2026-11-15)
 
 
