@@ -65,7 +65,7 @@ jobs:
       - name: Download modules
         run: go mod download
       - name: Verify pinned Go toolchain
-        run: test "$(go env GOVERSION)" = "go1.26.11"
+        run: test "$(go env GOVERSION)" = "go$(awk '$1 == "go" { print $2; exit }' go.mod)"
       - name: Run unit tests with race detector
         run: go test -race ./...
 
@@ -116,7 +116,7 @@ jobs:
         run: go test -count=1 -timeout 20m ./tools/importer -run 'TestImporterImportPreservesLiveSettings|TestImporterCLIOutputValidates'
       - name: Verify contract and generated content
         run: |
-          test "$(go env GOVERSION)" = "go1.26.11"
+          test "$(go env GOVERSION)" = "go$(awk '$1 == "go" { print $2; exit }' go.mod)"
           go mod verify
           go run ./tools/openapi check
           go run ./tools/compatibility check
@@ -173,7 +173,7 @@ jobs:
       - name: Run formatting and vet checks
         shell: bash
         run: |
-          test "$(go env GOVERSION)" = "go1.26.11"
+          test "$(go env GOVERSION)" = "go$(awk '$1 == "go" { print $2; exit }' go.mod)"
           test -z "$(gofmt -l main.go internal tools)"
           go vet ./...
           tofu fmt -check -recursive examples acceptance test/consumer
@@ -481,7 +481,7 @@ jobs:
           cache: true
       - name: Run govulncheck
         run: |
-          test "$(go env GOVERSION)" = "go1.26.11"
+          test "$(go env GOVERSION)" = "go$(awk '$1 == "go" { print $2; exit }' go.mod)"
           go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
 
   release-snapshot:
