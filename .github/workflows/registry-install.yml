@@ -14,14 +14,41 @@ on:
     types: [published]
 
 concurrency:
-  group: registry-install-${{ github.ref }}
-  cancel-in-progress: true
+  group: registry-install
+  cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
+  resolve:
+    runs-on: uecb-shared
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Resolve latest published version
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${RELEASE_TAG:-}"
+          if [ -z "$tag" ]; then
+            tag=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name')
+          fi
+          version="${tag#v}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Unexpected release tag '$tag'"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+
   install:
+    needs: resolve
     name: ${{ matrix.tool }} init
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'uecb-shared' }}
     timeout-minutes: 20
@@ -42,29 +69,10 @@ jobs:
         with:
           tofu_wrapper: false
 
-      - name: Resolve latest published version
-        id: version
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          tag="${RELEASE_TAG:-}"
-          if [ -z "$tag" ]; then
-            tag=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name')
-          fi
-          version="${tag#v}"
-          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Unexpected release tag '$tag'"
-            exit 1
-          fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
       - name: Install provider from registry (with retries for index lag)
         env:
           TOOL: ${{ matrix.tool }}
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.resolve.outputs.version }}
         shell: bash
         run: |
           set -euo pipefail
@@ -110,3 +118,49 @@ jobs:
           grep -q "version     = \"${VERSION}\"" .terraform.lock.hcl
           grep -q 'zh:' .terraform.lock.hcl
           echo "${TOOL} installed chaptarr ${VERSION} from ${source_addr}"
+
+  report:
+    name: Track registry availability
+    if: ${{ always() && github.event_name != 'release' && needs.install.result != 'cancelled' && needs.install.result != 'skipped' && needs.resolve.result == 'success' }}
+    needs: [resolve, install]
+    runs-on: uecb-shared
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RUN_ID: ${{ github.run_id }}
+      VERSION: ${{ needs.resolve.outputs.version }}
+    steps:
+      - name: Reconcile tracking issue
+        shell: bash
+        run: |
+          set -euo pipefail
+          jobs="$(gh api --paginate "repos/${GH_REPO}/actions/runs/${RUN_ID}/jobs?per_page=100" --jq '.jobs[] | {name, conclusion}')"
+          terraform="$(jq -sr '[.[] | select(.name == "terraform init")][0].conclusion // empty' <<<"$jobs")"
+          tofu="$(jq -sr '[.[] | select(.name == "tofu init")][0].conclusion // empty' <<<"$jobs")"
+          # Do not close or create an issue from incomplete job evidence.
+          [[ -n "$terraform" && -n "$tofu" ]] || { echo 'Missing matrix job conclusions' >&2; exit 1; }
+          matches="$(gh issue list --state all --limit 100 --json number,state,body --jq '[.[] | select((.body // "") | contains("<!-- registry-install -->"))]')"
+          issue="$(jq -r '[.[] | select(.state == "OPEN")][0].number // empty' <<<"$matches")"
+          if [[ "$terraform" == success && "$tofu" == success ]]; then
+            while IFS= read -r number; do
+              [[ -z "$number" ]] || gh issue close "$number" --comment "Both registries installed ${VERSION} successfully."
+            done < <(jq -r '.[] | select(.state == "OPEN") | .number' <<<"$matches")
+            exit 0
+          fi
+          {
+            echo '<!-- registry-install -->'
+            printf '\nRegistry installation check for release %s:\n\n' "$VERSION"
+            printf -- '- Terraform (registry.terraform.io): %s\n' "$terraform"
+            printf -- '- OpenTofu (registry.opentofu.org): %s\n' "$tofu"
+            printf '\nInspect the [workflow run](%s/%s/actions/runs/%s) and follow docs/release-gates.md.\n' "$GITHUB_SERVER_URL" "$GH_REPO" "$RUN_ID"
+          } > issue-body.txt
+          if [[ -z "$issue" ]]; then
+            issue="$(jq -r '[.[] | select(.state == "CLOSED")][0].number // empty' <<<"$matches")"
+            if [[ -n "$issue" ]]; then gh issue reopen "$issue"; else gh issue create --title 'Registry installation check failed' --body-file issue-body.txt; fi
+          fi
+          if [[ -n "$issue" ]]; then gh issue edit "$issue" --title 'Registry installation check failed' --body-file issue-body.txt; fi
