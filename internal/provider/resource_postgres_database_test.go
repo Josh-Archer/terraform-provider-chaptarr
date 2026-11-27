@@ -14,8 +14,10 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/lib/pq"
@@ -92,20 +94,15 @@ func TestPostgresDatabaseGetSSLMode(t *testing.T) {
 		want  string
 	}{
 		{types.StringNull(), "require"},
-		{types.StringUnknown(), "require"},
-		{types.StringValue(""), "require"},
+		{types.StringUnknown(), ""},
+		{types.StringValue(""), ""},
 		{types.StringValue("require"), "require"},
 		{types.StringValue("prefer"), "prefer"},
 		{types.StringValue("disable"), "disable"},
 		{types.StringValue("verify-ca"), "verify-ca"},
 		{types.StringValue("verify-full"), "verify-full"},
 		{types.StringValue("allow"), "allow"},
-		{types.StringValue(" REQUIRE "), "require"},
-		{types.StringValue(" Prefer "), "prefer"},
-		{types.StringValue("require extra_keyword=value"), "require"},
-		{types.StringValue("disable sslmode=require"), "require"},
-		{types.StringValue("require host=evil.com"), "require"},
-		{types.StringValue("invalid_mode"), "require"},
+		{types.StringValue("verify_full"), "verify_full"},
 	}
 
 	for _, tt := range tests {
@@ -761,5 +758,71 @@ func TestPostgresDatabaseUpdateFailsWhenGrantRoleMembershipErrors(t *testing.T) 
 	_ = resp.State.Get(t.Context(), &result)
 	if result.IsHealthy.ValueBool() {
 		t.Fatal("expected is_healthy not to be set to true in state on update error")
+	}
+}
+
+func TestPostgresBridgeFailures(t *testing.T) {
+	for _, tc := range []struct {
+		name, response, want string
+		status               int
+	}{
+		{"status", "sentinel", "Bridge Request Failed", 401},
+		{"redirect", "sentinel", "Bridge Request Failed", 302},
+		{"malformed", "sentinel", "Invalid Bridge Response", 200},
+		{"empty", `{"value":""}`, "Invalid Bridge Response", 200},
+		{"oversized", strings.Repeat("x", 65537), "Invalid Bridge Response", 200},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				w.WriteHeader(tc.status)
+				_, _ = w.Write([]byte(tc.response))
+			}))
+			defer server.Close()
+			resp := &resource.CreateResponse{}
+			got := (&postgresDatabaseResource{}).resolveRolePassword(t.Context(), postgresDatabaseCredentials{bridgeURL: server.URL, bridgeToken: "sentinel"}, resp)
+			if got != "" || len(resp.Diagnostics) != 1 || resp.Diagnostics[0].Summary() != tc.want || strings.Contains(resp.Diagnostics[0].Detail(), "sentinel") {
+				t.Fatalf("unexpected result: %q %v", got, resp.Diagnostics)
+			}
+		})
+	}
+	for _, tc := range []struct{ url, key, want string }{
+		{"http://example.com", "key", "Invalid Bridge URL"},
+		{"http://127.0.0.1:1", "key", "Bridge Unreachable"},
+		{"http://127.0.0.1:1", "../key", "Invalid Bridge Secret Key"},
+	} {
+		resp := &resource.CreateResponse{}
+		(&postgresDatabaseResource{}).resolveRolePassword(t.Context(), postgresDatabaseCredentials{bridgeURL: tc.url, bridgeToken: "sentinel", bridgeSecretKey: tc.key}, resp)
+		if len(resp.Diagnostics) != 1 || resp.Diagnostics[0].Summary() != tc.want {
+			t.Fatalf("%s: %v", tc.url, resp.Diagnostics)
+		}
+	}
+}
+
+func TestPostgresSSLModeSchemaValidation(t *testing.T) {
+	attr := postgresDatabaseSchema(1).Attributes["ssl_mode"].(schema.StringAttribute)
+	for _, tc := range []struct {
+		value string
+		valid bool
+	}{{"verify-full", true}, {"verify_full", false}, {"", false}} {
+		resp := &validator.StringResponse{}
+		attr.Validators[0].ValidateString(t.Context(), validator.StringRequest{Path: path.Root("ssl_mode"), ConfigValue: types.StringValue(tc.value)}, resp)
+		if resp.Diagnostics.HasError() == tc.valid {
+			t.Errorf("%q: %v", tc.value, resp.Diagnostics)
+		}
+	}
+}
+
+func TestPostgresBridgeEscapesKeySegments(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.EscapedPath() != "/v1/secret/media/a%3Fb%23c/CHAPTARR_PASSWORD" {
+			t.Errorf("unexpected path: %s", req.URL.EscapedPath())
+		}
+		_, _ = w.Write([]byte(`{"value":"password"}`))
+	}))
+	defer server.Close()
+	resp := &resource.CreateResponse{}
+	got := (&postgresDatabaseResource{}).resolveRolePassword(t.Context(), postgresDatabaseCredentials{bridgeURL: server.URL, bridgeToken: "token", bridgeSecretKey: "media/a?b#c"}, resp)
+	if got != "password" || resp.Diagnostics.HasError() {
+		t.Fatalf("resolution failed: %v", resp.Diagnostics)
 	}
 }

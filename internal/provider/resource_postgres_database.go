@@ -6,18 +6,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Josh-Archer/terraform-provider-chaptarr/internal/client"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	_ "github.com/lib/pq"
@@ -116,7 +120,7 @@ func postgresDatabaseSchema(version int64) schema.Schema {
 			},
 			"vaultwarden_bridge_url": schema.StringAttribute{
 				Optional:            true,
-				MarkdownDescription: "Optional Vaultwarden ESO bridge HTTP REST API URL.",
+				MarkdownDescription: "Optional Vaultwarden ESO bridge REST API URL. HTTPS is required except on loopback addresses.",
 			},
 			"vaultwarden_bridge_token": schema.StringAttribute{
 				Optional:            true,
@@ -152,7 +156,8 @@ func postgresDatabaseSchema(version int64) schema.Schema {
 			},
 			"ssl_mode": schema.StringAttribute{
 				Optional:            true,
-				MarkdownDescription: "PostgreSQL SSL mode ('require', 'prefer', 'disable'). Default 'require'.",
+				MarkdownDescription: "PostgreSQL SSL mode: disable, allow, prefer, require, verify-ca, or verify-full. Default require.",
+				Validators:          []validator.String{stringvalidator.OneOf("disable", "allow", "prefer", "require", "verify-ca", "verify-full")},
 			},
 			"is_healthy": schema.BoolAttribute{
 				Computed:            true,
@@ -377,27 +382,63 @@ func (r *postgresDatabaseResource) resolveRolePassword(ctx context.Context, cred
 	}
 
 	if bridgeURL != "" && bridgeToken != "" {
-		reqURL := fmt.Sprintf("%s/v1/secret/%s/CHAPTARR_PASSWORD", strings.TrimSuffix(bridgeURL, "/"), secretKey)
-		httpReq, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
-		if err == nil {
-			httpReq.Header.Set("Authorization", "Bearer "+bridgeToken)
-			httpClient := &http.Client{Timeout: 10 * time.Second}
-			httpResp, err := httpClient.Do(httpReq)
-			if err == nil && httpResp != nil {
-				defer httpResp.Body.Close()
-			}
-			if err == nil && httpResp != nil && httpResp.StatusCode == http.StatusOK {
-				body, _ := io.ReadAll(httpResp.Body)
-				var bResp bridgeSecretResponse
-				if err := json.Unmarshal(body, &bResp); err == nil && bResp.Value != "" {
-					return bResp.Value
-				}
-			}
+		parsed, err := url.Parse(bridgeURL)
+		if err != nil || parsed.Hostname() == "" || parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment != "" || (parsed.Scheme != "https" && !(parsed.Scheme == "http" && isLoopbackHost(parsed.Hostname()))) {
+			r.addError(resp, "Invalid Bridge URL", "The bridge URL must use HTTPS, or HTTP on a loopback address, and must not contain credentials, a query, or a fragment.")
+			return ""
 		}
+		segments := strings.Split(secretKey, "/")
+		for i, segment := range segments {
+			if segment == "" || segment == "." || segment == ".." {
+				r.addError(resp, "Invalid Bridge Secret Key", "The bridge secret key contains an empty or relative path segment.")
+				return ""
+			}
+			segments[i] = url.PathEscape(segment)
+		}
+		parts := append([]string{"v1", "secret"}, segments...)
+		parts = append(parts, "CHAPTARR_PASSWORD")
+		reqURL, err := url.JoinPath(bridgeURL, parts...)
+		if err != nil {
+			r.addError(resp, "Invalid Bridge URL", "Could not construct the bridge request URL.")
+			return ""
+		}
+		httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
+		if err != nil {
+			r.addError(resp, "Invalid Bridge URL", "Could not construct the bridge request.")
+			return ""
+		}
+		httpReq.Header.Set("Authorization", "Bearer "+bridgeToken)
+		httpClient := &http.Client{Timeout: 10 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+		httpResp, err := httpClient.Do(httpReq)
+		if err != nil {
+			r.addError(resp, "Bridge Unreachable", "Could not reach the Vaultwarden bridge.")
+			return ""
+		}
+		defer httpResp.Body.Close()
+		if httpResp.StatusCode != http.StatusOK {
+			r.addError(resp, "Bridge Request Failed", fmt.Sprintf("The Vaultwarden bridge returned HTTP status %d.", httpResp.StatusCode))
+			return ""
+		}
+		const maxBridgeResponse = 64 * 1024
+		body, err := io.ReadAll(io.LimitReader(httpResp.Body, maxBridgeResponse+1))
+		var bResp bridgeSecretResponse
+		if err != nil || len(body) > maxBridgeResponse || json.Unmarshal(body, &bResp) != nil || bResp.Value == "" {
+			r.addError(resp, "Invalid Bridge Response", "The Vaultwarden bridge returned an empty, malformed, or oversized secret response.")
+			return ""
+		}
+		return bResp.Value
 	}
 
 	r.addError(resp, "Missing Role Password", "Specify `role_password` or configure valid `vaultwarden_bridge_url` and `vaultwarden_bridge_token`.")
 	return ""
+}
+
+func isLoopbackHost(host string) bool {
+	if strings.EqualFold(host, "localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 func loadPostgresDatabaseWriteOnlyConfig(ctx context.Context, config tfsdk.Config, model *postgresDatabaseModel, diagnostics *diag.Diagnostics) postgresDatabaseCredentials {
@@ -477,13 +518,10 @@ func getPort(v types.Int64) int {
 }
 
 func getSSLMode(v types.String) string {
-	if !v.IsNull() && !v.IsUnknown() {
-		switch mode := strings.ToLower(strings.TrimSpace(v.ValueString())); mode {
-		case "disable", "allow", "prefer", "require", "verify-ca", "verify-full":
-			return mode
-		}
+	if v.IsNull() {
+		return "require"
 	}
-	return "require"
+	return v.ValueString()
 }
 
 func getRoleName(v types.String) string {
